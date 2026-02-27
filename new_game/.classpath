@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry excluding="vue/entity/|controller/map/|model/map/|controller/entity/|model/entity/|model/game/|vue/game/|controller/game/|vue/map/" kind="src" path="src"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
