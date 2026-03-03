@@ -1,8 +1,8 @@
 package map.model;
 
-public class SimpleExitModel extends ExitModel {
+public class SimpleExit extends Exit {
 
-    public SimpleExitModel(RoomModel p_target) {
+    public SimpleExit(RoomModel p_target) {
         super(p_target);
     }
 

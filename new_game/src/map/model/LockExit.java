@@ -1,10 +1,10 @@
 package map.model;
 
-public class LockExitModel extends ExitModel {
+public class LockExit extends Exit {
 
     private boolean locked;
 
-    public LockExitModel(RoomModel p_target, boolean p_locked) {
+    public LockExit(RoomModel p_target, boolean p_locked) {
         super(p_target);
         this.locked = p_locked;
     }

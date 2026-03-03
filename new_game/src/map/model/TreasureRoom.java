@@ -3,11 +3,11 @@ package map.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TreasureRoomModel extends RoomModel {
+public class TreasureRoom extends RoomModel {
 
     private final List<String> treasures;
 
-    public TreasureRoomModel(String p_name, String p_description) {
+    public TreasureRoom(String p_name, String p_description) {
         super(p_name, p_description);
         this.treasures = new ArrayList<>();
     }

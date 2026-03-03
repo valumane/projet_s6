@@ -2,11 +2,11 @@ package map.model;
 
 import mvc.Model;
 
-public abstract class ExitModel implements Model {
+public abstract class Exit implements Model {
 
     private final RoomModel target;
 
-    protected ExitModel(RoomModel p_target) {
+    protected Exit(RoomModel p_target) {
         this.target = p_target;
     }
 

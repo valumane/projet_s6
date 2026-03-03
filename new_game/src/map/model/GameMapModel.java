@@ -21,58 +21,58 @@ public class GameMapModel implements Model {
 
     private RoomModel buildMap() {
         // --- Rooms ---
-        SimpleRoomModel entrance    = new SimpleRoomModel("entrance",
+        SimpleRoom entrance    = new SimpleRoom("entrance",
                 "You are at the entrance of a dark dungeon. You can go west and east.");
-        SimpleRoomModel corridor1   = new SimpleRoomModel("dark and silent corridor",
+        SimpleRoom corridor1   = new SimpleRoom("dark and silent corridor",
                 "You are in a dark and silent corridor. You can go west and east.");
-        SimpleRoomModel corridor2   = new SimpleRoomModel("narrow corridor",
+        SimpleRoom corridor2   = new SimpleRoom("narrow corridor",
                 "You are in a narrow corridor leading deeper into the dungeon. You can go north and east. There is also a locked door to the south.");
-        SimpleRoomModel corridor3   = new SimpleRoomModel("damp corridor",
+        SimpleRoom corridor3   = new SimpleRoom("damp corridor",
                 "You are in a damp corridor with cobwebs on the walls. You can go south and to the north.");
-        SimpleRoomModel corridor4   = new SimpleRoomModel("swampy corridor",
+        SimpleRoom corridor4   = new SimpleRoom("swampy corridor",
                 "You are in a swampy corridor with a musty smell. You can go north, east and west.");
-        SimpleRoomModel corridor5   = new SimpleRoomModel("cul-de-sac",
+        SimpleRoom corridor5   = new SimpleRoom("cul-de-sac",
                 "That's a cul-de-sac, you need to go back. You can go south.");
-        SimpleRoomModel corridor6   = new SimpleRoomModel("goblin corridor",
+        SimpleRoom corridor6   = new SimpleRoom("goblin corridor",
                 "You are in a corridor where goblin noises can be heard. You can go west and there is a huge locked door to the south.");
-        SimpleRoomModel runicRoom   = new SimpleRoomModel("runic room",
+        SimpleRoom runicRoom   = new SimpleRoom("runic room",
                 "You are in a room filled with ancient runes and an altar at its centre.");
-        TreasureRoomModel treasureRoom = new TreasureRoomModel("treasure room",
+        TreasureRoom treasureRoom = new TreasureRoom("treasure room",
                 "A room filled with sparkling treasures.");
-        BossRoomModel bossRoom      = new BossRoomModel("boss room",
+        BossRoom bossRoom      = new BossRoom("boss room",
                 "The final boss room.", "Basilisk");
 
         // --- Exits ---
-        entrance.addExit("west",  new SimpleExitModel(corridor1));
-        entrance.addExit("east",  new SimpleExitModel(corridor4));
+        entrance.addExit("west",  new SimpleExit(corridor1));
+        entrance.addExit("east",  new SimpleExit(corridor4));
 
-        corridor1.addExit("east", new SimpleExitModel(entrance));
-        corridor1.addExit("west", new SimpleExitModel(corridor2));
+        corridor1.addExit("east", new SimpleExit(entrance));
+        corridor1.addExit("west", new SimpleExit(corridor2));
 
-        corridor2.addExit("east",  new SimpleExitModel(corridor1));
-        corridor2.addExit("north", new SimpleExitModel(corridor3));
-        corridor2.addExit("south", new LockExitModel(treasureRoom, true));
+        corridor2.addExit("east",  new SimpleExit(corridor1));
+        corridor2.addExit("north", new SimpleExit(corridor3));
+        corridor2.addExit("south", new LockExit(treasureRoom, true));
 
-        corridor3.addExit("south", new SimpleExitModel(corridor2));
-        corridor3.addExit("north", new SimpleExitModel(runicRoom));
+        corridor3.addExit("south", new SimpleExit(corridor2));
+        corridor3.addExit("north", new SimpleExit(runicRoom));
 
-        runicRoom.addExit("south", new SimpleExitModel(corridor3));
+        runicRoom.addExit("south", new SimpleExit(corridor3));
 
-        treasureRoom.addExit("north", new SimpleExitModel(corridor2));
+        treasureRoom.addExit("north", new SimpleExit(corridor2));
         treasureRoom.addTreasure("Medium Potion");
         treasureRoom.addTreasure("Boss Key");
         treasureRoom.addTreasure("Katana");
 
-        corridor4.addExit("west",  new SimpleExitModel(entrance));
-        corridor4.addExit("north", new SimpleExitModel(corridor5));
-        corridor4.addExit("east",  new SimpleExitModel(corridor6));
+        corridor4.addExit("west",  new SimpleExit(entrance));
+        corridor4.addExit("north", new SimpleExit(corridor5));
+        corridor4.addExit("east",  new SimpleExit(corridor6));
 
-        corridor5.addExit("south", new SimpleExitModel(corridor4));
+        corridor5.addExit("south", new SimpleExit(corridor4));
 
-        corridor6.addExit("west",  new SimpleExitModel(corridor4));
-        corridor6.addExit("south", new LockExitModel(bossRoom, true));
+        corridor6.addExit("west",  new SimpleExit(corridor4));
+        corridor6.addExit("south", new LockExit(bossRoom, true));
 
-        bossRoom.addExit("north", new SimpleExitModel(corridor6));
+        bossRoom.addExit("north", new SimpleExit(corridor6));
 
         // --- Register rooms ---
         addRoom(entrance);
@@ -110,11 +110,11 @@ public class GameMapModel implements Model {
     }
 
     public boolean move(String p_direction) {
-        ExitModel exitModel = this.currentRoomModel.getExit(p_direction);
-        if (exitModel == null) {
+        Exit exit = this.currentRoomModel.getExit(p_direction);
+        if (exit == null) {
             return false;
         }
-        RoomModel next = exitModel.cross();
+        RoomModel next = exit.cross();
         if (next == null) {
             return false;
         }

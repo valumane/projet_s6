@@ -1,12 +1,12 @@
 package map.model;
 
-public class BossRoomModel extends RoomModel {
+public class BossRoom extends RoomModel {
 
     private final String bossName;
 
     private boolean bossDefeated;
 
-    public BossRoomModel(String p_name, String p_description, String p_bossName) {
+    public BossRoom(String p_name, String p_description, String p_bossName) {
         super(p_name, p_description);
         this.bossName = p_bossName;
         this.bossDefeated = false;

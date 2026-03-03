@@ -11,7 +11,7 @@ public abstract class RoomModel implements Model {
 
 	private final String description;
 
-	private final Map<String, ExitModel> exits;
+	private final Map<String, Exit> exits;
 
 	protected RoomModel(String p_name, String p_description) {
 		this.name = p_name;
@@ -27,16 +27,16 @@ public abstract class RoomModel implements Model {
 		return this.description;
 	}
 
-	public Map<String, ExitModel> getExits() {
+	public Map<String, Exit> getExits() {
 		return this.exits;
 	}
 
-	public ExitModel getExit(String p_direction) {
+	public Exit getExit(String p_direction) {
 		return this.exits.get(p_direction.toLowerCase());
 	}
 
-	public void addExit(String p_direction, ExitModel p_exitModel) {
-		this.exits.put(p_direction.toLowerCase(), p_exitModel);
+	public void addExit(String p_direction, Exit p_exit) {
+		this.exits.put(p_direction.toLowerCase(), p_exit);
 	}
 
 	@Override
