@@ -8,11 +8,6 @@ public class PotionModel extends ItemModel {
         super(name);
         this.healAmount = healAmount;
     }
-    
-    @Override
-    public void run() { // From [Model]
-    	System.out.println("Potion#run");
-    }
 
     /*
     @Override

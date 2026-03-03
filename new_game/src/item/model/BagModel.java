@@ -12,11 +12,6 @@ public class BagModel extends ItemModel {
         this.capacity = capacity;
         this.content = new ArrayList<>();
     }
-    
-    @Override
-    public void run() { // From [Model]
-    	System.out.println("Bag#run");
-    }
 
     public int getCapacity() {
         return capacity;

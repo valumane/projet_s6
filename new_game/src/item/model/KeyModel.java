@@ -5,11 +5,6 @@ public class KeyModel extends ItemModel {
     public KeyModel(String name) {
         super(name);
     }
-    
-    @Override
-    public void run() { // From [Model]
-    	System.out.println("Key#run");
-    }
 
     /*
     @Override

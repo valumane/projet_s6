@@ -8,11 +8,6 @@ public class WeaponModel extends ItemModel {
         super(name);
         this.damage = damage;
     }
-    
-    @Override
-    public void run() { // From [Model]
-    	System.out.println("Weapon#run");
-    }
 
     public int getDamage() {
         return damage;

@@ -3,16 +3,11 @@ package item.model;
 import java.io.Serializable;
 import mvc.Model;
 
-public abstract class ItemModel implements Model, Serializable {
+public abstract class ItemModel implements Serializable {
     private final String name;
 
     protected ItemModel(String name) {
         this.name = name;
-    }
-    
-    @Override
-    public void run() { // From [Model]
-    	System.out.println("Item#run");
     }
 
     public String getName() {

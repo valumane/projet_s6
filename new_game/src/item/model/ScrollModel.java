@@ -9,23 +9,11 @@ public class ScrollModel extends ItemModel {
     }
 
     @Override
-    public void run() { // From [Model]
-    	System.out.println("Scroll#run");
-    }
-    
-    /* 
-    @Override
-    public void use(Hero h) {
-        h.learnSpell(spell);
-        System.out.println("You read the " + getName()
-                + " and learn the spell " + spell.getName() + ".");
-
-        h.removeFromInventory(this);
-    }
-    */
-
-    @Override
     public String getDescription() {
         return getName() + " (scroll: " + spell.getName() + ")";
+    }
+    
+    public SpellModel getSpell() {
+        return spell;
     }
 }
