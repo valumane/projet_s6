@@ -1,7 +1,7 @@
 package item.model;
 
 import java.io.Serializable;
-import mvc.Model;
+import entity.model.Hero;
 
 public abstract class SpellModel implements Serializable {
 	
@@ -15,5 +15,5 @@ public abstract class SpellModel implements Serializable {
         return name;
     }
 
-    public abstract void castSpell(/* Hero caster */);
+    public abstract void castSpell(Hero caster);
 }

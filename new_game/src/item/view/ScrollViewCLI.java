@@ -1,11 +1,10 @@
 package item.view;
 
-import item.model.ScrollModel;
-
 public class ScrollViewCLI extends ScrollView{
 
-    public void displayOnUse(ScrollModel model) {
-        System.out.println("You read the " + model.getName()
-                + " and learn the spell " + model.getSpell().getName() + ".");
+	@Override
+    public void displayOnUse(String name, String spellName) {
+        System.out.println("You read the " + name
+                + " and learn the spell " + spellName + ".");
     }
 }

@@ -1,5 +1,7 @@
 package item.model;
 
+import entity.model.Hero;
+
 public class HealSpellModel extends SpellModel {
 
     private final int healAmount;
@@ -9,19 +11,15 @@ public class HealSpellModel extends SpellModel {
         this.healAmount = healAmount;
     }
     
-    // temp le temps d'avoir la classe hero
-    public void castSpell() {}
-
     /*
-     * 
-     * 
+     * Calcul puis soigne le héro d'un certains nombres de points de vie.
+     */ 
     @Override
-    public int castSpell(Hero caster) {
+    public void castSpell(Hero caster) {
 
         int before = caster.getHp();
         int after = before + healAmount;
 
         caster.setHp(after);
     }
-    */
 }

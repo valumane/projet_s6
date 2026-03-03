@@ -2,7 +2,7 @@ package item.controller;
 
 import item.model.ScrollModel;
 import item.view.ScrollView;
-// import entity.model.Hero;
+import entity.model.Hero;
 
 public class ScrollController {
 
@@ -17,17 +17,14 @@ public class ScrollController {
     }
     
     /*
-     * Utilisation du Scroll
-     * (pas encore la classe héro mais t'as capté)
+     * Utilisation du parchemin
+     */
     public void onUse(Hero hero) {
         hero.learnSpell(model.getSpell());
         // Appel des deux vues
-        view1.displayOnUse(model);
-        view2.displayOnUse(model);
+        view1.displayOnUse(model.getName(), model.getSpell().getName());
+        view2.displayOnUse(model.getName(), model.getSpell().getName());
         
         hero.removeFromInventory(model);
-    }
-    */
-    
-    
+    }  
 }
