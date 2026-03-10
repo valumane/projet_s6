@@ -1,4 +1,4 @@
-package src.entity.view;
+package entity.view;
 
 import src.mvc.View;
 

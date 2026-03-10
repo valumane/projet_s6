@@ -1,9 +1,10 @@
-package src.entity.model;
+package entity.model;
+
 
 import java.io.Serializable;
 
-import src.mvc.Model;
-import src.map.Room; 	// Importer Room
+import mvc.Model;
+import map.Room; 	// Importer Room
 
 public class HeroModel extends Character implements Serializable, Model {
     private final Bag backpack;
@@ -15,6 +16,12 @@ public class HeroModel extends Character implements Serializable, Model {
         this.backpack = backpack;
         this.location = location;
     }
+
+    @Override
+    public void run() {
+        // vide pour l’instant
+    }
+
 
     public Bag getBackpack() {
         return backpack;

@@ -1,0 +1,224 @@
+src/mvc/View.java:1:package mvc;
+src/mvc/View.java:3:/// Generic View for the triple {Model-View-Controller}
+src/mvc/View.java:4:///
+src/mvc/View.java:5:/// @author X. Skapin
+src/mvc/View.java:6:/// @version 1.0.0
+src/mvc/View.java:7:public interface View {
+src/mvc/View.java:9:		/// Hide this instance
+src/mvc/View.java:10:		public void hide();
+src/mvc/View.java:11:		
+src/mvc/View.java:12:		/// Show this instance 
+src/mvc/View.java:13:		public void show();
+src/mvc/View.java:14:}
+src/mvc/Controller.java:1:package mvc;
+src/mvc/Controller.java:3:import java.util.List;
+src/mvc/Controller.java:4:import java.util.ArrayList;
+src/mvc/Controller.java:6:/// Generic Controller for the triple {Model-View-Controller}.
+src/mvc/Controller.java:7:/// Every Controller can create some sub-controllers.
+src/mvc/Controller.java:8:///
+src/mvc/Controller.java:9:/// @author X. Skapin
+src/mvc/Controller.java:10:/// @version 1.0.0
+src/mvc/Controller.java:11:public abstract class Controller {
+src/mvc/Controller.java:12:		/// Sub-controllers
+src/mvc/Controller.java:13:		protected final List<Controller> subControllers = new ArrayList<>();
+src/mvc/Controller.java:14:	
+src/mvc/Controller.java:15:		/// Related [Model]
+src/mvc/Controller.java:16:		protected final Model model;
+src/mvc/Controller.java:18:		/// Related [View]
+src/mvc/Controller.java:19:		protected final View view;
+src/mvc/Controller.java:21:		/// Custom constructor
+src/mvc/Controller.java:22:		///
+src/mvc/Controller.java:23:		/// @param p_model Related [Model]. Should not be null.
+src/mvc/Controller.java:24:		/// @param p_view Related [View]. Should not be null.
+src/mvc/Controller.java:25:		protected Controller(Model p_model, View p_view) {
+src/mvc/Controller.java:26:				this.model = p_model;
+src/mvc/Controller.java:27:				this.view = p_view;
+src/mvc/Controller.java:28:		}
+src/mvc/Controller.java:30:		/// {@return the related [Model]}
+src/mvc/Controller.java:31:		public Model getModel() {
+src/mvc/Controller.java:32:				return this.model;
+src/mvc/Controller.java:33:		}
+src/mvc/Controller.java:35:		/// {@return the related [View]}
+src/mvc/Controller.java:36:		public View getView() {
+src/mvc/Controller.java:37:				return this.view;
+src/mvc/Controller.java:38:		}
+src/mvc/Controller.java:39:}
+src/mvc/Model.java:1:package mvc;
+src/mvc/Model.java:3:/// Generic Model for the triple {Model-View-Controller}
+src/mvc/Model.java:4:///
+src/mvc/Model.java:5:/// @author X. Skapin
+src/mvc/Model.java:6:/// @version 1.0.0
+src/mvc/Model.java:7:public interface Model {
+src/mvc/Model.java:9:		/// Execute a command
+src/mvc/Model.java:10:		public abstract void run();
+src/mvc/Model.java:11:}
+src/entity/model/HeroModel.java:1:package entity.model;
+src/entity/model/HeroModel.java:4:import java.io.Serializable;
+src/entity/model/HeroModel.java:6:import mvc.Model;
+src/entity/model/HeroModel.java:7:import map.Room; 	// Importer Room
+src/entity/model/HeroModel.java:9:public class HeroModel extends Character implements Serializable, Model {
+src/entity/model/HeroModel.java:10:    private final Bag backpack;
+src/entity/model/HeroModel.java:11:    private Spell healSpell; // compétence Heal
+src/entity/model/HeroModel.java:12:    private Room location;
+src/entity/model/HeroModel.java:14:    public HeroModel(String name, int hp, Bag backpack, Room location) {
+src/entity/model/HeroModel.java:15:        super(name, hp);
+src/entity/model/HeroModel.java:16:        this.backpack = backpack;
+src/entity/model/HeroModel.java:17:        this.location = location;
+src/entity/model/HeroModel.java:18:    }
+src/entity/model/HeroModel.java:20:    @Override
+src/entity/model/HeroModel.java:21:    public void run() {
+src/entity/model/HeroModel.java:22:        // vide pour l’instant
+src/entity/model/HeroModel.java:23:    }
+src/entity/model/HeroModel.java:26:    public Bag getBackpack() {
+src/entity/model/HeroModel.java:27:        return backpack;
+src/entity/model/HeroModel.java:28:    }
+src/entity/model/HeroModel.java:30:    // DROP : enlève l'item de l'inventaire et le renvoie
+src/entity/model/HeroModel.java:31:    public Item drop(String itemName) {
+src/entity/model/HeroModel.java:32:        for (Item item : getInventory()) {
+src/entity/model/HeroModel.java:33:            if (item.getName().equals(itemName)) {
+src/entity/model/HeroModel.java:34:                removeFromInventory(item);
+src/entity/model/HeroModel.java:35:                return item; 
+src/entity/model/HeroModel.java:36:            }
+src/entity/model/HeroModel.java:37:        }
+src/entity/model/HeroModel.java:38:        return null;
+src/entity/model/HeroModel.java:39:    }
+src/entity/model/HeroModel.java:41:    public boolean learnSpell(Spell s) {
+src/entity/model/HeroModel.java:42:        if (s instanceof HealSpell) {
+src/entity/model/HeroModel.java:43:            this.healSpell = s;
+src/entity/model/HeroModel.java:44:            return true;
+src/entity/model/HeroModel.java:45:        } else {
+src/entity/model/HeroModel.java:46:        	return false;
+src/entity/model/HeroModel.java:47:        }
+src/entity/model/HeroModel.java:48:    }
+src/entity/model/HeroModel.java:50:    public boolean hasHealSpell() {
+src/entity/model/HeroModel.java:51:        return healSpell != null;
+src/entity/model/HeroModel.java:52:    }
+src/entity/model/HeroModel.java:54:    public boolean useHealSpell() {
+src/entity/model/HeroModel.java:55:        if (healSpell == null) {
+src/entity/model/HeroModel.java:56:            return false;
+src/entity/model/HeroModel.java:57:        } else {
+src/entity/model/HeroModel.java:58:        	healSpell.cast(this);
+src/entity/model/HeroModel.java:59:        	return true;
+src/entity/model/HeroModel.java:60:        }
+src/entity/model/HeroModel.java:61:        
+src/entity/model/HeroModel.java:62:    }
+src/entity/model/HeroModel.java:63:    
+src/entity/model/HeroModel.java:64:    public Room getLocation() {
+src/entity/model/HeroModel.java:65:    	return location;
+src/entity/model/HeroModel.java:66:    }
+src/entity/model/HeroModel.java:67:}
+src/entity/view/HeroViewCLI.java:1:package entity.view;
+src/entity/view/HeroViewCLI.java:3:import src.mvc.View;
+src/entity/view/HeroViewCLI.java:5:public class HeroViewCLI extends HeroView implements View {
+src/entity/view/HeroViewCLI.java:6:	
+src/entity/view/HeroViewCLI.java:7:	@Override
+src/entity/view/HeroViewCLI.java:8:	public void showDropObject(String c, String i) {
+src/entity/view/HeroViewCLI.java:9:		System.out.println(c + " drop " + i);
+src/entity/view/HeroViewCLI.java:10:	}
+src/entity/view/HeroViewCLI.java:11:	
+src/entity/view/HeroViewCLI.java:12:	@Override
+src/entity/view/HeroViewCLI.java:13:	public void showObjectNotFindInInventory(String i) {
+src/entity/view/HeroViewCLI.java:14:		System.out.println(i + "not in the inventory");
+src/entity/view/HeroViewCLI.java:15:	}
+src/entity/view/HeroViewCLI.java:16:	
+src/entity/view/HeroViewCLI.java:17:	@Override
+src/entity/view/HeroViewCLI.java:18:	public void showNoHealSpell() {
+src/entity/view/HeroViewCLI.java:19:		System.out.println("You don't know how to use this spell yet.");
+src/entity/view/HeroViewCLI.java:20:	}
+src/entity/view/HeroViewCLI.java:21:	
+src/entity/view/HeroViewCLI.java:22:	@Override
+src/entity/view/HeroViewCLI.java:23:	public void receiveHealingPower() {
+src/entity/view/HeroViewCLI.java:24:		System.out.println("You receive a healing power.");
+src/entity/view/HeroViewCLI.java:25:	}
+src/entity/view/HeroViewCLI.java:26:	
+src/entity/view/HeroViewCLI.java:27:	@Override
+src/entity/view/HeroViewCLI.java:28:	public void showDontKnowHealingSpell() {
+src/entity/view/HeroViewCLI.java:29:		System.out.println("You don't know any healing spell.");
+src/entity/view/HeroViewCLI.java:30:	}
+src/entity/view/HeroViewCLI.java:31:	
+src/entity/view/HeroViewCLI.java:32:	@Override
+src/entity/view/HeroViewCLI.java:33:	public void useHealingPower() {
+src/entity/view/HeroViewCLI.java:34:		System.out.println("You use your healing power !");
+src/entity/view/HeroViewCLI.java:35:	}
+src/entity/view/HeroViewCLI.java:36:}
+src/entity/view/HeroViewGUI.java:1:package entity.view;
+src/entity/view/HeroViewGUI.java:3:public class HeroViewNull extends HeroView {
+src/entity/view/HeroViewGUI.java:4:    @Override public void hide() {}
+src/entity/view/HeroViewGUI.java:5:    @Override public void show() {}
+src/entity/view/HeroViewGUI.java:7:    @Override public void showDropObject(String c, String i) {}
+src/entity/view/HeroViewGUI.java:8:    @Override public void showObjectNotFindInInventory(String i) {}
+src/entity/view/HeroViewGUI.java:9:    @Override public void showNoHealSpell() {}
+src/entity/view/HeroViewGUI.java:10:    @Override public void receiveHealingPower() {}
+src/entity/view/HeroViewGUI.java:11:    @Override public void showDontKnowHealingSpell() {}
+src/entity/view/HeroViewGUI.java:12:    @Override public void useHealingPower() {}
+src/entity/view/HeroViewGUI.java:13:}
+src/entity/controller/HeroController.java:1:package entity.controller;
+src/entity/controller/HeroController.java:3:import mvc.Controller;
+src/entity/controller/HeroController.java:4:import entity.model.HeroModel;
+src/entity/controller/HeroController.java:5:import entity.view.HeroView;
+src/entity/controller/HeroController.java:6:import entity.model.Item;
+src/entity/controller/HeroController.java:7:import entity.model.Spell;
+src/entity/controller/HeroController.java:9:public class HeroController extends Controller {
+src/entity/controller/HeroController.java:11:    private final HeroModel hero;
+src/entity/controller/HeroController.java:12:    private final HeroView view1;
+src/entity/controller/HeroController.java:13:    private final HeroView view2;
+src/entity/controller/HeroController.java:15:    public HeroController(HeroModel hero, HeroView view1, HeroView view2) {
+src/entity/controller/HeroController.java:16:        super(hero, view1);          // obligatoire (Controller n’a pas de super() vide)
+src/entity/controller/HeroController.java:17:        this.hero = hero;
+src/entity/controller/HeroController.java:18:        this.view1 = view1;
+src/entity/controller/HeroController.java:19:        this.view2 = view2;
+src/entity/controller/HeroController.java:20:    }
+src/entity/controller/HeroController.java:22:    // Déposer un item (je garde ta signature, mais je corrige le message)
+src/entity/controller/HeroController.java:23:    public void onDropItem(Item itemToDrop) {
+src/entity/controller/HeroController.java:25:        Item dropped = hero.drop(itemToDrop.getName());
+src/entity/controller/HeroController.java:27:        if (dropped == null) {
+src/entity/controller/HeroController.java:28:            // on affiche le nom demandé, pas dropped.getName() (car dropped == null)
+src/entity/controller/HeroController.java:29:            view1.showObjectNotFindInInventory(itemToDrop.getName());
+src/entity/controller/HeroController.java:30:            view2.showObjectNotFindInInventory(itemToDrop.getName());
+src/entity/controller/HeroController.java:31:        } else {
+src/entity/controller/HeroController.java:32:            view1.showDropObject(hero.getName(), dropped.getName());
+src/entity/controller/HeroController.java:33:            view2.showDropObject(hero.getName(), dropped.getName());
+src/entity/controller/HeroController.java:34:            hero.getLocation().addItem(dropped);
+src/entity/controller/HeroController.java:35:        }
+src/entity/controller/HeroController.java:36:    }
+src/entity/controller/HeroController.java:38:    public void onLearnSpell(Spell s) {
+src/entity/controller/HeroController.java:39:        boolean ok = hero.learnSpell(s);
+src/entity/controller/HeroController.java:40:        if (ok) {
+src/entity/controller/HeroController.java:41:            view1.receiveHealingPower(); view2.receiveHealingPower();
+src/entity/controller/HeroController.java:42:        } else {
+src/entity/controller/HeroController.java:43:            view1.showNoHealSpell(); view2.showNoHealSpell();
+src/entity/controller/HeroController.java:44:        }
+src/entity/controller/HeroController.java:45:    }
+src/entity/controller/HeroController.java:47:    public void onUseHealSpell() {
+src/entity/controller/HeroController.java:48:        boolean ok = hero.useHealSpell();
+src/entity/controller/HeroController.java:49:        if (ok) {
+src/entity/controller/HeroController.java:50:            view1.useHealingPower(); view2.useHealingPower();
+src/entity/controller/HeroController.java:51:        } else {
+src/entity/controller/HeroController.java:52:            view1.showDontKnowHealingSpell(); view2.showDontKnowHealingSpell();
+src/entity/controller/HeroController.java:53:        }
+src/entity/controller/HeroController.java:54:    }
+src/entity/controller/HeroController.java:55:}
+src/application/Main.java:1:package app;
+src/application/Main.java:3:import entity.controller.HeroController;
+src/application/Main.java:4:import entity.model.HeroModel;
+src/application/Main.java:5:import entity.model.Bag;
+src/application/Main.java:6:import map.Room;
+src/application/Main.java:7:import entity.view.HeroView;
+src/application/Main.java:8:import entity.view.HeroViewCLI;
+src/application/Main.java:9:import entity.view.HeroViewNull;
+src/application/Main.java:10:import entity.model.HealSpell;
+src/application/Main.java:12:public class MainHero {
+src/application/Main.java:14:    public static void main(String[] args) {
+src/application/Main.java:16:        //Adapte ces 2 lignes à TES constructeurs réels
+src/application/Main.java:17:        Room start = new Room("entrance");      // ou new BasicRoom(...)
+src/application/Main.java:18:        Bag bag = new Bag();                    // ou new Bag(capacity)
+src/application/Main.java:20:        HeroModel hero = new HeroModel("Hero", 100, bag, start);
+src/application/Main.java:22:        HeroView v1 = new HeroViewCLI();
+src/application/Main.java:23:        HeroView v2 = new HeroViewNull(); // GUI plus tard
+src/application/Main.java:25:        HeroController heroController = new HeroController(hero, v1, v2);
+src/application/Main.java:27:        // Test rapide
+src/application/Main.java:28:        heroController.onUseHealSpell();            // -> "You don't know any healing spell."
+src/application/Main.java:29:        heroController.onLearnSpell(new HealSpell(40)); // -> "You receive a healing power."
+src/application/Main.java:30:        heroController.onUseHealSpell();            // -> "You use your healing power !"
+src/application/Main.java:31:    }
+src/application/Main.java:32:}
