@@ -33,4 +33,9 @@ public class HeroViewCLI extends HeroView implements View {
 	public void useHealingPower() {
 		System.out.println("You use your healing power !");
 	}
+
+	@Override
+	public void showLocation(String loc){
+		
+	}
 }

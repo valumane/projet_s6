@@ -28,5 +28,8 @@ public class Main {
         heroController.onUseHealSpell();            // -> "You don't know any healing spell."
         heroController.onLearnSpell(new HealSpell(40)); // -> "You receive a healing power."
         heroController.onUseHealSpell();            // -> "You use your healing power !"
+
+
+        System.out.println(heroController.getLocation());
     }
 }
