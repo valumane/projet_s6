@@ -9,7 +9,7 @@ import entity.view.HeroViewCLI;
 import entity.view.HeroViewNull;
 import entity.model.HealSpell;
 
-public class MainHero {
+public class Main {
 
     public static void main(String[] args) {
 

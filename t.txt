@@ -107,8 +107,19 @@ src/entity/model/HeroModel.java:64:    public Room getLocation() {
 src/entity/model/HeroModel.java:65:    	return location;
 src/entity/model/HeroModel.java:66:    }
 src/entity/model/HeroModel.java:67:}
+src/entity/view/HeroViewNULL.java:1:package entity.view;
+src/entity/view/HeroViewNULL.java:3:public class HeroViewNull extends HeroView {
+src/entity/view/HeroViewNULL.java:4:    @Override public void hide() {}
+src/entity/view/HeroViewNULL.java:5:    @Override public void show() {}
+src/entity/view/HeroViewNULL.java:7:    @Override public void showDropObject(String c, String i) {}
+src/entity/view/HeroViewNULL.java:8:    @Override public void showObjectNotFindInInventory(String i) {}
+src/entity/view/HeroViewNULL.java:9:    @Override public void showNoHealSpell() {}
+src/entity/view/HeroViewNULL.java:10:    @Override public void receiveHealingPower() {}
+src/entity/view/HeroViewNULL.java:11:    @Override public void showDontKnowHealingSpell() {}
+src/entity/view/HeroViewNULL.java:12:    @Override public void useHealingPower() {}
+src/entity/view/HeroViewNULL.java:13:}
 src/entity/view/HeroViewCLI.java:1:package entity.view;
-src/entity/view/HeroViewCLI.java:3:import src.mvc.View;
+src/entity/view/HeroViewCLI.java:3:import mvc.View;
 src/entity/view/HeroViewCLI.java:5:public class HeroViewCLI extends HeroView implements View {
 src/entity/view/HeroViewCLI.java:6:	
 src/entity/view/HeroViewCLI.java:7:	@Override
@@ -141,17 +152,6 @@ src/entity/view/HeroViewCLI.java:33:	public void useHealingPower() {
 src/entity/view/HeroViewCLI.java:34:		System.out.println("You use your healing power !");
 src/entity/view/HeroViewCLI.java:35:	}
 src/entity/view/HeroViewCLI.java:36:}
-src/entity/view/HeroViewGUI.java:1:package entity.view;
-src/entity/view/HeroViewGUI.java:3:public class HeroViewNull extends HeroView {
-src/entity/view/HeroViewGUI.java:4:    @Override public void hide() {}
-src/entity/view/HeroViewGUI.java:5:    @Override public void show() {}
-src/entity/view/HeroViewGUI.java:7:    @Override public void showDropObject(String c, String i) {}
-src/entity/view/HeroViewGUI.java:8:    @Override public void showObjectNotFindInInventory(String i) {}
-src/entity/view/HeroViewGUI.java:9:    @Override public void showNoHealSpell() {}
-src/entity/view/HeroViewGUI.java:10:    @Override public void receiveHealingPower() {}
-src/entity/view/HeroViewGUI.java:11:    @Override public void showDontKnowHealingSpell() {}
-src/entity/view/HeroViewGUI.java:12:    @Override public void useHealingPower() {}
-src/entity/view/HeroViewGUI.java:13:}
 src/entity/controller/HeroController.java:1:package entity.controller;
 src/entity/controller/HeroController.java:3:import mvc.Controller;
 src/entity/controller/HeroController.java:4:import entity.model.HeroModel;
@@ -207,7 +207,7 @@ src/application/Main.java:7:import entity.view.HeroView;
 src/application/Main.java:8:import entity.view.HeroViewCLI;
 src/application/Main.java:9:import entity.view.HeroViewNull;
 src/application/Main.java:10:import entity.model.HealSpell;
-src/application/Main.java:12:public class MainHero {
+src/application/Main.java:12:public class Main {
 src/application/Main.java:14:    public static void main(String[] args) {
 src/application/Main.java:16:        //Adapte ces 2 lignes à TES constructeurs réels
 src/application/Main.java:17:        Room start = new Room("entrance");      // ou new BasicRoom(...)

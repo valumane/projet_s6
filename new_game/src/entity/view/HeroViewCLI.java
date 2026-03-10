@@ -1,6 +1,6 @@
 package entity.view;
 
-import src.mvc.View;
+import mvc.View;
 
 public class HeroViewCLI extends HeroView implements View {
 	
