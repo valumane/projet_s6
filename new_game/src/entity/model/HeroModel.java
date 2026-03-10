@@ -4,11 +4,11 @@ package entity.model;
 import java.io.Serializable;
 
 import mvc.Model;
-import map.Room; 	// Importer Room
+
+import map.model.Room;
 
 public class HeroModel extends Character implements Serializable, Model {
     private final Bag backpack;
-    private Spell healSpell; // compétence Heal
     private Room location;
 
     public HeroModel(String name, int hp, Bag backpack, Room location) {
@@ -19,7 +19,6 @@ public class HeroModel extends Character implements Serializable, Model {
 
     @Override
     public void run() {
-        // vide pour l’instant
     }
 
 
@@ -27,7 +26,6 @@ public class HeroModel extends Character implements Serializable, Model {
         return backpack;
     }
 
-    // DROP : enlève l'item de l'inventaire et le renvoie
     public Item drop(String itemName) {
         for (Item item : getInventory()) {
             if (item.getName().equals(itemName)) {
@@ -38,30 +36,20 @@ public class HeroModel extends Character implements Serializable, Model {
         return null;
     }
 
-    public boolean learnSpell(Spell s) {
-        if (s instanceof HealSpell) {
-            this.healSpell = s;
-            return true;
-        } else {
-        	return false;
-        }
-    }
-
-    public boolean hasHealSpell() {
-        return healSpell != null;
-    }
-
-    public boolean useHealSpell() {
-        if (healSpell == null) {
-            return false;
-        } else {
-        	healSpell.cast(this);
-        	return true;
-        }
-        
-    }
     
     public Room getLocation() {
     	return location;
     }
+
+    public Room getCurrentRoom() { return location; }
+    public void setCurrentRoom(Room r) { this.location = r; }
+    
+    public void addItem(Item item) { 
+        addToInventory(item); 
+    }
+    
+    public Item dropItem(String name) { 
+        return drop(name);
+    }
+
 }

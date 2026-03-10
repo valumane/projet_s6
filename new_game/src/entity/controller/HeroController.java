@@ -2,9 +2,8 @@ package entity.controller;
 
 import mvc.Controller;
 import entity.model.HeroModel;
-import entity.view.HeroView;
 import entity.model.Item;
-import entity.model.Spell;
+import entity.view.base.HeroView;
 
 public class HeroController extends Controller {
 
@@ -35,21 +34,4 @@ public class HeroController extends Controller {
         }
     }
 
-    public void onLearnSpell(Spell s) {
-        boolean ok = hero.learnSpell(s);
-        if (ok) {
-            view1.receiveHealingPower(); view2.receiveHealingPower();
-        } else {
-            view1.showNoHealSpell(); view2.showNoHealSpell();
-        }
-    }
-
-    public void onUseHealSpell() {
-        boolean ok = hero.useHealSpell();
-        if (ok) {
-            view1.useHealingPower(); view2.useHealingPower();
-        } else {
-            view1.showDontKnowHealingSpell(); view2.showDontKnowHealingSpell();
-        }
-    }
 }

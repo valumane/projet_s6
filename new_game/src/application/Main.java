@@ -1,35 +1,35 @@
 package app;
 
-import entity.controller.HeroController;
-import entity.model.HeroModel;
 import entity.model.Bag;
-import map.Room;
-import entity.view.HeroView;
-import entity.view.HeroViewCLI;
-import entity.view.HeroViewNull;
-import entity.model.HealSpell;
+import entity.model.HeroModel;
+import entity.model.Item;
+
+import map.controller.RoomController;
+import map.model.Room;
+import map.view.cli.RoomView;
 
 public class Main {
-
     public static void main(String[] args) {
 
-        //Adapte ces 2 lignes à TES constructeurs réels
-        Room start = new Room("entrance");      // ou new BasicRoom(...)
-        Bag bag = new Bag();                    // ou new Bag(capacity)
+        Room entrance = new Room("Entrance","desc room");
+        Room corridor = new Room("Dark Corridor","desc room");
+        Room treasureRoom = new Room("Treasure Room","desc room");
 
-        HeroModel hero = new HeroModel("Hero", 100, bag, start);
-
-        HeroView v1 = new HeroViewCLI();
-        HeroView v2 = new HeroViewNull(); // GUI plus tard
-
-        HeroController heroController = new HeroController(hero, v1, v2);
-
-        // Test rapide
-        heroController.onUseHealSpell();            // -> "You don't know any healing spell."
-        heroController.onLearnSpell(new HealSpell(40)); // -> "You receive a healing power."
-        heroController.onUseHealSpell();            // -> "You use your healing power !"
+        entrance.addExit("north", corridor);
+        corridor.addExit("south", entrance);
+        corridor.addExit("east", treasureRoom);
+        treasureRoom.addExit("west", corridor);
 
 
-        System.out.println(heroController.getLocation());
+        entrance.addItem(new Item("Sword", "A rusty but sharp sword."));
+        corridor.addItem(new Item("Potion", "A small healing potion."));
+        treasureRoom.addItem(new Item("Key", "An old iron key."));
+
+
+        HeroModel hero = new HeroModel("Hero", 100, new Bag(), entrance);
+
+        
+        RoomController game = new RoomController(hero, new RoomView());
+        game.run();
     }
 }
