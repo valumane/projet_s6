@@ -1,4 +1,0 @@
-map : tout ce qui est related a la map, ( portes, zones, room, ...)
-entity : tout ce qui est related au entity ( items, players, personnages, etc...)
-game : tout ce qui est related au cores du moteur du jeu
-
