@@ -16,15 +16,17 @@ public abstract class Controller {
 		protected final Model model;
 
 		/// Related [View]
-		protected final View view;
+		protected final View viewGUI;
+		protected final View viewCLI;
 
 		/// Custom constructor
 		///
 		/// @param p_model Related [Model]. Should not be null.
 		/// @param p_view Related [View]. Should not be null.
-		protected Controller(Model p_model, View p_view) {
+		protected Controller(Model p_model, View p_viewCLI, View p_viewGUI) {
 				this.model = p_model;
-				this.view = p_view;
+				this.viewGUI = p_viewCLI;
+				this.viewCLI = p_viewGUI;
 		}
 
 		/// {@return the related [Model]}
@@ -33,7 +35,11 @@ public abstract class Controller {
 		}
 
 		/// {@return the related [View]}
-		public View getView() {
-				return this.view;
+		public View getViewCLI() {
+				return this.viewCLI;
 		}
+		
+		public View getViewGUI() {
+			return this.viewGUI;
+	}
 }

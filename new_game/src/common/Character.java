@@ -1,4 +1,4 @@
-package entity.model;
+package src.common;
 
 import java.io.Serializable;
 import java.util.ArrayList;
