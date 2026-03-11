@@ -10,6 +10,7 @@ import map.model.Room;
 public class HeroModel extends Character implements Serializable, Model {
     private final Bag backpack;
     private Room location;
+    private Hero hero
 
     public HeroModel(String name, int hp, Bag backpack, Room location) {
         super(name, hp);
@@ -23,7 +24,7 @@ public class HeroModel extends Character implements Serializable, Model {
 
 
     public Bag getBackpack() {
-        return backpack;
+        return this.hero.getBackpack
     }
 
     public Item drop(String itemName) {
@@ -38,18 +39,14 @@ public class HeroModel extends Character implements Serializable, Model {
 
     
     public Room getLocation() {
-    	return location;
+    	return hero.getLocation;
     }
 
     public Room getCurrentRoom() { return location; }
     public void setCurrentRoom(Room r) { this.location = r; }
     
-    public void addItem(Item item) { 
-        addToInventory(item); 
-    }
+    public void addItem(Item item) { addToInventory(item); }
     
-    public Item dropItem(String name) { 
-        return drop(name);
-    }
+    public Item dropItem(String name) { return drop(name); }
 
 }
