@@ -2,7 +2,7 @@ package common.item;
 
 import java.io.Serializable;
 
-public abstract class Item implements Serializable {
+public class Item implements Serializable {
     private final String name;
     private final String description;
 

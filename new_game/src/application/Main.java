@@ -1,34 +1,54 @@
 package application;
 
+import common.entity.Hero;
+import common.item.Bag;
 import common.item.Item;
-import entity.model.Bag;
-import entity.model.HeroModel;
-import map.controller.RoomController;
-import map.model.Room;
-import map.view.cli.RoomView;
+import common.item.Key;
+import common.item.Weapon;
+import common.map.Room;
 
 public class Main {
+	// TODO
+	// Identifier les constantes (comme celles ci-dessous) et les mettres dans des fichiers a part
+	private final static int DEFAULT_HERO_DAMAGE = 10;
+	private final static int DEFAULT_HERO_BAG_CAPACITY = 5;
+	
     public static void main(String[] args) {
 
-        Room entrance = new Room("Entrance","desc room");
-        Room corridor = new Room("Dark Corridor","desc room");
-        Room treasureRoom = new Room("Treasure Room","desc room");
+        Room entrance = new Room("Entrance");
+        Room corridor = new Room("Dark Corridor");
+        Room treasureRoom = new Room("Treasure Room");
+        
+        Key key = new Key("Key", "A key to a special door");
 
         entrance.addExit("north", corridor);
         corridor.addExit("south", entrance);
-        corridor.addExit("east", treasureRoom);
+        corridor.addLockedExit("east", treasureRoom, key);
         treasureRoom.addExit("west", corridor);
 
 
-        entrance.addItem(new Item("Sword", "A rusty but sharp sword."));
-        corridor.addItem(new Item("Potion", "A small healing potion."));
-        treasureRoom.addItem(new Item("Key", "An old iron key."));
+        entrance.addItem(key);
+        corridor.addItem(new Item("Potion"));
+        treasureRoom.addItem(new Weapon("Sword", 18));
 
-
-        HeroModel hero = new HeroModel("Hero", 100, new Bag(), entrance);
-
+        // TODO
+        // Instancier les commandes ici pour les ajouter ensuite au héro.
         
-        RoomController game = new RoomController(hero, new RoomView());
-        game.run();
+        
+        Hero hero = new Hero(
+        		"Hero",
+        		100,
+        		new Bag(
+        				"nom du sac",
+        				DEFAULT_HERO_BAG_CAPACITY),
+        		entrance,
+        		DEFAULT_HERO_DAMAGE);
+
+        System.out.println(hero);
+        
+        // TODO
+        // ajouter les controllers, etc 
+        // RoomController game = new RoomController(hero, new RoomView());
+        // game.run();
     }
 }

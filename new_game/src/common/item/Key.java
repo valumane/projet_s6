@@ -7,6 +7,10 @@ public class Key extends UsableItem {
 	public Key(String name) {
 		super(name);
 	}
+	
+	public Key(String name, String description) {
+		super(name, description);
+	}
 
 	@Override
 	public void use(Hero h) {

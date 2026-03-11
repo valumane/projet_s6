@@ -8,7 +8,7 @@ public class Bag extends Item implements Serializable {
     private final int capacity;
     private final List<Item> content;
 
-    public Bag(String name,int capacity) {
+    public Bag(String name, int capacity) {
         super(name);
         this.capacity = capacity;
         this.content = new ArrayList<>();

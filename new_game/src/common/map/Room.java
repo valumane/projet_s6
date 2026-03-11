@@ -9,6 +9,7 @@ import java.util.Map;
 import common.entity.Character;
 import common.entity.Hero;
 import common.item.Item;
+import common.item.Key;
 
 public class Room implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -17,7 +18,7 @@ public class Room implements Serializable {
     private final List<Item> items;
     private final List<Character> characters;
 
-    protected Room(String name) {
+    public Room(String name) {
         this.name = name;
         this.exits = new HashMap<>();
         this.items = new ArrayList<>();
@@ -28,7 +29,13 @@ public class Room implements Serializable {
         return name;
     }
 
-    public void addExit(String key, Exit exit) {
+    public void addExit(String key, Room toRoom) {
+    	Exit exit = new SimpleExit(toRoom);
+        exits.put(key.toLowerCase(), exit);
+    }
+    
+    public void addLockedExit(String key, Room toRoom, Key keyItem) {
+    	Exit exit = new LockedExit(toRoom, keyItem);
         exits.put(key.toLowerCase(), exit);
     }
 
