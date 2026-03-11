@@ -1,8 +1,6 @@
 package map.view.cli;
 
-import common.item.Item;
-import entity.model.Character;
-import map.model.Room;
+import common.map.Room;
 /**
  * VIEW - Affiche les informations d'une salle.
  * C'est le SEUL endroit où System.out.println est utilisé pour la Room.
@@ -16,7 +14,6 @@ public class RoomView {
     public void displayRoom(Room room) {
         System.out.println();
         System.out.println("=== " + room.getName().toUpperCase() + " ===");
-        System.out.println(room.getDescription());
 
         displayExits(room);
         System.out.println();

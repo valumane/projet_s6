@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import common.item.Item;
-import entity.model.Character;
+import common.entity.Character;
 /**
  * MODEL - Représente l'état d'une salle.
  * Aucun System.out.println ici : le Model ne sait pas qu'il y a un affichage.
@@ -91,5 +91,9 @@ public class Room {
 
     public String getDescription() {
         return description;
+    }
+
+    public Room getRoom(){
+        return this;
     }
 }

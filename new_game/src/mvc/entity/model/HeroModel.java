@@ -1,12 +1,12 @@
-package src.entity.model;
+package entity.model;
 
 import java.io.Serializable;
 
 import common.item.Item;
 import mvc.Model;
-import src.common.Character;
-import src.common.Hero;
-import map.model.Room;
+import common.entity.Character;
+import common.entity.Hero;
+import common.map.Room;
 
 public class HeroModel implements Model {
 
@@ -23,4 +23,9 @@ public class HeroModel implements Model {
     public void drop(Item item) {
     	this.hero.dropItem(item);
     }    
+
+    public Room getRoom(){
+        return this.hero.getRoom();
+        
+    }
 }

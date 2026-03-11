@@ -1,1 +1,42 @@
-error: file not found: sources.txt
+src/mvc/map/controller/RoomController.java:22: error: cannot find symbol
+        view.displayRoom(hero.getCurrentRoom());
+                             ^
+  symbol:   method getCurrentRoom()
+  location: variable hero of type HeroModel
+src/mvc/entity/model/HeroModel.java:15: error: constructor Character in class Character cannot be applied to given types;
+    public HeroModel(Hero hero) {
+                                ^
+  required: String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+src/mvc/entity/controller/HeroController.java:18: error: cannot find symbol
+        Item dropped = heroModel.drop(itemToDrop.getName());
+                       ^
+  symbol:   variable heroModel
+  location: class HeroController
+src/mvc/entity/controller/HeroController.java:22: error: cannot find symbol
+            viewGUI.showObjectNotFindInInventory(itemToDrop.getName());
+                   ^
+  symbol:   method showObjectNotFindInInventory(String)
+  location: variable viewGUI of type View
+src/mvc/entity/controller/HeroController.java:23: error: cannot find symbol
+            viewCLI.showObjectNotFindInInventory(itemToDrop.getName());
+                   ^
+  symbol:   method showObjectNotFindInInventory(String)
+  location: variable viewCLI of type View
+src/mvc/entity/controller/HeroController.java:26: error: cannot find symbol
+        	viewGUI.showDropObject(heroModel.getName(), dropped.getName());
+        	                       ^
+  symbol:   variable heroModel
+  location: class HeroController
+src/mvc/entity/controller/HeroController.java:27: error: cannot find symbol
+            viewCLI.showDropObject(heroModel.getName(), dropped.getName());
+                                   ^
+  symbol:   variable heroModel
+  location: class HeroController
+src/mvc/entity/controller/HeroController.java:28: error: cannot find symbol
+            heroModel.getRoom().addItem(dropped);
+            ^
+  symbol:   variable heroModel
+  location: class HeroController
+8 errors

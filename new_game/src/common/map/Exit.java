@@ -2,7 +2,7 @@ package common.map;
 
 import java.io.Serializable;
 
-import entity.Hero;
+import common.entity.Hero;
 
 public abstract class Exit implements Serializable {
     private static final long serialVersionUID = 1L;
