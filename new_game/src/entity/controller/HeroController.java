@@ -1,17 +1,17 @@
 package entity.controller;
 
 import mvc.Controller;
+import common.Hero;
 import entity.model.HeroModel;
 import entity.model.Item;
 import entity.view.base.HeroView;
-import entity.common.Hero;
 
 public class HeroController extends Controller {
 
     private final HeroModel hero;
     private final HeroView view1;
     private final HeroView view2;
-    
+
 
     public HeroController(HeroModel hero, HeroView view1, HeroView view2) {
         super(hero, view1);          // obligatoire (Controller n’a pas de super() vide)

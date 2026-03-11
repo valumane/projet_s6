@@ -1,4 +1,4 @@
-package entity.common;
+package common;
 
 
 
