@@ -27,29 +27,47 @@ public class Hero extends Character {
             Weapon weapon = (Weapon) item;
             this.damage += weapon.getDamage();
         }
-    	addToInventory(item); 
+        // Voir ici si il ne faudra pas retirer l'objet de la piece, au moment ou on le récupère dans l'inventaire.
+    	this.addToInventory(item); 
     }
     
-    public Item dropItem(String itemName) {
-        for (Item item : getInventory()) {
-            if (item.getName().equals(itemName)) {
+    // Si le héro a l'item sur lui : on le dépose dans la salle
+    public void dropItem(Item itemToDrop) {
+        for (Item item : this.getInventory()) {
+            if (item.getName().equals(itemToDrop.getName())) {
                 if (item instanceof Weapon) {
                     Weapon weapon = (Weapon) item;
                     this.damage -= weapon.getDamage();
                 }
-                removeFromInventory(item);
-                return item; 
+                this.removeFromInventory(item);
+                this.room.addItem(item)
             }
         }
-        return null;
     }
 
     // Getter and setters
     public Room getRoom() { 
-    	return room; 
+    	return this.room; 
     }
     
     public void setCurrentRoom(Room r) { 
     	this.room = r; 
+    }
+
+    // Les items du héro sont dans le bagpack
+    @Override
+    public List<Item> getInventory() {
+        return this.backpack.getContent();
+    }
+
+    // On pourra utiliser la limite du sac pour limiter le nombre d'objets possible à avoir sur soi
+    @Override
+    public void addToInventory(Item item) {
+        this.backpack.addItem(item);
+    }
+
+    @Override
+    public void removeFromInventory(Item item) {
+        this.backpack.removeItem(item);
     }
 }

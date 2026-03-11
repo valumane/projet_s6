@@ -9,25 +9,23 @@ import entity.view.base.HeroView;
 public class HeroController extends Controller {
 
     public HeroController(HeroModel heroModel, HeroView viewGUI, HeroView viewCLI) {
-        super(heroModel, viewGUI, viewCLI); /// Hérité de la	classe [mvc.Controller]
+        super(heroModel, viewGUI, viewCLI); /// Hérité de la classe [mvc.Controller]
     }
 
-    // Déposer un item (je garde ta signature, mais je corrige le message)
-    public void onDropItem(Item itemToDrop) {
+    public void onDropItem(Item item) {
 
-        Item dropped = heroModel.drop(itemToDrop.getName());
+        boolean haveItem = heroModel.containsItem(item);
 
-        if (dropped == null) {
-            // on affiche le nom demandé, pas dropped.getName() (car dropped == null)
-            viewGUI.showObjectNotFindInInventory(itemToDrop.getName());
-            viewCLI.showObjectNotFindInInventory(itemToDrop.getName());
-            
-        } else {
-        	viewGUI.showDropObject(heroModel.getName(), dropped.getName());
-            viewCLI.showDropObject(heroModel.getName(), dropped.getName());
-            heroModel.getRoom().addItem(dropped);
-            
+        // Si le héro a l'item sur lui on le dépose dans la salle
+        // Sinon on informe le joueur qu'il n'a pas l'item et ne peut donc pas le supprimer
+        if (haveItem) {
+            heroModel.drop(item);
+            viewGUI.showDropObject(heroModel.getName(), item.getName());
+            viewCLI.showDropObject(heroModel.getName(), item.getName());
+        } 
+        else {
+            viewGUI.showObjectNotFindInInventory(item.getName());
+            viewCLI.showObjectNotFindInInventory(item.getName());
         }
     }
-
 }

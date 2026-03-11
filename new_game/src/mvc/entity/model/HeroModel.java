@@ -8,7 +8,7 @@ import src.common.Character;
 import src.common.Hero;
 import map.model.Room;
 
-public class HeroModel extends Character implements Serializable, Model {
+public class HeroModel implements Model {
 
     private Hero hero;
 
@@ -19,10 +19,8 @@ public class HeroModel extends Character implements Serializable, Model {
     @Override
     public void run() {
     }
-    
-    public Item dropItem(String itemName) {
-    	this.hero.dropItem(itemName);
-    }
-    
-    
+     
+    public void drop(Item item) {
+    	this.hero.dropItem(item);
+    }    
 }
