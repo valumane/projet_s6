@@ -1,6 +1,6 @@
-package app;
+package application;
 
-import common.Item;
+import common.item.Item;
 import entity.model.Bag;
 import entity.model.HeroModel;
 import map.controller.RoomController;
