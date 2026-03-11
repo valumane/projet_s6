@@ -1,11 +1,11 @@
-package src.entity.model;
+package entity.model;
 
 import java.io.Serializable;
 
 import common.item.Item;
 import mvc.Model;
-import src.common.Character;
-import src.common.Hero;
+import common.entity.Character;
+import common.entity.Hero;
 import map.model.Room;
 
 public class HeroModel extends Character implements Serializable, Model {
@@ -22,6 +22,11 @@ public class HeroModel extends Character implements Serializable, Model {
     
     public Item dropItem(String itemName) {
     	this.hero.dropItem(itemName);
+    }
+
+    public Room getCurrentRoom(){
+        Room r= this.hero.getRoom();
+        return r;
     }
     
     

@@ -1,7 +1,5 @@
 package map.view.cli;
 
-import common.item.Item;
-import entity.model.Character;
 import map.model.Room;
 /**
  * VIEW - Affiche les informations d'une salle.
