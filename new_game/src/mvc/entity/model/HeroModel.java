@@ -6,9 +6,9 @@ import common.item.Item;
 import mvc.Model;
 import common.entity.Character;
 import common.entity.Hero;
-import map.model.Room;
+import common.map.Room;
 
-public class HeroModel extends Character implements Serializable, Model {
+public class HeroModel implements Serializable, Model {
 
     private Hero hero;
 
@@ -20,13 +20,13 @@ public class HeroModel extends Character implements Serializable, Model {
     public void run() {
     }
     
-    public Item dropItem(String itemName) {
-    	this.hero.dropItem(itemName);
-    }
+    
+    
+        
 
-    public Room getCurrentRoom(){
-        Room r= this.hero.getRoom();
-        return r;
+    public Room getRoom(){
+        return this.hero.getRoom();
+        
     }
     
     

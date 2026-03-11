@@ -19,7 +19,7 @@ public class RoomController {
     }
 
     public void run() {
-        view.displayRoom(hero.getCurrentRoom());
+        view.displayRoom(hero.getRoom());
     }
 
-}
+}   
