@@ -1,6 +1,8 @@
 package src.entity.model;
 
 import java.io.Serializable;
+
+import common.Item;
 import mvc.Model;
 import src.common.Character;
 import src.common.Hero;

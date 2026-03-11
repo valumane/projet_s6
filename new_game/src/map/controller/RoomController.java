@@ -2,8 +2,8 @@ package map.controller;
 
 import java.util.Scanner;
 
+import common.Item;
 import entity.model.HeroModel;
-import entity.model.Item;
 import map.model.Room;
 import map.view.cli.RoomView;
 

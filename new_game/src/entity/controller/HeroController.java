@@ -2,8 +2,8 @@ package entity.controller;
 
 import mvc.Controller;
 import common.Hero;
+import common.Item;
 import entity.model.HeroModel;
-import entity.model.Item;
 import entity.view.base.HeroView;
 
 public class HeroController extends Controller {

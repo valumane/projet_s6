@@ -1,9 +1,8 @@
 package app;
 
+import common.Item;
 import entity.model.Bag;
 import entity.model.HeroModel;
-import entity.model.Item;
-
 import map.controller.RoomController;
 import map.model.Room;
 import map.view.cli.RoomView;

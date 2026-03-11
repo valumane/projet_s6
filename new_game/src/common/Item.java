@@ -1,8 +1,8 @@
-package entity.model;
+package common;
 
 import java.io.Serializable;
 
-public class Item implements Serializable {
+public abstract class Item implements Serializable {
     private final String name;
     private final String description;
 

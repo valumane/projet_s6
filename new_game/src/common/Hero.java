@@ -1,14 +1,16 @@
-package src.common;
+package common;
 
 public class Hero extends Character {
     
     private final Bag backpack;
     private Room room;
+    private int damage;
 	
-    public Hero (String name, int hp, Bag backpack, Room room) {
+    public Hero (String name, int hp, Bag backpack, Room room, int baseDamage) {
         super(name, hp);
         this.backpack = backpack;
         this.room = room;
+        this.damage = baseDamage;
     }
 
     public Bag getBackpack(){
@@ -16,12 +18,20 @@ public class Hero extends Character {
     }
 
     public void addItem(Item item) { 
+        if (item instanceof Weapon) {
+            Weapon weapon = (Weapon) item;
+            this.damage += weapon.getDamage();
+        }
     	addToInventory(item); 
     }
     
     public Item dropItem(String itemName) {
         for (Item item : getInventory()) {
             if (item.getName().equals(itemName)) {
+                if (item instanceof Weapon) {
+                    Weapon weapon = (Weapon) item;
+                    this.damage -= weapon.getDamage();
+                }
                 removeFromInventory(item);
                 return item; 
             }
@@ -29,7 +39,6 @@ public class Hero extends Character {
         return null;
     }
 
-    
     // Getter and setters
     public Room getRoom() { 
     	return room; 

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import entity.model.Item;
+import common.Item;
 import entity.model.Character;
 /**
  * MODEL - Représente l'état d'une salle.
