@@ -16,6 +16,12 @@ public class HeroController extends Controller {
         this.heroModel = heroModel;
         this.viewGUI = viewGUI;
         this.viewCLI = viewCLI;
+
+        this.viewGUI.setOnRemoveHp(() -> {
+            int hp = heroModel.removeHp(1); // à créer dans HeroModel
+            viewGUI.showHealth(hp);
+            viewCLI.showHealth(hp);
+        });
     }
 
     // Déposer un item
@@ -29,6 +35,7 @@ public class HeroController extends Controller {
             viewGUI.showDropObject(heroModel.getName(), dropped.getName());
             viewCLI.showDropObject(heroModel.getName(), dropped.getName());
         }
+
     }
 
 }

@@ -34,8 +34,15 @@ public class HeroModel implements Model {
     public String getName() {
         return hero.getName();
     }
-    
+
     public int getHealth() {
         return hero.getHp();
     }
+
+    public int removeHp(int amount) {
+        int newHp = Math.max(0, hero.getHp() - amount);
+        hero.setHp(newHp);
+        return newHp;
+    }
+
 }

@@ -1,5 +1,8 @@
 package application;
 
+import entity.controller.HeroController;
+import entity.model.HeroModel;
+import entity.view.cli.HeroViewCLI;
 import entity.view.gui.HeroViewGUI;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -14,25 +17,27 @@ public class GuiMain extends Application {
 
     @Override
     public void start(Stage stage) {
-        HeroViewGUI gui = new HeroViewGUI(stage);
-
+        // --- domain ---
         Room entrance = new Room("Entrance");
-
         Hero hero = new Hero(
                 "Hero",
                 100,
-                new Bag(
-                        "nom du sac",
-                        DEFAULT_HERO_BAG_CAPACITY),
+                new Bag("nom du sac", DEFAULT_HERO_BAG_CAPACITY),
                 entrance,
                 DEFAULT_HERO_DAMAGE);
 
-        gui.setHeroName("Hero");
-        gui.showLocation("Entrance");
-        gui.show();
-        gui.showHealth();
-        gui.showDropObject("Hero", "Sword");
+        // --- mvc ---
+        HeroModel model = new HeroModel(hero);
+        HeroViewGUI viewGUI = new HeroViewGUI(stage);
+        HeroViewCLI viewCLI = new HeroViewCLI();
 
+        new HeroController(model, viewGUI, viewCLI); // <- branche le bouton ici
+
+        // --- init affichage ---
+        viewGUI.setHeroName(model.getName());
+        viewGUI.showLocation(model.getRoom().getName());
+        viewGUI.showHealth(model.getHealth());
+        viewGUI.show();
     }
 
     public static void main(String[] args) {

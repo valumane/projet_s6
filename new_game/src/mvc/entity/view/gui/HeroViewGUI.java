@@ -1,6 +1,5 @@
 package entity.view.gui;
 
-import common.entity.Hero;
 import entity.view.base.HeroView;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -11,7 +10,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import jfx.incubator.scene.control.richtext.model.PlainTextFormatHandler;
 
 public class HeroViewGUI extends HeroView {
 
@@ -20,7 +18,8 @@ public class HeroViewGUI extends HeroView {
     private final Label heroLabel = new Label("Hero");
     private final Label locationLabel = new Label("Location: ?");
     private final TextArea logArea = new TextArea();
-    private final Label HpLabel = new Label("health : " );
+    private final Label hpLabel = new Label("Health : ?");
+    private final Button buttonRemoveLife = new Button("remove 1hp");
 
     public HeroViewGUI(Stage stage) {
         this.stage = stage;
@@ -37,16 +36,12 @@ public class HeroViewGUI extends HeroView {
         root.setPadding(new Insets(10));
 
         // bouton qui retire de la vie au hero car je l'aime pas
-        Button buttonRemoveLife = new Button("remove 1hp");
-
-
-        // div health
-        VBox divHealth = new VBox(6,buttonRemoveLife,HpLabel);
-
+        VBox divHealth = new VBox(6, buttonRemoveLife, hpLabel);
+        divHealth.setPadding(new Insets(10));
 
         // place le bouton en bas
         root.setRight(divHealth);
-        
+
         BorderPane.setMargin(buttonRemoveLife, new Insets(10, 0, 0, 0));
         Scene scene = new Scene(root, 700, 450);
         stage.setScene(scene);
@@ -55,11 +50,9 @@ public class HeroViewGUI extends HeroView {
     // --- helpers ---
     private void log(String msg) {
         Platform.runLater(() -> {
-            if (!logArea.getText().isEmpty()) {
+            if (!logArea.getText().isEmpty())
                 logArea.appendText("\n");
-            } else {
-                logArea.appendText(msg);
-            }
+            logArea.appendText(msg);
         });
     }
 
@@ -111,8 +104,13 @@ public class HeroViewGUI extends HeroView {
     }
 
     @Override
-    public void showHealth(int HpHero){
-        Platform.runLater(()-> heroLabel.setText("Health"+ HpHero));
+    public void setOnRemoveHp(Runnable action) {
+        Platform.runLater(() -> buttonRemoveLife.setOnAction(e -> action.run()));
+    }
+
+    @Override
+    public void showHealth(int hpHero) {
+        Platform.runLater(() -> hpLabel.setText("Health : " + hpHero));
     }
 
     // bonus (pratique)
