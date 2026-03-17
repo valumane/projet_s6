@@ -1,10 +1,9 @@
 package common.item;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bag extends Item implements Serializable {
+public class Bag extends Item {
     private final int capacity;
     private final List<Item> content;
 

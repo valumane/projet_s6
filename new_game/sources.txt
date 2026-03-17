@@ -10,6 +10,7 @@ src/mvc/entity/view/cli/HeroViewCLI.java
 src/mvc/entity/view/base/HeroView.java
 src/mvc/entity/view/gui/HeroViewGUI.java
 src/mvc/entity/controller/HeroController.java
+src/application/GuiMain.java
 src/application/Main.java
 src/common/map/SimpleExit.java
 src/common/map/Exit.java
