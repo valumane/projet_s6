@@ -4,6 +4,7 @@ import entity.view.base.HeroView;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
@@ -17,6 +18,7 @@ public class HeroViewGUI extends HeroView {
     private final Label heroLabel = new Label("Hero");
     private final Label locationLabel = new Label("Location: ?");
     private final TextArea logArea = new TextArea();
+    private final Label HpLabel = new Label("health : " );
 
     public HeroViewGUI(Stage stage) {
         this.stage = stage;
@@ -32,6 +34,18 @@ public class HeroViewGUI extends HeroView {
         root.setCenter(logArea);
         root.setPadding(new Insets(10));
 
+        // bouton qui retire de la vie au hero car je l'aime pas
+        Button buttonRemoveLife = new Button("remove 1hp");
+
+
+        // div health
+        VBox divHealth = new VBox(6,buttonRemoveLife,HpLabel);
+
+
+        // place le bouton en bas
+        root.setRight(divHealth);
+        
+        BorderPane.setMargin(buttonRemoveLife, new Insets(10, 0, 0, 0));
         Scene scene = new Scene(root, 700, 450);
         stage.setScene(scene);
     }
@@ -39,9 +53,9 @@ public class HeroViewGUI extends HeroView {
     // --- helpers ---
     private void log(String msg) {
         Platform.runLater(() -> {
-            if (!logArea.getText().isEmpty()){
+            if (!logArea.getText().isEmpty()) {
                 logArea.appendText("\n");
-            }else{
+            } else {
                 logArea.appendText(msg);
             }
         });
@@ -93,7 +107,6 @@ public class HeroViewGUI extends HeroView {
     public void useHealingPower() {
         log("You use your healing power!");
     }
-
 
     // bonus (pratique)
     public void setHeroName(String name) {
