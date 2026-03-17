@@ -10,3 +10,5 @@
 /.metadata/
 *.class
 new_game/out/*
+
+/new_game/*.txt
