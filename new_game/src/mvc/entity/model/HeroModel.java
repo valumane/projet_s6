@@ -34,4 +34,8 @@ public class HeroModel implements Model {
     public String getName() {
         return hero.getName();
     }
+    
+    public int getHealth() {
+        return hero.getHp();
+    }
 }
