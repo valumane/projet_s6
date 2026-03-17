@@ -14,4 +14,5 @@ public abstract class HeroView implements View {
 	public abstract void receiveHealingPower();
 	public abstract void showDontKnowHealingSpell();
 	public abstract void useHealingPower();
+    public abstract void showHealth(int HpHero);
 }

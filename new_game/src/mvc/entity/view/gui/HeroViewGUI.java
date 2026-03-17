@@ -1,5 +1,6 @@
 package entity.view.gui;
 
+import common.entity.Hero;
 import entity.view.base.HeroView;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -10,6 +11,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import jfx.incubator.scene.control.richtext.model.PlainTextFormatHandler;
 
 public class HeroViewGUI extends HeroView {
 
@@ -106,6 +108,11 @@ public class HeroViewGUI extends HeroView {
     @Override
     public void useHealingPower() {
         log("You use your healing power!");
+    }
+
+    @Override
+    public void showHealth(int HpHero){
+        Platform.runLater(()-> heroLabel.setText("Health"+ HpHero));
     }
 
     // bonus (pratique)
