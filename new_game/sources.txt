@@ -4,7 +4,7 @@ src/mvc/mvc/Model.java
 src/mvc/map/model/Room.java
 src/mvc/map/view/cli/RoomView.java
 src/mvc/map/controller/RoomController.java
-src/mvc/entity/model/Bag.java
+src/mvc/entity/model/BagModel.java
 src/mvc/entity/model/HeroModel.java
 src/mvc/entity/view/cli/HeroViewCLI.java
 src/mvc/entity/view/base/HeroView.java

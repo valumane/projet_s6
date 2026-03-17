@@ -44,7 +44,7 @@ public class Main {
         		entrance,
         		DEFAULT_HERO_DAMAGE);
 
-        System.out.println(hero);
+        System.out.println(hero.getName());
         
         // TODO
         // ajouter les controllers, etc 

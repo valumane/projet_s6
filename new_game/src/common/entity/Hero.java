@@ -1,5 +1,7 @@
 package common.entity;
 
+import java.util.List;
+
 import common.item.Bag;
 import common.item.Item;
 import common.item.Weapon;
@@ -40,7 +42,7 @@ public class Hero extends Character {
                     this.damage -= weapon.getDamage();
                 }
                 this.removeFromInventory(item);
-                this.room.addItem(item)
+                this.room.addItem(item);
             }
         }
     }

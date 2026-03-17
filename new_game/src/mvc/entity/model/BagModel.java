@@ -1,8 +1,10 @@
 package entity.model;
 
 import java.io.Serializable;
+import common.item.Bag;
+import mvc.Model;
 
-public class BagModel extends Item {
+public class BagModel {
     
     private Bag bag;
 
@@ -10,8 +12,6 @@ public class BagModel extends Item {
         this.bag = bag;
     }
 
-    @Override
-    public void run() {
-    }
+   
         
 }

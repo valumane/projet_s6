@@ -11,4 +11,11 @@ public class HeroViewGUI extends HeroView {
     @Override public void showDropObject(String c, String i) {}
     @Override public void showObjectNotFindInInventory(String i) {}
     @Override public void showLocation(String loc) {}
+
+    @Override public void showDontKnowHealingSpell(){};
+    @Override public void receiveHealingPower(){};
+    @Override public void showNoHealSpell(){};
+    @Override public void useHealingPower(){};
+
+
 }

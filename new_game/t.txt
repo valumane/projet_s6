@@ -1,42 +1,797 @@
-src/mvc/map/controller/RoomController.java:22: error: cannot find symbol
-        view.displayRoom(hero.getCurrentRoom());
-                             ^
-  symbol:   method getCurrentRoom()
-  location: variable hero of type HeroModel
-src/mvc/entity/model/HeroModel.java:15: error: constructor Character in class Character cannot be applied to given types;
-    public HeroModel(Hero hero) {
-                                ^
-  required: String,int
-  found:    no arguments
-  reason: actual and formal argument lists differ in length
-src/mvc/entity/controller/HeroController.java:18: error: cannot find symbol
-        Item dropped = heroModel.drop(itemToDrop.getName());
-                       ^
-  symbol:   variable heroModel
-  location: class HeroController
-src/mvc/entity/controller/HeroController.java:22: error: cannot find symbol
-            viewGUI.showObjectNotFindInInventory(itemToDrop.getName());
-                   ^
-  symbol:   method showObjectNotFindInInventory(String)
-  location: variable viewGUI of type View
-src/mvc/entity/controller/HeroController.java:23: error: cannot find symbol
-            viewCLI.showObjectNotFindInInventory(itemToDrop.getName());
-                   ^
-  symbol:   method showObjectNotFindInInventory(String)
-  location: variable viewCLI of type View
-src/mvc/entity/controller/HeroController.java:26: error: cannot find symbol
-        	viewGUI.showDropObject(heroModel.getName(), dropped.getName());
-        	                       ^
-  symbol:   variable heroModel
-  location: class HeroController
-src/mvc/entity/controller/HeroController.java:27: error: cannot find symbol
-            viewCLI.showDropObject(heroModel.getName(), dropped.getName());
-                                   ^
-  symbol:   variable heroModel
-  location: class HeroController
-src/mvc/entity/controller/HeroController.java:28: error: cannot find symbol
-            heroModel.getRoom().addItem(dropped);
-            ^
-  symbol:   variable heroModel
-  location: class HeroController
-8 errors
+sources.txt:1:src/mvc/mvc/View.java
+sources.txt:2:src/mvc/mvc/Controller.java
+sources.txt:3:src/mvc/mvc/Model.java
+sources.txt:4:src/mvc/map/model/Room.java
+sources.txt:5:src/mvc/map/view/cli/RoomView.java
+sources.txt:6:src/mvc/map/controller/RoomController.java
+sources.txt:7:src/mvc/entity/model/BagModel.java
+sources.txt:8:src/mvc/entity/model/HeroModel.java
+sources.txt:9:src/mvc/entity/view/cli/HeroViewCLI.java
+sources.txt:10:src/mvc/entity/view/base/HeroView.java
+sources.txt:11:src/mvc/entity/view/gui/HeroViewGUI.java
+sources.txt:12:src/mvc/entity/controller/HeroController.java
+sources.txt:13:src/application/Main.java
+sources.txt:14:src/common/map/SimpleExit.java
+sources.txt:15:src/common/map/Exit.java
+sources.txt:16:src/common/map/LockedExit.java
+sources.txt:17:src/common/map/Room.java
+sources.txt:18:src/common/item/Weapon.java
+sources.txt:19:src/common/item/UsableItem.java
+sources.txt:20:src/common/item/Spell.java
+sources.txt:21:src/common/item/Scroll.java
+sources.txt:22:src/common/item/Bag.java
+sources.txt:23:src/common/item/Key.java
+sources.txt:24:src/common/item/HealSpell.java
+sources.txt:25:src/common/item/Item.java
+sources.txt:26:src/common/entity/Character.java
+sources.txt:27:src/common/entity/Boss.java
+sources.txt:28:src/common/entity/Hero.java
+quickrun.sh:1:rm -rf out sources.txt
+quickrun.sh:2:find src -name "*.java" > sources.txt
+quickrun.sh:3:javac -d out -sourcepath src @sources.txt
+quickrun.sh:4:java -cp out application.Main
+src/mvc/mvc/View.java:1:package mvc;
+src/mvc/mvc/View.java:3:/// Generic View for the triple {Model-View-Controller}
+src/mvc/mvc/View.java:4:///
+src/mvc/mvc/View.java:5:/// @author X. Skapin
+src/mvc/mvc/View.java:6:/// @version 1.0.0
+src/mvc/mvc/View.java:7:public interface View {
+src/mvc/mvc/View.java:9:		/// Hide this instance
+src/mvc/mvc/View.java:10:		public void hide();
+src/mvc/mvc/View.java:11:		
+src/mvc/mvc/View.java:12:		/// Show this instance 
+src/mvc/mvc/View.java:13:		public void show();
+src/mvc/mvc/View.java:14:}
+src/mvc/mvc/Controller.java:1:package mvc;
+src/mvc/mvc/Controller.java:3:import java.util.List;
+src/mvc/mvc/Controller.java:4:import java.util.ArrayList;
+src/mvc/mvc/Controller.java:6:/// Generic Controller for the triple {Model-View-Controller}.
+src/mvc/mvc/Controller.java:7:/// Every Controller can create some sub-controllers.
+src/mvc/mvc/Controller.java:8:///
+src/mvc/mvc/Controller.java:9:/// @author X. Skapin
+src/mvc/mvc/Controller.java:10:/// @version 1.0.0
+src/mvc/mvc/Controller.java:11:public abstract class Controller {
+src/mvc/mvc/Controller.java:12:		/// Sub-controllers
+src/mvc/mvc/Controller.java:13:		protected final List<Controller> subControllers = new ArrayList<>();
+src/mvc/mvc/Controller.java:14:	
+src/mvc/mvc/Controller.java:15:		/// Related [Model]
+src/mvc/mvc/Controller.java:16:		protected final Model model;
+src/mvc/mvc/Controller.java:18:		/// Related [View]
+src/mvc/mvc/Controller.java:19:		protected final View viewGUI;
+src/mvc/mvc/Controller.java:20:		protected final View viewCLI;
+src/mvc/mvc/Controller.java:22:		/// Custom constructor
+src/mvc/mvc/Controller.java:23:		///
+src/mvc/mvc/Controller.java:24:		/// @param p_model Related [Model]. Should not be null.
+src/mvc/mvc/Controller.java:25:		/// @param p_view Related [View]. Should not be null.
+src/mvc/mvc/Controller.java:26:		protected Controller(Model p_model, View p_viewCLI, View p_viewGUI) {
+src/mvc/mvc/Controller.java:27:				this.model = p_model;
+src/mvc/mvc/Controller.java:28:				this.viewGUI = p_viewCLI;
+src/mvc/mvc/Controller.java:29:				this.viewCLI = p_viewGUI;
+src/mvc/mvc/Controller.java:30:		}
+src/mvc/mvc/Controller.java:32:		/// {@return the related [Model]}
+src/mvc/mvc/Controller.java:33:		public Model getModel() {
+src/mvc/mvc/Controller.java:34:				return this.model;
+src/mvc/mvc/Controller.java:35:		}
+src/mvc/mvc/Controller.java:37:		/// {@return the related [View]}
+src/mvc/mvc/Controller.java:38:		public View getViewCLI() {
+src/mvc/mvc/Controller.java:39:				return this.viewCLI;
+src/mvc/mvc/Controller.java:40:		}
+src/mvc/mvc/Controller.java:41:		
+src/mvc/mvc/Controller.java:42:		public View getViewGUI() {
+src/mvc/mvc/Controller.java:43:			return this.viewGUI;
+src/mvc/mvc/Controller.java:44:	}
+src/mvc/mvc/Controller.java:45:}
+src/mvc/mvc/Model.java:1:package mvc;
+src/mvc/mvc/Model.java:4:/// Generic Model for the triple {Model-View-Controller}
+src/mvc/mvc/Model.java:5:///
+src/mvc/mvc/Model.java:6:/// @author X. Skapin
+src/mvc/mvc/Model.java:7:/// @version 1.0.0
+src/mvc/mvc/Model.java:8:public interface Model {
+src/mvc/mvc/Model.java:10:		/// Execute a command
+src/mvc/mvc/Model.java:11:		public abstract void run();
+src/mvc/mvc/Model.java:12:}
+src/mvc/map/model/Room.java:1:package map.model;
+src/mvc/map/model/Room.java:3:import java.util.ArrayList;
+src/mvc/map/model/Room.java:4:import java.util.HashMap;
+src/mvc/map/model/Room.java:5:import java.util.List;
+src/mvc/map/model/Room.java:6:import java.util.Map;
+src/mvc/map/model/Room.java:8:import common.item.Item;
+src/mvc/map/model/Room.java:9:import common.entity.Character;
+src/mvc/map/model/Room.java:10:/**
+src/mvc/map/model/Room.java:11: * MODEL - Représente l'état d'une salle.
+src/mvc/map/model/Room.java:12: * Aucun System.out.println ici : le Model ne sait pas qu'il y a un affichage.
+src/mvc/map/model/Room.java:13: */
+src/mvc/map/model/Room.java:14:public class Room {
+src/mvc/map/model/Room.java:16:    private final String name;
+src/mvc/map/model/Room.java:17:    private final String description;
+src/mvc/map/model/Room.java:18:    private final Map<String, Room> exits;   // "north" -> Room
+src/mvc/map/model/Room.java:19:    private final List<Item> items;
+src/mvc/map/model/Room.java:20:    private final List<Character> characters;
+src/mvc/map/model/Room.java:22:    public Room(String name, String description) {
+src/mvc/map/model/Room.java:23:        this.name = name;
+src/mvc/map/model/Room.java:24:        this.description = description;
+src/mvc/map/model/Room.java:25:        this.exits = new HashMap<>();
+src/mvc/map/model/Room.java:26:        this.items = new ArrayList<>();
+src/mvc/map/model/Room.java:27:        this.characters = new ArrayList<>();
+src/mvc/map/model/Room.java:28:    }
+src/mvc/map/model/Room.java:30:    // --- Exits ---
+src/mvc/map/model/Room.java:31:    public void addExit(String direction, Room room) {
+src/mvc/map/model/Room.java:32:        exits.put(direction.toLowerCase(), room);
+src/mvc/map/model/Room.java:33:    }
+src/mvc/map/model/Room.java:36:    /** @return la Room dans cette direction, ou null si inexistante */
+src/mvc/map/model/Room.java:37:    public Room getExit(String direction) {
+src/mvc/map/model/Room.java:38:        return exits.get(direction.toLowerCase());
+src/mvc/map/model/Room.java:39:    }
+src/mvc/map/model/Room.java:41:    public Map<String, Room> getExits() {
+src/mvc/map/model/Room.java:42:        return exits;
+src/mvc/map/model/Room.java:43:    }
+src/mvc/map/model/Room.java:46:    // --- Items ---
+src/mvc/map/model/Room.java:47:    public void addItem(Item item) {
+src/mvc/map/model/Room.java:48:        items.add(item);
+src/mvc/map/model/Room.java:49:    }
+src/mvc/map/model/Room.java:52:    /** @return true si l'item a été retiré, false s'il n'était pas là */
+src/mvc/map/model/Room.java:53:    public boolean removeItem(Item item) {
+src/mvc/map/model/Room.java:54:        return items.remove(item);
+src/mvc/map/model/Room.java:55:    }
+src/mvc/map/model/Room.java:57:    public List<Item> getItems() {
+src/mvc/map/model/Room.java:58:        return items;
+src/mvc/map/model/Room.java:59:    }
+src/mvc/map/model/Room.java:62:    /** Cherche un item par nom (insensible à la casse) */
+src/mvc/map/model/Room.java:63:    public Item findItemByName(String name) {
+src/mvc/map/model/Room.java:64:        for (Item item : items) {
+src/mvc/map/model/Room.java:65:            if (item.getName().equalsIgnoreCase(name)) {
+src/mvc/map/model/Room.java:66:                return item;
+src/mvc/map/model/Room.java:67:            }
+src/mvc/map/model/Room.java:68:        }
+src/mvc/map/model/Room.java:69:        return null;
+src/mvc/map/model/Room.java:70:    }
+src/mvc/map/model/Room.java:71:    
+src/mvc/map/model/Room.java:73:    // --- Characters ---
+src/mvc/map/model/Room.java:74:    public void addCharacter(Character c) {
+src/mvc/map/model/Room.java:75:        characters.add(c);
+src/mvc/map/model/Room.java:76:    }
+src/mvc/map/model/Room.java:78:    public boolean removeCharacter(Character c) {
+src/mvc/map/model/Room.java:79:        return characters.remove(c);
+src/mvc/map/model/Room.java:80:    }
+src/mvc/map/model/Room.java:82:    public List<Character> getCharacters() {
+src/mvc/map/model/Room.java:83:        return characters;
+src/mvc/map/model/Room.java:84:    }
+src/mvc/map/model/Room.java:87:    // --- Getters ---
+src/mvc/map/model/Room.java:88:    public String getName() {
+src/mvc/map/model/Room.java:89:        return name;
+src/mvc/map/model/Room.java:90:    }
+src/mvc/map/model/Room.java:92:    public String getDescription() {
+src/mvc/map/model/Room.java:93:        return description;
+src/mvc/map/model/Room.java:94:    }
+src/mvc/map/model/Room.java:96:    public Room getRoom(){
+src/mvc/map/model/Room.java:97:        return this;
+src/mvc/map/model/Room.java:98:    }
+src/mvc/map/model/Room.java:99:}
+src/mvc/map/view/cli/RoomView.java:1:package map.view.cli;
+src/mvc/map/view/cli/RoomView.java:3:import common.map.Room;
+src/mvc/map/view/cli/RoomView.java:4:/**
+src/mvc/map/view/cli/RoomView.java:5: * VIEW - Affiche les informations d'une salle.
+src/mvc/map/view/cli/RoomView.java:6: * C'est le SEUL endroit où System.out.println est utilisé pour la Room.
+src/mvc/map/view/cli/RoomView.java:7: */
+src/mvc/map/view/cli/RoomView.java:8:public class RoomView {
+src/mvc/map/view/cli/RoomView.java:10:    /**
+src/mvc/map/view/cli/RoomView.java:11:     * Affiche la description complète d'une salle :
+src/mvc/map/view/cli/RoomView.java:12:     * description, sorties, items, personnages présents.
+src/mvc/map/view/cli/RoomView.java:13:     */
+src/mvc/map/view/cli/RoomView.java:14:    public void displayRoom(Room room) {
+src/mvc/map/view/cli/RoomView.java:15:        System.out.println();
+src/mvc/map/view/cli/RoomView.java:16:        System.out.println("=== " + room.getName().toUpperCase() + " ===");
+src/mvc/map/view/cli/RoomView.java:18:        displayExits(room);
+src/mvc/map/view/cli/RoomView.java:19:        System.out.println();
+src/mvc/map/view/cli/RoomView.java:20:    }
+src/mvc/map/view/cli/RoomView.java:22:    private void displayExits(Room room) {
+src/mvc/map/view/cli/RoomView.java:23:        if (room.getExits().isEmpty()) {
+src/mvc/map/view/cli/RoomView.java:24:            System.out.println("Exits : none");
+src/mvc/map/view/cli/RoomView.java:25:        } else {
+src/mvc/map/view/cli/RoomView.java:26:            System.out.print("Exits : ");
+src/mvc/map/view/cli/RoomView.java:27:            System.out.println(String.join(", ", room.getExits().keySet()));
+src/mvc/map/view/cli/RoomView.java:28:        }
+src/mvc/map/view/cli/RoomView.java:29:    }
+src/mvc/map/view/cli/RoomView.java:32:    /** Message de déplacement du héros */
+src/mvc/map/view/cli/RoomView.java:33:    public void displayMove(String direction, String roomName) {
+src/mvc/map/view/cli/RoomView.java:34:        System.out.println("You go " + direction + " and enter : " + roomName);
+src/mvc/map/view/cli/RoomView.java:35:    }
+src/mvc/map/view/cli/RoomView.java:37:    /** Message d'erreur si la sortie n'existe pas */
+src/mvc/map/view/cli/RoomView.java:38:    public void displayNoExit(String direction) {
+src/mvc/map/view/cli/RoomView.java:39:        System.out.println("There is no exit to the " + direction + ".");
+src/mvc/map/view/cli/RoomView.java:40:    }
+src/mvc/map/view/cli/RoomView.java:42:}
+src/mvc/map/controller/RoomController.java:1:package map.controller;
+src/mvc/map/controller/RoomController.java:3:import java.util.Scanner;
+src/mvc/map/controller/RoomController.java:5:import common.item.Item;
+src/mvc/map/controller/RoomController.java:6:import entity.model.HeroModel;
+src/mvc/map/controller/RoomController.java:7:import map.model.Room;
+src/mvc/map/controller/RoomController.java:8:import map.view.cli.RoomView;
+src/mvc/map/controller/RoomController.java:10:public class RoomController {
+src/mvc/map/controller/RoomController.java:12:    private final HeroModel hero;
+src/mvc/map/controller/RoomController.java:13:    private final RoomView view;
+src/mvc/map/controller/RoomController.java:14:    private boolean running = true;
+src/mvc/map/controller/RoomController.java:16:    public RoomController(HeroModel hero, RoomView view) {
+src/mvc/map/controller/RoomController.java:17:        this.hero = hero;
+src/mvc/map/controller/RoomController.java:18:        this.view = view;
+src/mvc/map/controller/RoomController.java:19:    }
+src/mvc/map/controller/RoomController.java:21:    public void run() {
+src/mvc/map/controller/RoomController.java:22:        view.displayRoom(hero.getRoom());
+src/mvc/map/controller/RoomController.java:23:    }
+src/mvc/map/controller/RoomController.java:25:}   
+src/mvc/entity/model/BagModel.java:1:package entity.model;
+src/mvc/entity/model/BagModel.java:3:import java.io.Serializable;
+src/mvc/entity/model/BagModel.java:4:import common.item.Bag;
+src/mvc/entity/model/BagModel.java:5:import mvc.Model;
+src/mvc/entity/model/BagModel.java:7:public class BagModel {
+src/mvc/entity/model/BagModel.java:8:    
+src/mvc/entity/model/BagModel.java:9:    private Bag bag;
+src/mvc/entity/model/BagModel.java:11:    public BagModel(Bag bag) {
+src/mvc/entity/model/BagModel.java:12:        this.bag = bag;
+src/mvc/entity/model/BagModel.java:13:    }
+src/mvc/entity/model/BagModel.java:15:   
+src/mvc/entity/model/BagModel.java:16:        
+src/mvc/entity/model/BagModel.java:17:}
+src/mvc/entity/model/HeroModel.java:1:package entity.model;
+src/mvc/entity/model/HeroModel.java:4:import common.item.Item;
+src/mvc/entity/model/HeroModel.java:5:import mvc.Model;
+src/mvc/entity/model/HeroModel.java:6:import common.entity.Hero;
+src/mvc/entity/model/HeroModel.java:7:import common.map.Room;
+src/mvc/entity/model/HeroModel.java:9:public class HeroModel implements Model {
+src/mvc/entity/model/HeroModel.java:11:    private final Hero hero;
+src/mvc/entity/model/HeroModel.java:13:    public HeroModel(Hero hero) {
+src/mvc/entity/model/HeroModel.java:14:        this.hero = hero;
+src/mvc/entity/model/HeroModel.java:15:    }
+src/mvc/entity/model/HeroModel.java:17:    @Override
+src/mvc/entity/model/HeroModel.java:18:    public void run() {
+src/mvc/entity/model/HeroModel.java:19:    }
+src/mvc/entity/model/HeroModel.java:20:     
+src/mvc/entity/model/HeroModel.java:21:    public void drop(Item item) {
+src/mvc/entity/model/HeroModel.java:22:    	this.hero.dropItem(item);
+src/mvc/entity/model/HeroModel.java:23:    }    
+src/mvc/entity/model/HeroModel.java:25:    public Room getRoom(){
+src/mvc/entity/model/HeroModel.java:26:        return this.hero.getRoom();   
+src/mvc/entity/model/HeroModel.java:27:    }
+src/mvc/entity/model/HeroModel.java:29:    public String getName(){
+src/mvc/entity/model/HeroModel.java:30:        return hero.getName();
+src/mvc/entity/model/HeroModel.java:31:    }
+src/mvc/entity/model/HeroModel.java:32:}
+src/mvc/entity/view/cli/HeroViewCLI.java:1:package entity.view.cli;
+src/mvc/entity/view/cli/HeroViewCLI.java:3:import entity.view.base.HeroView;
+src/mvc/entity/view/cli/HeroViewCLI.java:6:public class HeroViewCLI extends HeroView {
+src/mvc/entity/view/cli/HeroViewCLI.java:7:	
+src/mvc/entity/view/cli/HeroViewCLI.java:8:	@Override
+src/mvc/entity/view/cli/HeroViewCLI.java:9:	public void showDropObject(String character, String item) {
+src/mvc/entity/view/cli/HeroViewCLI.java:10:		System.out.println(character + " drop " + item);
+src/mvc/entity/view/cli/HeroViewCLI.java:11:	}
+src/mvc/entity/view/cli/HeroViewCLI.java:12:	
+src/mvc/entity/view/cli/HeroViewCLI.java:13:	@Override
+src/mvc/entity/view/cli/HeroViewCLI.java:14:	public void showObjectNotFindInInventory(String item) {
+src/mvc/entity/view/cli/HeroViewCLI.java:15:		System.out.println(item + "not in the inventory");
+src/mvc/entity/view/cli/HeroViewCLI.java:16:	}
+src/mvc/entity/view/cli/HeroViewCLI.java:18:	@Override
+src/mvc/entity/view/cli/HeroViewCLI.java:19:	public void showLocation(String loc) {
+src/mvc/entity/view/cli/HeroViewCLI.java:20:    	System.out.println("Location: " + loc);
+src/mvc/entity/view/cli/HeroViewCLI.java:21:	}
+src/mvc/entity/view/cli/HeroViewCLI.java:23:	@Override
+src/mvc/entity/view/cli/HeroViewCLI.java:24:	public void showNoHealSpell() {
+src/mvc/entity/view/cli/HeroViewCLI.java:25:		System.out.println("You don't know how to use this spell yet.");
+src/mvc/entity/view/cli/HeroViewCLI.java:26:	}
+src/mvc/entity/view/cli/HeroViewCLI.java:27:	
+src/mvc/entity/view/cli/HeroViewCLI.java:28:	@Override
+src/mvc/entity/view/cli/HeroViewCLI.java:29:	public void receiveHealingPower() {
+src/mvc/entity/view/cli/HeroViewCLI.java:30:		System.out.println("You receive a healing power.");
+src/mvc/entity/view/cli/HeroViewCLI.java:31:	}
+src/mvc/entity/view/cli/HeroViewCLI.java:32:	
+src/mvc/entity/view/cli/HeroViewCLI.java:33:	@Override
+src/mvc/entity/view/cli/HeroViewCLI.java:34:	public void showDontKnowHealingSpell() {
+src/mvc/entity/view/cli/HeroViewCLI.java:35:		System.out.println("You don't know any healing spell.");
+src/mvc/entity/view/cli/HeroViewCLI.java:36:	}
+src/mvc/entity/view/cli/HeroViewCLI.java:37:	
+src/mvc/entity/view/cli/HeroViewCLI.java:38:	@Override
+src/mvc/entity/view/cli/HeroViewCLI.java:39:	public void useHealingPower() {
+src/mvc/entity/view/cli/HeroViewCLI.java:40:		System.out.println("You use your healing power !");
+src/mvc/entity/view/cli/HeroViewCLI.java:41:	}
+src/mvc/entity/view/cli/HeroViewCLI.java:42:}
+src/mvc/entity/view/base/HeroView.java:1:package entity.view.base;
+src/mvc/entity/view/base/HeroView.java:3:import mvc.View;
+src/mvc/entity/view/base/HeroView.java:5:public abstract class HeroView implements View {
+src/mvc/entity/view/base/HeroView.java:7:    @Override public void hide() {}
+src/mvc/entity/view/base/HeroView.java:8:    @Override public void show() {}
+src/mvc/entity/view/base/HeroView.java:10:    public abstract void showDropObject(String character, String item);
+src/mvc/entity/view/base/HeroView.java:11:    public abstract void showObjectNotFindInInventory(String item);
+src/mvc/entity/view/base/HeroView.java:12:    public abstract void showLocation(String loc);
+src/mvc/entity/view/base/HeroView.java:13:    public abstract void showNoHealSpell();
+src/mvc/entity/view/base/HeroView.java:14:	public abstract void receiveHealingPower();
+src/mvc/entity/view/base/HeroView.java:15:	public abstract void showDontKnowHealingSpell();
+src/mvc/entity/view/base/HeroView.java:16:	public abstract void useHealingPower();
+src/mvc/entity/view/base/HeroView.java:17:}
+src/mvc/entity/view/gui/HeroViewGUI.java:1:package entity.view.gui;
+src/mvc/entity/view/gui/HeroViewGUI.java:4:import entity.view.base.HeroView;
+src/mvc/entity/view/gui/HeroViewGUI.java:7:public class HeroViewGUI extends HeroView {
+src/mvc/entity/view/gui/HeroViewGUI.java:8:    @Override public void hide() {}
+src/mvc/entity/view/gui/HeroViewGUI.java:9:    @Override public void show() {}
+src/mvc/entity/view/gui/HeroViewGUI.java:11:    @Override public void showDropObject(String c, String i) {}
+src/mvc/entity/view/gui/HeroViewGUI.java:12:    @Override public void showObjectNotFindInInventory(String i) {}
+src/mvc/entity/view/gui/HeroViewGUI.java:13:    @Override public void showLocation(String loc) {}
+src/mvc/entity/view/gui/HeroViewGUI.java:15:    @Override public void showDontKnowHealingSpell(){};
+src/mvc/entity/view/gui/HeroViewGUI.java:16:    @Override public void receiveHealingPower(){};
+src/mvc/entity/view/gui/HeroViewGUI.java:17:    @Override public void showNoHealSpell(){};
+src/mvc/entity/view/gui/HeroViewGUI.java:18:    @Override public void useHealingPower(){};
+src/mvc/entity/view/gui/HeroViewGUI.java:21:}
+src/mvc/entity/controller/HeroController.java:1:package entity.controller;
+src/mvc/entity/controller/HeroController.java:3:import mvc.Controller;
+src/mvc/entity/controller/HeroController.java:4:import common.item.Item;
+src/mvc/entity/controller/HeroController.java:5:import entity.model.HeroModel;
+src/mvc/entity/controller/HeroController.java:6:import entity.view.base.HeroView;
+src/mvc/entity/controller/HeroController.java:8:public class HeroController extends Controller {
+src/mvc/entity/controller/HeroController.java:10:    private final HeroModel heroModel;
+src/mvc/entity/controller/HeroController.java:11:    private final HeroView viewGUI;
+src/mvc/entity/controller/HeroController.java:12:    private final HeroView viewCLI;
+src/mvc/entity/controller/HeroController.java:14:    public HeroController(HeroModel heroModel, HeroView viewGUI, HeroView viewCLI) {
+src/mvc/entity/controller/HeroController.java:15:        super(heroModel, viewGUI, viewCLI);
+src/mvc/entity/controller/HeroController.java:16:        this.heroModel = heroModel;
+src/mvc/entity/controller/HeroController.java:17:        this.viewGUI = viewGUI;
+src/mvc/entity/controller/HeroController.java:18:        this.viewCLI = viewCLI;
+src/mvc/entity/controller/HeroController.java:19:    }
+src/mvc/entity/controller/HeroController.java:21:    // Déposer un item
+src/mvc/entity/controller/HeroController.java:22:    public void onDropItem(Item itemToDrop) {
+src/mvc/entity/controller/HeroController.java:23:        Item dropped = heroModel.drop(itemToDrop.getName());
+src/mvc/entity/controller/HeroController.java:25:        if (dropped == null) {
+src/mvc/entity/controller/HeroController.java:26:            viewGUI.showObjectNotFindInInventory(itemToDrop.getName());
+src/mvc/entity/controller/HeroController.java:27:            viewCLI.showObjectNotFindInInventory(itemToDrop.getName());
+src/mvc/entity/controller/HeroController.java:28:        } else {
+src/mvc/entity/controller/HeroController.java:29:            viewGUI.showDropObject(heroModel.getName(), dropped.getName());
+src/mvc/entity/controller/HeroController.java:30:            viewCLI.showDropObject(heroModel.getName(), dropped.getName());
+src/mvc/entity/controller/HeroController.java:31:            heroModel.getRoom().addItem(dropped);
+src/mvc/entity/controller/HeroController.java:32:        }
+src/mvc/entity/controller/HeroController.java:33:    }
+src/mvc/entity/controller/HeroController.java:35:}
+src/application/Main.java:1:package application;
+src/application/Main.java:3:import common.entity.Hero;
+src/application/Main.java:4:import common.item.Bag;
+src/application/Main.java:5:import common.item.Item;
+src/application/Main.java:6:import common.item.Key;
+src/application/Main.java:7:import common.item.Weapon;
+src/application/Main.java:8:import common.map.Room;
+src/application/Main.java:10:public class Main {
+src/application/Main.java:11:	// TODO
+src/application/Main.java:12:	// Identifier les constantes (comme celles ci-dessous) et les mettres dans des fichiers a part
+src/application/Main.java:13:	private final static int DEFAULT_HERO_DAMAGE = 10;
+src/application/Main.java:14:	private final static int DEFAULT_HERO_BAG_CAPACITY = 5;
+src/application/Main.java:15:	
+src/application/Main.java:16:    public static void main(String[] args) {
+src/application/Main.java:18:        Room entrance = new Room("Entrance");
+src/application/Main.java:19:        Room corridor = new Room("Dark Corridor");
+src/application/Main.java:20:        Room treasureRoom = new Room("Treasure Room");
+src/application/Main.java:21:        
+src/application/Main.java:22:        Key key = new Key("Key", "A key to a special door");
+src/application/Main.java:24:        entrance.addExit("north", corridor);
+src/application/Main.java:25:        corridor.addExit("south", entrance);
+src/application/Main.java:26:        corridor.addLockedExit("east", treasureRoom, key);
+src/application/Main.java:27:        treasureRoom.addExit("west", corridor);
+src/application/Main.java:30:        entrance.addItem(key);
+src/application/Main.java:31:        corridor.addItem(new Item("Potion"));
+src/application/Main.java:32:        treasureRoom.addItem(new Weapon("Sword", 18));
+src/application/Main.java:34:        // TODO
+src/application/Main.java:35:        // Instancier les commandes ici pour les ajouter ensuite au héro.
+src/application/Main.java:36:        
+src/application/Main.java:37:        
+src/application/Main.java:38:        Hero hero = new Hero(
+src/application/Main.java:39:        		"Hero",
+src/application/Main.java:40:        		100,
+src/application/Main.java:41:        		new Bag(
+src/application/Main.java:42:        				"nom du sac",
+src/application/Main.java:43:        				DEFAULT_HERO_BAG_CAPACITY),
+src/application/Main.java:44:        		entrance,
+src/application/Main.java:45:        		DEFAULT_HERO_DAMAGE);
+src/application/Main.java:47:        System.out.println(hero.getName());
+src/application/Main.java:48:        
+src/application/Main.java:49:        // TODO
+src/application/Main.java:50:        // ajouter les controllers, etc 
+src/application/Main.java:51:        // RoomController game = new RoomController(hero, new RoomView());
+src/application/Main.java:52:        // game.run();
+src/application/Main.java:53:    }
+src/application/Main.java:54:}
+src/common/map/SimpleExit.java:1:package common.map;
+src/common/map/SimpleExit.java:3:import common.entity.Hero;
+src/common/map/SimpleExit.java:5:public class SimpleExit extends Exit {
+src/common/map/SimpleExit.java:7:    public SimpleExit(Room target) {
+src/common/map/SimpleExit.java:8:        super(target);
+src/common/map/SimpleExit.java:9:    }
+src/common/map/SimpleExit.java:11:    @Override
+src/common/map/SimpleExit.java:12:    public boolean canCross(Hero h) {
+src/common/map/SimpleExit.java:13:        return true;
+src/common/map/SimpleExit.java:14:    }
+src/common/map/SimpleExit.java:15:}
+src/common/map/Exit.java:1:package common.map;
+src/common/map/Exit.java:3:import java.io.Serializable;
+src/common/map/Exit.java:5:import common.entity.Hero;
+src/common/map/Exit.java:7:public abstract class Exit implements Serializable {
+src/common/map/Exit.java:8:    private static final long serialVersionUID = 1L;
+src/common/map/Exit.java:9:    private final Room target;
+src/common/map/Exit.java:11:    protected Exit(Room target) {
+src/common/map/Exit.java:12:        this.target = target;
+src/common/map/Exit.java:13:    }
+src/common/map/Exit.java:15:    public Room getTarget() {
+src/common/map/Exit.java:16:        return target;
+src/common/map/Exit.java:17:    }
+src/common/map/Exit.java:19:    public abstract boolean canCross(Hero h);
+src/common/map/Exit.java:21:    public Room cross(Hero h) {
+src/common/map/Exit.java:22:        if (canCross(h)) {
+src/common/map/Exit.java:23:            return target;
+src/common/map/Exit.java:24:        }
+src/common/map/Exit.java:25:        return null;
+src/common/map/Exit.java:26:    }
+src/common/map/Exit.java:27:}
+src/common/map/LockedExit.java:1:package common.map;
+src/common/map/LockedExit.java:3:import common.entity.Hero;
+src/common/map/LockedExit.java:4:import common.item.Key;
+src/common/map/LockedExit.java:6:public class LockedExit extends Exit {
+src/common/map/LockedExit.java:7:    private boolean locked;
+src/common/map/LockedExit.java:8:    private Key key;
+src/common/map/LockedExit.java:10:    public LockedExit(Room target, Key keyItem) {
+src/common/map/LockedExit.java:11:        super(target);
+src/common/map/LockedExit.java:12:        this.key = keyItem;
+src/common/map/LockedExit.java:13:        this.locked = false;
+src/common/map/LockedExit.java:14:    }
+src/common/map/LockedExit.java:16:    @Override
+src/common/map/LockedExit.java:17:    public boolean canCross(Hero h) {
+src/common/map/LockedExit.java:18:        return !locked;
+src/common/map/LockedExit.java:19:    }
+src/common/map/LockedExit.java:21:    public void unlock(Hero h) {
+src/common/map/LockedExit.java:22:        locked = false;
+src/common/map/LockedExit.java:23:    }
+src/common/map/LockedExit.java:24:    
+src/common/map/LockedExit.java:25:    public Key getKey() {
+src/common/map/LockedExit.java:26:    	return this.key;
+src/common/map/LockedExit.java:27:    }
+src/common/map/LockedExit.java:29:    public boolean isLocked() {
+src/common/map/LockedExit.java:30:        return locked;
+src/common/map/LockedExit.java:31:    }
+src/common/map/LockedExit.java:32:}
+src/common/map/Room.java:1:package common.map;
+src/common/map/Room.java:3:import java.io.Serializable;
+src/common/map/Room.java:4:import java.util.ArrayList;
+src/common/map/Room.java:5:import java.util.HashMap;
+src/common/map/Room.java:6:import java.util.List;
+src/common/map/Room.java:7:import java.util.Map;
+src/common/map/Room.java:9:import common.entity.Character;
+src/common/map/Room.java:10:import common.entity.Hero;
+src/common/map/Room.java:11:import common.item.Item;
+src/common/map/Room.java:12:import common.item.Key;
+src/common/map/Room.java:14:public class Room implements Serializable {
+src/common/map/Room.java:15:    private static final long serialVersionUID = 1L;
+src/common/map/Room.java:16:    private final String name;
+src/common/map/Room.java:17:    private final Map<String, Exit> exits;
+src/common/map/Room.java:18:    private final List<Item> items;
+src/common/map/Room.java:19:    private final List<Character> characters;
+src/common/map/Room.java:21:    public Room(String name) {
+src/common/map/Room.java:22:        this.name = name;
+src/common/map/Room.java:23:        this.exits = new HashMap<>();
+src/common/map/Room.java:24:        this.items = new ArrayList<>();
+src/common/map/Room.java:25:        this.characters = new ArrayList<>();
+src/common/map/Room.java:26:    }
+src/common/map/Room.java:28:    public String getName() {
+src/common/map/Room.java:29:        return name;
+src/common/map/Room.java:30:    }
+src/common/map/Room.java:32:    public void addExit(String key, Room toRoom) {
+src/common/map/Room.java:33:    	Exit exit = new SimpleExit(toRoom);
+src/common/map/Room.java:34:        exits.put(key.toLowerCase(), exit);
+src/common/map/Room.java:35:    }
+src/common/map/Room.java:36:    
+src/common/map/Room.java:37:    public void addLockedExit(String key, Room toRoom, Key keyItem) {
+src/common/map/Room.java:38:    	Exit exit = new LockedExit(toRoom, keyItem);
+src/common/map/Room.java:39:        exits.put(key.toLowerCase(), exit);
+src/common/map/Room.java:40:    }
+src/common/map/Room.java:42:    public Exit getExit(String key) {
+src/common/map/Room.java:43:        return exits.get(key.toLowerCase());
+src/common/map/Room.java:44:    }
+src/common/map/Room.java:46:    public Map<String, Exit> getExits() {
+src/common/map/Room.java:47:        return exits;
+src/common/map/Room.java:48:    }
+src/common/map/Room.java:50:    public void addItem(Item i) {
+src/common/map/Room.java:51:        items.add(i);
+src/common/map/Room.java:52:    }
+src/common/map/Room.java:54:    public void removeItem(Item i) {
+src/common/map/Room.java:55:        items.remove(i);
+src/common/map/Room.java:56:    }
+src/common/map/Room.java:58:    public List<Item> getItems() {
+src/common/map/Room.java:59:        return items;
+src/common/map/Room.java:60:    }
+src/common/map/Room.java:62:    public void addCharacter(Character c) {
+src/common/map/Room.java:63:        characters.add(c);
+src/common/map/Room.java:64:    }
+src/common/map/Room.java:66:    public void removeCharacter(Character c) {
+src/common/map/Room.java:67:        characters.remove(c);
+src/common/map/Room.java:68:    }
+src/common/map/Room.java:70:    public List<Character> getCharacters() {
+src/common/map/Room.java:71:        return characters;
+src/common/map/Room.java:72:    }
+src/common/map/Room.java:74:    public void enter(Hero h) {
+src/common/map/Room.java:75:        // comportement spécial si besoin
+src/common/map/Room.java:76:    }
+src/common/map/Room.java:77:}
+src/common/item/Weapon.java:1:package common.item;
+src/common/item/Weapon.java:3:import common.entity.Hero;
+src/common/item/Weapon.java:5:public class Weapon extends UsableItem {
+src/common/item/Weapon.java:7:    private final int damage;
+src/common/item/Weapon.java:9:    public Weapon(String name, int damage) {
+src/common/item/Weapon.java:10:        super(name);
+src/common/item/Weapon.java:11:        this.damage = damage;
+src/common/item/Weapon.java:12:    }
+src/common/item/Weapon.java:14:    public int getDamage() {
+src/common/item/Weapon.java:15:        return damage;
+src/common/item/Weapon.java:16:    }
+src/common/item/Weapon.java:18:    @Override
+src/common/item/Weapon.java:19:    public void use(Hero h) {
+src/common/item/Weapon.java:20:        h.addItem(this);
+src/common/item/Weapon.java:21:    }
+src/common/item/Weapon.java:23:    @Override
+src/common/item/Weapon.java:24:    public String getDescription() {
+src/common/item/Weapon.java:25:        return getName() + " (weapon, +" + damage + " dmg)";
+src/common/item/Weapon.java:26:    }
+src/common/item/Weapon.java:27:}
+src/common/item/UsableItem.java:1:package common.item;
+src/common/item/UsableItem.java:3:import common.entity.Hero;
+src/common/item/UsableItem.java:5:public abstract class UsableItem extends Item {
+src/common/item/UsableItem.java:7:	public UsableItem(String name) {
+src/common/item/UsableItem.java:8:		super(name);
+src/common/item/UsableItem.java:9:	}
+src/common/item/UsableItem.java:10:	
+src/common/item/UsableItem.java:11:	public UsableItem(String name, String description) {
+src/common/item/UsableItem.java:12:		super(name, description);
+src/common/item/UsableItem.java:13:	}
+src/common/item/UsableItem.java:15:	public abstract void use(Hero h);
+src/common/item/UsableItem.java:16:}
+src/common/item/Spell.java:1:package common.item;
+src/common/item/Spell.java:3:import java.io.Serializable;
+src/common/item/Spell.java:5:import common.entity.Hero;
+src/common/item/Spell.java:7:public abstract class Spell implements Serializable {
+src/common/item/Spell.java:8:    private final String name;
+src/common/item/Spell.java:10:    protected Spell(String name) {
+src/common/item/Spell.java:11:        this.name = name;
+src/common/item/Spell.java:12:    }
+src/common/item/Spell.java:14:    public String getName() {
+src/common/item/Spell.java:15:        return name;
+src/common/item/Spell.java:16:    }
+src/common/item/Spell.java:18:    /* Lance le sort sur le héros (ici le lanceur lui-même). */
+src/common/item/Spell.java:19:    // Y'a moyen que cast dégage pour un autre système :
+src/common/item/Spell.java:20:    //  Liste de commandes dans le héro et apprendre un sort ajoute une commande
+src/common/item/Spell.java:21:    public abstract void cast(Hero caster);
+src/common/item/Spell.java:22:}
+src/common/item/Scroll.java:1:package common.item;
+src/common/item/Scroll.java:3:import common.entity.Hero;
+src/common/item/Scroll.java:5:public class Scroll extends Item {
+src/common/item/Scroll.java:6:    private final Spell spell;
+src/common/item/Scroll.java:8:    public Scroll(String name, Spell spell) {
+src/common/item/Scroll.java:9:        super(name);
+src/common/item/Scroll.java:10:        this.spell = spell;
+src/common/item/Scroll.java:11:    }
+src/common/item/Scroll.java:13:    public void use(Hero h) {
+src/common/item/Scroll.java:14:    	// TODO Auto-generated method stub
+src/common/item/Scroll.java:15:    	// Faire apprendre la commande du sort au héro
+src/common/item/Scroll.java:16:    	// -> ajouter une liste de commande au héro au préalable
+src/common/item/Scroll.java:17:        h.removeFromInventory(this);
+src/common/item/Scroll.java:18:    }
+src/common/item/Scroll.java:20:    @Override
+src/common/item/Scroll.java:21:    public String getDescription() {
+src/common/item/Scroll.java:22:        return getName() + " (scroll: " + spell.getName() + ")";
+src/common/item/Scroll.java:23:    }
+src/common/item/Scroll.java:24:}
+src/common/item/Bag.java:1:package common.item;
+src/common/item/Bag.java:3:import java.io.Serializable;
+src/common/item/Bag.java:4:import java.util.ArrayList;
+src/common/item/Bag.java:5:import java.util.List;
+src/common/item/Bag.java:7:public class Bag extends Item implements Serializable {
+src/common/item/Bag.java:8:    private final int capacity;
+src/common/item/Bag.java:9:    private final List<Item> content;
+src/common/item/Bag.java:11:    public Bag(String name, int capacity) {
+src/common/item/Bag.java:12:        super(name);
+src/common/item/Bag.java:13:        this.capacity = capacity;
+src/common/item/Bag.java:14:        this.content = new ArrayList<>();
+src/common/item/Bag.java:15:    }
+src/common/item/Bag.java:17:    public int getCapacity() {
+src/common/item/Bag.java:18:        return capacity;
+src/common/item/Bag.java:19:    }
+src/common/item/Bag.java:21:    public boolean addItem(Item i) {
+src/common/item/Bag.java:22:        return content.add(i);
+src/common/item/Bag.java:23:    }
+src/common/item/Bag.java:25:    public boolean removeItem(Item i) {
+src/common/item/Bag.java:26:        return content.remove(i);
+src/common/item/Bag.java:27:    }
+src/common/item/Bag.java:29:    public List<Item> getContent() {
+src/common/item/Bag.java:30:        return content;
+src/common/item/Bag.java:31:    }
+src/common/item/Bag.java:33:    @Override
+src/common/item/Bag.java:34:    public String getDescription() {
+src/common/item/Bag.java:35:        return getName() + " (bag, capacity " + capacity + ")";
+src/common/item/Bag.java:36:    }
+src/common/item/Bag.java:37:}
+src/common/item/Key.java:1:package common.item;
+src/common/item/Key.java:3:import common.entity.Hero;
+src/common/item/Key.java:5:public class Key extends UsableItem {
+src/common/item/Key.java:7:	public Key(String name) {
+src/common/item/Key.java:8:		super(name);
+src/common/item/Key.java:9:	}
+src/common/item/Key.java:10:	
+src/common/item/Key.java:11:	public Key(String name, String description) {
+src/common/item/Key.java:12:		super(name, description);
+src/common/item/Key.java:13:	}
+src/common/item/Key.java:15:	@Override
+src/common/item/Key.java:16:	public void use(Hero h) {
+src/common/item/Key.java:17:		// TODO Auto-generated method stub
+src/common/item/Key.java:18:		// Vérifier les exits autour du héro.
+src/common/item/Key.java:19:		// Si une des exits est une LockedExit, faire son getKey()
+src/common/item/Key.java:20:		// Si son getKey == this alors on fais unlock().
+src/common/item/Key.java:21:	}
+src/common/item/Key.java:23:}
+src/common/item/HealSpell.java:1:package common.item;
+src/common/item/HealSpell.java:3:import common.entity.Hero;
+src/common/item/HealSpell.java:5:public class HealSpell extends Spell {
+src/common/item/HealSpell.java:6:    private final int healAmount;
+src/common/item/HealSpell.java:8:    public HealSpell(int healAmount) {
+src/common/item/HealSpell.java:9:        super("Heal");
+src/common/item/HealSpell.java:10:        this.healAmount = healAmount;
+src/common/item/HealSpell.java:11:    }
+src/common/item/HealSpell.java:13:    @Override
+src/common/item/HealSpell.java:14:    public void cast(Hero caster) {
+src/common/item/HealSpell.java:15:        int before = caster.getHp();
+src/common/item/HealSpell.java:16:        int after = before + healAmount;
+src/common/item/HealSpell.java:18:        caster.setHp(after);
+src/common/item/HealSpell.java:19:    }
+src/common/item/HealSpell.java:20:}
+src/common/item/Item.java:1:package common.item;
+src/common/item/Item.java:3:import java.io.Serializable;
+src/common/item/Item.java:5:public class Item implements Serializable {
+src/common/item/Item.java:6:    private final String name;
+src/common/item/Item.java:7:    private final String description;
+src/common/item/Item.java:9:    public Item(String name) {
+src/common/item/Item.java:10:        this(name, "");
+src/common/item/Item.java:11:    }
+src/common/item/Item.java:13:    public Item(String name, String description) {
+src/common/item/Item.java:14:        this.name = name;
+src/common/item/Item.java:15:        this.description = description;
+src/common/item/Item.java:16:    }
+src/common/item/Item.java:18:    public String getName() {
+src/common/item/Item.java:19:        return name;
+src/common/item/Item.java:20:    }
+src/common/item/Item.java:22:    public String getDescription() {
+src/common/item/Item.java:23:        return description;
+src/common/item/Item.java:24:    }
+src/common/item/Item.java:25:}
+src/common/entity/Character.java:1:package common.entity;
+src/common/entity/Character.java:3:import java.io.Serializable;
+src/common/entity/Character.java:4:import java.util.ArrayList;
+src/common/entity/Character.java:5:import java.util.List;
+src/common/entity/Character.java:7:import common.item.Item;
+src/common/entity/Character.java:9:public class Character implements Serializable {
+src/common/entity/Character.java:10:    private final String name;
+src/common/entity/Character.java:11:    private int hp;
+src/common/entity/Character.java:13:    private final List<Item> inventory = new ArrayList<>();
+src/common/entity/Character.java:15:    public Character(String name, int hp) {
+src/common/entity/Character.java:16:        this.name = name;
+src/common/entity/Character.java:17:        this.hp = hp;
+src/common/entity/Character.java:18:    }
+src/common/entity/Character.java:20:    public String getName() {
+src/common/entity/Character.java:21:        return name;
+src/common/entity/Character.java:22:    }
+src/common/entity/Character.java:24:    public int getHp() {
+src/common/entity/Character.java:25:        return hp;
+src/common/entity/Character.java:26:    }
+src/common/entity/Character.java:28:    public void setHp(int hp) {
+src/common/entity/Character.java:29:        this.hp = hp;
+src/common/entity/Character.java:30:    }
+src/common/entity/Character.java:32:    public List<Item> getInventory() {
+src/common/entity/Character.java:33:        return inventory;
+src/common/entity/Character.java:34:    }
+src/common/entity/Character.java:36:    public void addToInventory(Item item) {
+src/common/entity/Character.java:37:        inventory.add(item);
+src/common/entity/Character.java:38:    }
+src/common/entity/Character.java:40:    public void removeFromInventory(Item item) {
+src/common/entity/Character.java:41:        inventory.remove(item);
+src/common/entity/Character.java:42:    }
+src/common/entity/Character.java:43:}
+src/common/entity/Boss.java:1:package common.entity;
+src/common/entity/Boss.java:3:public class Boss extends Character {
+src/common/entity/Boss.java:4:    private final int maxHp;
+src/common/entity/Boss.java:5:    private boolean hasRegenerated;
+src/common/entity/Boss.java:7:    public Boss(String name, int hp) {
+src/common/entity/Boss.java:8:        super(name, hp);
+src/common/entity/Boss.java:9:        this.maxHp = hp;          // PV max = PV de départ
+src/common/entity/Boss.java:10:        this.hasRegenerated = false;
+src/common/entity/Boss.java:11:    }
+src/common/entity/Boss.java:13:    /**
+src/common/entity/Boss.java:14:     * si le boss est à <= 50% de sa vie max,
+src/common/entity/Boss.java:15:     * et qu'il n'a pas encore régénéré,
+src/common/entity/Boss.java:16:     * il regagne 30% de sa vie max (une seule fois).
+src/common/entity/Boss.java:17:     */
+src/common/entity/Boss.java:18:    public void maybeRegen() {
+src/common/entity/Boss.java:19:        int current = getHp();
+src/common/entity/Boss.java:21:        // mort -> pas de résurrection
+src/common/entity/Boss.java:22:        if (current <= 0) {
+src/common/entity/Boss.java:23:            return;
+src/common/entity/Boss.java:24:        }
+src/common/entity/Boss.java:26:        // déjà régénéré -> on ne refait pas
+src/common/entity/Boss.java:27:        if (hasRegenerated) {
+src/common/entity/Boss.java:28:            return;
+src/common/entity/Boss.java:29:        }
+src/common/entity/Boss.java:31:        // condition : à la moitié ou moins de sa vie max
+src/common/entity/Boss.java:32:        if (current <= maxHp / 2) {
+src/common/entity/Boss.java:33:            int regenAmount = (int) (maxHp * 0.3); // 30% des PV max
+src/common/entity/Boss.java:34:            int newHp = current + regenAmount;
+src/common/entity/Boss.java:36:            if (newHp > maxHp) {
+src/common/entity/Boss.java:37:                newHp = maxHp; // on ne dépasse pas les PV max
+src/common/entity/Boss.java:38:            }
+src/common/entity/Boss.java:40:            setHp(newHp);
+src/common/entity/Boss.java:41:            hasRegenerated = true;
+src/common/entity/Boss.java:42:        }
+src/common/entity/Boss.java:43:    }
+src/common/entity/Boss.java:45:   
+src/common/entity/Boss.java:47:}
+src/common/entity/Hero.java:1:package common.entity;
+src/common/entity/Hero.java:3:import java.util.List;
+src/common/entity/Hero.java:5:import common.item.Bag;
+src/common/entity/Hero.java:6:import common.item.Item;
+src/common/entity/Hero.java:7:import common.item.Weapon;
+src/common/entity/Hero.java:8:import common.map.Room;
+src/common/entity/Hero.java:10:public class Hero extends Character {
+src/common/entity/Hero.java:11:    
+src/common/entity/Hero.java:12:    private final Bag backpack;
+src/common/entity/Hero.java:13:    private Room room;
+src/common/entity/Hero.java:14:    private int damage;
+src/common/entity/Hero.java:15:	
+src/common/entity/Hero.java:16:    public Hero (String name, int hp, Bag backpack, Room room, int baseDamage) {
+src/common/entity/Hero.java:17:        super(name, hp);
+src/common/entity/Hero.java:18:        this.backpack = backpack;
+src/common/entity/Hero.java:19:        this.room = room;
+src/common/entity/Hero.java:20:        this.damage = baseDamage;
+src/common/entity/Hero.java:21:    }
+src/common/entity/Hero.java:23:    public Bag getBackpack(){
+src/common/entity/Hero.java:24:        return this.backpack;
+src/common/entity/Hero.java:25:    }
+src/common/entity/Hero.java:27:    public void addItem(Item item) { 
+src/common/entity/Hero.java:28:        if (item instanceof Weapon) {
+src/common/entity/Hero.java:29:            Weapon weapon = (Weapon) item;
+src/common/entity/Hero.java:30:            this.damage += weapon.getDamage();
+src/common/entity/Hero.java:31:        }
+src/common/entity/Hero.java:32:        // Voir ici si il ne faudra pas retirer l'objet de la piece, au moment ou on le récupère dans l'inventaire.
+src/common/entity/Hero.java:33:    	this.addToInventory(item); 
+src/common/entity/Hero.java:34:    }
+src/common/entity/Hero.java:35:    
+src/common/entity/Hero.java:36:    // Si le héro a l'item sur lui : on le dépose dans la salle
+src/common/entity/Hero.java:37:    public void dropItem(Item itemToDrop) {
+src/common/entity/Hero.java:38:        for (Item item : this.getInventory()) {
+src/common/entity/Hero.java:39:            if (item.getName().equals(itemToDrop.getName())) {
+src/common/entity/Hero.java:40:                if (item instanceof Weapon) {
+src/common/entity/Hero.java:41:                    Weapon weapon = (Weapon) item;
+src/common/entity/Hero.java:42:                    this.damage -= weapon.getDamage();
+src/common/entity/Hero.java:43:                }
+src/common/entity/Hero.java:44:                this.removeFromInventory(item);
+src/common/entity/Hero.java:45:                this.room.addItem(item);
+src/common/entity/Hero.java:46:            }
+src/common/entity/Hero.java:47:        }
+src/common/entity/Hero.java:48:    }
+src/common/entity/Hero.java:50:    // Getter and setters
+src/common/entity/Hero.java:51:    public Room getRoom() { 
+src/common/entity/Hero.java:52:    	return this.room; 
+src/common/entity/Hero.java:53:    }
+src/common/entity/Hero.java:54:    
+src/common/entity/Hero.java:55:    public void setCurrentRoom(Room r) { 
+src/common/entity/Hero.java:56:    	this.room = r; 
+src/common/entity/Hero.java:57:    }
+src/common/entity/Hero.java:59:    // Les items du héro sont dans le bagpack
+src/common/entity/Hero.java:60:    @Override
+src/common/entity/Hero.java:61:    public List<Item> getInventory() {
+src/common/entity/Hero.java:62:        return this.backpack.getContent();
+src/common/entity/Hero.java:63:    }
+src/common/entity/Hero.java:65:    // On pourra utiliser la limite du sac pour limiter le nombre d'objets possible à avoir sur soi
+src/common/entity/Hero.java:66:    @Override
+src/common/entity/Hero.java:67:    public void addToInventory(Item item) {
+src/common/entity/Hero.java:68:        this.backpack.addItem(item);
+src/common/entity/Hero.java:69:    }
+src/common/entity/Hero.java:71:    @Override
+src/common/entity/Hero.java:72:    public void removeFromInventory(Item item) {
+src/common/entity/Hero.java:73:        this.backpack.removeItem(item);
+src/common/entity/Hero.java:74:    }
+src/common/entity/Hero.java:75:}
