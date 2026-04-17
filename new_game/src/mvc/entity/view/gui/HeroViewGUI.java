@@ -1,6 +1,5 @@
-package entity.view.gui;
+package mvc.entity.view.gui;
 
-import entity.view.base.HeroView;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -10,6 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import mvc.entity.view.base.HeroView;
 
 public class HeroViewGUI extends HeroView {
 

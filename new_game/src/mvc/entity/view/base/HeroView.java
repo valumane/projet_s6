@@ -1,16 +1,14 @@
-package entity.view.base;
+package mvc.entity.view.base;
 
-import mvc.View;
+import mvc.mvc.View;
 
 public abstract class HeroView implements View {
 
     @Override
-    public void hide() {
-    }
+    public void hide() {}
 
     @Override
-    public void show() {
-    }
+    public void show() {}
 
     public abstract void showDropObject(String character, String item);
 
@@ -26,7 +24,7 @@ public abstract class HeroView implements View {
 
     public abstract void useHealingPower();
 
-    public abstract void showHealth(int HpHero);
+    public abstract void showHealth(int hpHero);
 
     public void setOnRemoveHp(Runnable action) {
     }

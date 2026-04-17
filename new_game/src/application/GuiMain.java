@@ -1,14 +1,15 @@
 package application;
 
-import entity.controller.HeroController;
-import entity.model.HeroModel;
-import entity.view.cli.HeroViewCLI;
-import entity.view.gui.HeroViewGUI;
-import javafx.application.Application;
-import javafx.stage.Stage;
 import common.entity.Hero;
 import common.item.Bag;
 import common.map.Room;
+import javafx.application.Application;
+import javafx.stage.Stage;
+import mvc.entity.controller.HeroController;
+import mvc.entity.model.HeroModel;
+import mvc.entity.view.cli.HeroViewCLI;
+import mvc.entity.view.gui.HeroViewGUI;
+
 
 public class GuiMain extends Application {
 
@@ -31,12 +32,10 @@ public class GuiMain extends Application {
         HeroViewGUI viewGUI = new HeroViewGUI(stage);
         HeroViewCLI viewCLI = new HeroViewCLI();
 
-        new HeroController(model, viewGUI, viewCLI); // <- branche le bouton ici
-
+        new HeroController(model, viewCLI, viewGUI); // <- branche le bouton ici
+        // --- init model ---
+        model.syncState();
         // --- init affichage ---
-        viewGUI.setHeroName(model.getName());
-        viewGUI.showLocation(model.getRoom().getName());
-        viewGUI.showHealth(model.getHealth());
         viewGUI.show();
     }
 

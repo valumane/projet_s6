@@ -1,11 +1,11 @@
-package map.controller;
+package mvc.map.controller;
 
 import java.util.Scanner;
 
 import common.item.Item;
-import entity.model.HeroModel;
-import map.model.Room;
-import map.view.cli.RoomView;
+import mvc.entity.model.HeroModel;
+import mvc.map.view.cli.RoomView;
+
 
 public class RoomController {
 

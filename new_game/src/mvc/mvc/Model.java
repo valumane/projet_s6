@@ -1,4 +1,4 @@
-package mvc;
+package mvc.mvc;
 
 
 /// Generic Model for the triple {Model-View-Controller}

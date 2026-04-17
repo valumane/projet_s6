@@ -1,4 +1,4 @@
-package map.model;
+package mvc.map.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 
 import common.item.Item;
 import common.entity.Character;
+
 /**
  * MODEL - Représente l'état d'une salle.
  * Aucun System.out.println ici : le Model ne sait pas qu'il y a un affichage.

@@ -1,4 +1,4 @@
-package map.view.cli;
+package mvc.map.view.cli;
 
 import common.map.Room;
 /**

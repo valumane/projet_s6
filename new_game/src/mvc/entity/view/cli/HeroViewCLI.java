@@ -1,6 +1,6 @@
-package entity.view.cli;
+package mvc.entity.view.cli;
 
-import entity.view.base.HeroView;
+import mvc.entity.view.base.HeroView;
 
 public class HeroViewCLI extends HeroView {
 
