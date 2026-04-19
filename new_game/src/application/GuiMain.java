@@ -19,7 +19,7 @@ public class GuiMain extends Application {
     @Override
     public void start(Stage stage) {
         // --- domain ---
-        Room entrance = new Room("Entrance");
+        Room entrance = new Room("Entrance", "desc");
         Hero hero = new Hero(
                 "Hero",
                 100,
