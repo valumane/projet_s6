@@ -1,6 +1,7 @@
 package mvc.entity.model;
 
 import common.item.Item;
+import common.item.Weapon;
 import common.entity.Hero;
 import common.map.Room;
 import mvc.mvc.Model;
@@ -15,6 +16,7 @@ public class HeroModel implements Model {
 
     private final Hero hero;
     private Listener listener;
+
     public HeroModel(Hero hero) {
         this.hero = hero;
     }
@@ -23,44 +25,40 @@ public class HeroModel implements Model {
     public void run() {
     }
 
-    public void setListener(Listener listener){
+    public void setListener(Listener listener) {
         this.listener = listener;
     }
 
-    private void notifyHealthChanged(){
-        if(listener != null){
+    private void notifyHealthChanged() {
+        if (listener != null) {
             listener.onHealthChanged(hero.getHp());
         }
     }
 
-    private void notifyLocationChanged(){
-        if(listener != null && hero.getRoom() != null){
+    private void notifyLocationChanged() {
+        if (listener != null && hero.getRoom() != null) {
             listener.onLocationChanged(hero.getRoom().getName());
         }
     }
 
-    public void syncState(){
+    public void syncState() {
         notifyHealthChanged();
         notifyLocationChanged();
     }
 
-
+    public Hero getHero() {
+        return this.hero;
+    }
 
     public Item drop(String itemName) {
-        for (Item item : hero.getInventory()) {
-            if (item.getName().equalsIgnoreCase(itemName)) {
-                hero.dropItem(item); // remove de l’inventaire + ajoute à la room
-                return item; // on renvoie l’item pour l'affiché
-            }
-        }
-        return null;
+        return hero.dropItem(itemName);
     }
 
     public Room getRoom() {
         return this.hero.getRoom();
     }
 
-    public void setRoom(Room room){
+    public void setRoom(Room room) {
         this.hero.setCurrentRoom(room);
         notifyLocationChanged();
     }

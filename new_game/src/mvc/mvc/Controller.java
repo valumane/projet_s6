@@ -25,8 +25,8 @@ public abstract class Controller {
 		/// @param p_view Related [View]. Should not be null.
 		protected Controller(Model p_model, View p_viewCLI, View p_viewGUI) {
 				this.model = p_model;
-				this.viewGUI = p_viewCLI;
-				this.viewCLI = p_viewGUI;
+				this.viewGUI = p_viewGUI;
+				this.viewCLI = p_viewCLI;
 		}
 
 		/// {@return the related [Model]}

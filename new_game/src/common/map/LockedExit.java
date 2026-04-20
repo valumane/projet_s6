@@ -5,12 +5,12 @@ import common.item.Key;
 
 public class LockedExit extends Exit {
     private boolean locked;
-    private Key key;
+    private final Key key;
 
     public LockedExit(Room target, Key keyItem) {
         super(target);
         this.key = keyItem;
-        this.locked = false;
+        this.locked = true;
     }
 
     @Override
@@ -21,9 +21,9 @@ public class LockedExit extends Exit {
     public void unlock(Hero h) {
         locked = false;
     }
-    
+
     public Key getKey() {
-    	return this.key;
+        return this.key;
     }
 
     public boolean isLocked() {

@@ -4,13 +4,18 @@ import common.entity.Hero;
 
 public abstract class UsableItem extends Item {
 
-	public UsableItem(String name) {
-		super(name);
-	}
-	
-	public UsableItem(String name, String description) {
-		super(name, description);
-	}
+    public UsableItem(String name) {
+        super(name);
+    }
 
-	public abstract void use(Hero h);
+    public UsableItem(String name, String description) {
+        super(name, description);
+    }
+
+    @Override
+    public boolean canBeUsed() {
+        return true;
+    }
+
+    public abstract void use(Hero h);
 }

@@ -2,7 +2,7 @@ package common.item;
 
 import common.entity.Hero;
 
-public class Scroll extends Item {
+public class Scroll extends UsableItem {
     private final Spell spell;
 
     public Scroll(String name, Spell spell) {
@@ -10,10 +10,9 @@ public class Scroll extends Item {
         this.spell = spell;
     }
 
+    @Override
     public void use(Hero h) {
-    	// TODO Auto-generated method stub
-    	// Faire apprendre la commande du sort au héro
-    	// -> ajouter une liste de commande au héro au préalable
+        spell.cast(h);
         h.removeFromInventory(this);
     }
 

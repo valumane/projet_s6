@@ -22,4 +22,16 @@ public class Item implements Serializable {
     public String getDescription() {
         return description;
     }
+
+    public boolean canBeTaken() {
+        return true;
+    }
+
+    public boolean canBeDropped() {
+        return true;
+    }
+
+    public boolean canBeUsed() {
+        return false;
+    }
 }
