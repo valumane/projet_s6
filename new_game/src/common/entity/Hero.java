@@ -55,7 +55,9 @@ public class Hero extends Character {
             }
         }
 
-        return (found == null) ? null : found;
+        if (found == null) {
+            return null;
+        }
 
         if (found instanceof Weapon) {
             Weapon weapon = (Weapon) found;
