@@ -55,10 +55,8 @@ public class Hero extends Character {
             }
         }
 
-        if (found == null) {
-            return null;
-        }
-        
+        return (found == null) ? null : found;
+
         if (found instanceof Weapon) {
             Weapon weapon = (Weapon) found;
             this.damage -= weapon.getDamage();
