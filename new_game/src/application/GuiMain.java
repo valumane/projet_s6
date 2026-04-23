@@ -28,9 +28,9 @@ public class GuiMain extends Application {
     @Override
     public void start(Stage stage) {
         // --- domain ---
-        Room entrance = new Room("Entrance");
-        Room corridor = new Room("Dark Corridor");
-        Room treasureRoom = new Room("Treasure Room");
+        Room entrance = new Room("Entrance", "desc");
+        Room corridor = new Room("Dark Corridor", "desc");
+        Room treasureRoom = new Room("Treasure Room", "desc");
 
         Key key = new Key("Golden Key", "A key to a special door");
         entrance.addExit("north", corridor);

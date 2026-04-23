@@ -14,12 +14,14 @@ import common.item.Key;
 public class Room implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String name;
+    private final String description;
     private final Map<String, Exit> exits;
     private final List<Item> items;
     private final List<Character> characters;
 
-    public Room(String name) {
+    public Room(String name, String description) {
         this.name = name;
+        this.description = description;
         this.exits = new HashMap<>();
         this.items = new ArrayList<>();
         this.characters = new ArrayList<>();
@@ -27,6 +29,10 @@ public class Room implements Serializable {
 
     public String getName() {
         return name;
+    }
+    
+    public String getDescription() {
+        return description;
     }
 
     public void addExit(String key, Room toRoom) {
