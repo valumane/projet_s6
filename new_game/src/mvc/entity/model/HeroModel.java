@@ -1,8 +1,10 @@
 package mvc.entity.model;
 
-import common.item.Item;
-import common.item.Weapon;
+import java.util.ArrayList;
+import java.util.List;
+
 import common.entity.Hero;
+import common.item.Item;
 import common.map.Room;
 import mvc.mvc.Model;
 
@@ -10,12 +12,17 @@ public class HeroModel implements Model {
 
     public interface Listener {
         void onHealthChanged(int newHp);
-
         void onLocationChanged(String newLocation);
     }
 
+    private static final double DEFAULT_X = 230;
+    private static final double DEFAULT_Y = 150;
+
     private final Hero hero;
-    private Listener listener;
+    private final List<Listener> listeners = new ArrayList<>();
+
+    private double x = DEFAULT_X;
+    private double y = DEFAULT_Y;
 
     public HeroModel(Hero hero) {
         this.hero = hero;
@@ -25,19 +32,26 @@ public class HeroModel implements Model {
     public void run() {
     }
 
-    public void setListener(Listener listener) {
-        this.listener = listener;
+    public void addListener(Listener listener) {
+        if (listener != null) {
+            listeners.add(listener);
+        }
     }
 
     private void notifyHealthChanged() {
-        if (listener != null) {
+        for (Listener listener : listeners) {
             listener.onHealthChanged(hero.getHp());
         }
     }
 
     private void notifyLocationChanged() {
-        if (listener != null && hero.getRoom() != null) {
-            listener.onLocationChanged(hero.getRoom().getName());
+        if (hero.getRoom() == null) {
+            return;
+        }
+
+        String roomName = hero.getRoom().getName();
+        for (Listener listener : listeners) {
+            listener.onLocationChanged(roomName);
         }
     }
 
@@ -78,4 +92,21 @@ public class HeroModel implements Model {
         return newHp;
     }
 
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setPosition(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void resetPosition() {
+        this.x = DEFAULT_X;
+        this.y = DEFAULT_Y;
+    }
 }

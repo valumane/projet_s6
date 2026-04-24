@@ -1,5 +1,6 @@
 package mvc.item.controller;
 
+import mvc.entity.model.HeroModel;
 import mvc.item.model.ItemModel;
 import mvc.item.view.base.ItemView;
 import mvc.mvc.Controller;
@@ -10,7 +11,7 @@ public class ItemController extends Controller {
     private final ItemView viewCLI;
     private final ItemView viewGUI;
 
-    public ItemController(ItemModel itemModel, ItemView viewCLI, ItemView viewGUI) {
+    public ItemController(ItemModel itemModel, ItemView viewCLI, ItemView viewGUI, HeroModel heroModel) {
         super(itemModel, viewCLI, viewGUI);
 
         this.itemModel = itemModel;
@@ -35,6 +36,17 @@ public class ItemController extends Controller {
             public void onMessage(String message) {
                 ItemController.this.viewCLI.showMessage(message);
                 ItemController.this.viewGUI.showMessage(message);
+            }
+        });
+
+        heroModel.addListener(new HeroModel.Listener() {
+            @Override
+            public void onHealthChanged(int newHp) {
+            }
+
+            @Override
+            public void onLocationChanged(String newLocation) {
+                ItemController.this.itemModel.syncState();
             }
         });
 
@@ -78,5 +90,4 @@ public class ItemController extends Controller {
 
         viewGUI.setActionsVisible(takeVisible, dropVisible, useVisible);
     }
-
 }

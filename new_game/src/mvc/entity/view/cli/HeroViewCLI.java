@@ -11,7 +11,7 @@ public class HeroViewCLI extends HeroView {
 
 	@Override
 	public void showObjectNotFindInInventory(String item) {
-		System.out.println(item + "not in the inventory");
+		System.out.println(item + " not in the inventory");
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class HeroViewCLI extends HeroView {
 
 	@Override
 	public void showHealth(int HpHero) {
-		System.out.println(" you have " + HpHero + "hp");
+		System.out.println("You have " + HpHero + "hp");
 	}
 
 	@Override

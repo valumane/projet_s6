@@ -11,39 +11,44 @@ public class ExitController extends Controller {
 
     private final ExitModel exitModel;
     private final ExitView viewCLI;
+    private final ExitView viewGUI;
 
-    public ExitController(ExitModel exitModel, ExitView viewGUI, ExitView viewCLI) {
-        super(exitModel, viewGUI, viewCLI);
+    public ExitController(ExitModel exitModel, ExitView viewCLI, ExitView viewGUI) {
+        super(exitModel, viewCLI, viewGUI);
         this.exitModel = exitModel;
         this.viewCLI = viewCLI;
+        this.viewGUI = viewGUI;
     }
 
-    // Regarde si le Hero peut prendr la sortie ou non
     public Room onCross(Hero h) {
-        if (exitModel.isLocked()) {
-            viewCLI.displayLockedDoor();
+        if (!exitModel.canCross(h)) {
+            if (exitModel.isLocked()) {
+                viewCLI.displayLockedDoor();
+                viewGUI.displayLockedDoor();
+            }
             return null;
         }
         return exitModel.getTarget();
     }
 
-    // Regarde si le Hero peut dévérouiller la sortie ou non
     public void onUnlock(Hero h) {
         if (!exitModel.isLocked()) {
             return;
         }
-        if (exitModel.getExit() instanceof LockedExit) {
-            LockedExit lockedExit = (LockedExit) exitModel.getExit();
+
+        if (exitModel.getExit() instanceof LockedExit lockedExit) {
             String keyName = lockedExit.getKey().getName();
-            
-            // Vérifie si il a la clé
+
             boolean hasKey = h.getInventory().stream()
                     .anyMatch(item -> item.getName().equalsIgnoreCase(keyName));
+
             if (hasKey) {
                 exitModel.unlock(h);
                 viewCLI.displayUnlockedDoor();
+                viewGUI.displayUnlockedDoor();
             } else {
                 viewCLI.displayNeedKey(keyName);
+                viewGUI.displayNeedKey(keyName);
             }
         }
     }

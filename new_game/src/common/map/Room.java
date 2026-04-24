@@ -27,21 +27,25 @@ public class Room implements Serializable {
         this.characters = new ArrayList<>();
     }
 
+    public Room(String name) {
+        this(name, "");
+    }
+
     public String getName() {
         return name;
     }
-    
+
     public String getDescription() {
         return description;
     }
 
     public void addExit(String key, Room toRoom) {
-    	Exit exit = new SimpleExit(toRoom);
+        Exit exit = new SimpleExit(toRoom);
         exits.put(key.toLowerCase(), exit);
     }
-    
+
     public void addLockedExit(String key, Room toRoom, Key keyItem) {
-    	Exit exit = new LockedExit(toRoom, keyItem);
+        Exit exit = new LockedExit(toRoom, keyItem);
         exits.put(key.toLowerCase(), exit);
     }
 

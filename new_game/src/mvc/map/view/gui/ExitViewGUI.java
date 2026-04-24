@@ -1,13 +1,13 @@
-package mvc.map.view.cli;
+package mvc.map.view.gui;
 
 import java.util.function.Consumer;
 import mvc.map.view.base.ExitView;
 
-public class ExitViewCLI extends ExitView {
+public class ExitViewGUI extends ExitView {
 
     private final Consumer<String> logger;
 
-    public ExitViewCLI(Consumer<String> logger) {
+    public ExitViewGUI(Consumer<String> logger) {
         this.logger = logger;
     }
 

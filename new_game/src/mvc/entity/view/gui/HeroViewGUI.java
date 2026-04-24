@@ -2,80 +2,42 @@ package mvc.entity.view.gui;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import mvc.entity.view.base.HeroView;
 
 public class HeroViewGUI extends HeroView {
 
-    private final Stage stage;
+    private final VBox root = new VBox(6);
 
-    private final Label heroLabel = new Label("Hero");
+    private final Label heroLabel = new Label("Hero: ?");
     private final Label locationLabel = new Label("Location: ?");
-    private final TextArea logArea = new TextArea();
-    private final Label hpLabel = new Label("Health : ?");
-    private final Button buttonRemoveLife = new Button("remove 1hp");
 
-    public HeroViewGUI(Stage stage) {
-        this.stage = stage;
-
-        logArea.setEditable(false);
-        logArea.setWrapText(true);
-
-        VBox top = new VBox(6, heroLabel, locationLabel);
-        top.setPadding(new Insets(10));
-
-        BorderPane root = new BorderPane();
-        root.setTop(top);
-        root.setCenter(logArea);
+    public HeroViewGUI() {
+        root.getChildren().addAll(heroLabel, locationLabel);
         root.setPadding(new Insets(10));
-
-        // bouton qui retire de la vie au hero car je l'aime pas
-        VBox divHealth = new VBox(6, buttonRemoveLife, hpLabel);
-        divHealth.setPadding(new Insets(10));
-
-        // place le bouton en bas
-        root.setRight(divHealth);
-
-        BorderPane.setMargin(buttonRemoveLife, new Insets(10, 0, 0, 0));
-        Scene scene = new Scene(root, 700, 450);
-        stage.setScene(scene);
+        root.setPrefWidth(220);
+        root.setMinWidth(220);
     }
 
-    // --- helpers ---
-    private void log(String msg) {
-        Platform.runLater(() -> {
-            if (!logArea.getText().isEmpty())
-                logArea.appendText("\n");
-            logArea.appendText(msg);
-        });
+    public VBox getRoot() {
+        return root;
     }
 
-    // --- mvc.View ---
     @Override
     public void show() {
-        Platform.runLater(stage::show);
+        Platform.runLater(() -> {
+            root.setVisible(true);
+            root.setManaged(true);
+        });
     }
 
     @Override
     public void hide() {
-        Platform.runLater(stage::hide);
-    }
-
-    // --- HeroView API ---
-    @Override
-    public void showDropObject(String character, String item) {
-        log(character + " dropped " + item);
-    }
-
-    @Override
-    public void showObjectNotFindInInventory(String item) {
-        log(item + " not in the inventory");
+        Platform.runLater(() -> {
+            root.setVisible(false);
+            root.setManaged(false);
+        });
     }
 
     @Override
@@ -83,38 +45,35 @@ public class HeroViewGUI extends HeroView {
         Platform.runLater(() -> locationLabel.setText("Location: " + loc));
     }
 
+    public void setHeroName(String name) {
+        Platform.runLater(() -> heroLabel.setText("Hero: " + name));
+    }
+
+    @Override
+    public void showDropObject(String character, String item) {
+    }
+
+    @Override
+    public void showObjectNotFindInInventory(String item) {
+    }
+
     @Override
     public void showNoHealSpell() {
-        log("You don't know how to use this spell yet.");
     }
 
     @Override
     public void receiveHealingPower() {
-        log("You receive a healing power.");
     }
 
     @Override
     public void showDontKnowHealingSpell() {
-        log("You don't know any healing spell.");
     }
 
     @Override
     public void useHealingPower() {
-        log("You use your healing power!");
-    }
-
-    @Override
-    public void setOnRemoveHp(Runnable action) {
-        Platform.runLater(() -> buttonRemoveLife.setOnAction(e -> action.run()));
     }
 
     @Override
     public void showHealth(int hpHero) {
-        Platform.runLater(() -> hpLabel.setText("Health : " + hpHero));
-    }
-
-    // bonus (pratique)
-    public void setHeroName(String name) {
-        Platform.runLater(() -> heroLabel.setText("Hero Name" + name));
     }
 }

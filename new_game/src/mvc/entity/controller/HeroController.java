@@ -17,26 +17,22 @@ public class HeroController extends Controller {
         this.heroModel = heroModel;
         this.viewGUI = viewGUI;
         this.viewCLI = viewCLI;
-        
-        this.heroModel.setListener(new HeroModel.Listener() {
+
+        this.heroModel.addListener(new HeroModel.Listener() {
             @Override
-            public void onHealthChanged(int newHp){
+            public void onHealthChanged(int newHp) {
                 HeroController.this.viewGUI.showHealth(newHp);
                 HeroController.this.viewCLI.showHealth(newHp);
             }
 
             @Override
-            public void onLocationChanged(String newLocation){
+            public void onLocationChanged(String newLocation) {
                 HeroController.this.viewGUI.showLocation(newLocation);
                 HeroController.this.viewCLI.showLocation(newLocation);
             }
         });
-        
-        // pour faire fonctionner le btn de test dans la vu gui mais jsp quoi faire pour la cli
-        this.viewGUI.setOnRemoveHp(() -> heroModel.removeHp(1));
     }
 
-    // Déposer un item
     public void onDropItem(Item itemToDrop) {
         Item dropped = heroModel.drop(itemToDrop.getName());
 
@@ -48,5 +44,4 @@ public class HeroController extends Controller {
             viewCLI.showDropObject(heroModel.getName(), dropped.getName());
         }
     }
-
 }
