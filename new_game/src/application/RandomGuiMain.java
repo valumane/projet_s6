@@ -5,7 +5,6 @@ import common.item.Bag;
 import common.item.Chest;
 import common.item.HealSpell;
 import common.item.Item;
-import common.item.Key;
 import common.item.Scroll;
 import common.item.Weapon;
 import common.map.Room;
@@ -18,62 +17,31 @@ import mvc.entity.view.gui.HeroViewGUI;
 import mvc.game.controller.GameController;
 import mvc.game.model.GameModel;
 import mvc.game.view.gui.GameViewGUI;
+import mvc.game.view.gui.LogWindowGUI;
 import mvc.map.controller.RoomController;
 import mvc.map.model.RoomModel;
 import mvc.map.view.cli.RoomViewCLI;
 import mvc.map.view.gui.RoomViewGUI;
-import mvc.game.view.gui.LogWindowGUI;
 
-public class GuiMain extends Application {
+public class RandomGuiMain extends Application {
 
     private static final int DEFAULT_HERO_DAMAGE = 10;
     private static final int DEFAULT_HERO_BAG_CAPACITY = 5;
 
     @Override
     public void start(Stage stage) {
-        Room entrance = new Room("Entrance", "The beginning of the dungeon.");
-        Room corridor = new Room("Dark Corridor", "A cold corridor with old stones.");
-        Room treasureRoom = new Room("Treasure Room", "A room that seems to hide something valuable.");
-        Room basicRoom1 = new Room("BasicRoom", "a basic room, nothing in it");
-        Room basicRoom2 = new Room("another basicroom", "basic basi basic");
-        Room basicRoom3 = new Room("another one", "blablabla");
-        Room basicRoom4 = new Room("simple, basique", "vous n'avez pas les bases");
-        Room basicRoom5 = new Room("room qui room", "sa fait quoi ? sa room ou quoi ?");
-        Room basicRoom6 = new Room("vroom vroom", "miiiiiiiiiiieeeeeeeee");
-        Room basicRoom7 = new Room("gendarmerie", "controle des papiers, sortez du vehicule");
+        DungeonGenerator generator = new DungeonGenerator(System.currentTimeMillis());
+        DungeonData dungeon = generator.generate(12);
 
-        Key key = new Key("Golden Key", "A key to a special door");
-
-        entrance.addExit("north", corridor);
-        corridor.addExit("south", entrance);
-
-        corridor.addLockedExit("east", treasureRoom, key);
-        treasureRoom.addExit("west", corridor);
-
-        basicRoom1.addExit("east", entrance);
-        entrance.addExit("west", basicRoom1);
-
-        basicRoom1.addExit("north", basicRoom2);
-        basicRoom2.addExit("south", basicRoom1);
-
-        basicRoom1.addExit("south", basicRoom3);
-        basicRoom3.addExit("north", basicRoom1);
-
-        basicRoom3.addExit("east", basicRoom4);
-        basicRoom4.addExit("west", basicRoom3);
-
-        basicRoom4.addExit("east", basicRoom5);
-        basicRoom5.addExit("west", basicRoom4);
-
-        basicRoom5.addExit("east", basicRoom6);
-        basicRoom6.addExit("west", basicRoom5);
+        Room startRoom = dungeon.getStartRoom();
 
         Hero hero = new Hero(
                 "Hero",
                 100,
                 new Bag("Backpack", DEFAULT_HERO_BAG_CAPACITY),
-                entrance,
-                DEFAULT_HERO_DAMAGE);
+                startRoom,
+                DEFAULT_HERO_DAMAGE
+        );
 
         Weapon sword = new Weapon("Sword", 18);
         Scroll healingScroll = new Scroll("Healing Scroll", new HealSpell(25));
@@ -81,11 +49,9 @@ public class GuiMain extends Application {
         chest.addItem(new Item("Ruby", "A shiny red gem"));
         chest.addItem(new Item("Coin", "An old gold coin"));
 
-        entrance.addItem(sword);
-        entrance.addItem(healingScroll);
-        entrance.addItem(chest);
-
-        hero.addItem(key);
+        startRoom.addItem(sword);
+        startRoom.addItem(healingScroll);
+        startRoom.addItem(chest);
 
         HeroModel heroModel = new HeroModel(hero);
         RoomModel roomModel = new RoomModel(heroModel.getRoom());

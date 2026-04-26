@@ -4,6 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -17,11 +18,14 @@ public class GameViewGUI extends GameView {
     private final BorderPane root = new BorderPane();
     private final Scene scene;
 
+    private final Button logsButton = new Button("Logs");
+
     private Runnable onMoveNorth;
     private Runnable onMoveSouth;
     private Runnable onMoveEast;
     private Runnable onMoveWest;
     private Runnable onTakeItem;
+    private Runnable onShowLogs;
 
     private boolean northPressed;
     private boolean southPressed;
@@ -49,14 +53,21 @@ public class GameViewGUI extends GameView {
     public GameViewGUI(Stage stage, HeroViewGUI heroViewGUI, RoomViewGUI roomViewGUI) {
         this.stage = stage;
 
-        HBox topRow = new HBox(20, heroViewGUI.getRoot(), roomViewGUI.getInfoBox());
+        logsButton.setFocusTraversable(false);
+        logsButton.setOnAction(e -> {
+            if (onShowLogs != null) {
+                onShowLogs.run();
+            }
+        });
+
+        HBox topRow = new HBox(20, heroViewGUI.getRoot(), roomViewGUI.getInfoBox(), logsButton);
         topRow.setPadding(new Insets(10));
 
         root.setTop(topRow);
         root.setCenter(roomViewGUI.getRoot());
         root.setFocusTraversable(true);
 
-        this.scene = new Scene(root, 1100, 700);
+        scene = new Scene(root, 1300, 860);
         this.stage.setTitle("Dungeon MVC");
         this.stage.setScene(scene);
 
@@ -113,6 +124,11 @@ public class GameViewGUI extends GameView {
     @Override
     public void setOnInteract(Runnable action) {
         this.onTakeItem = action;
+    }
+
+    @Override
+    public void setOnShowLogs(Runnable action) {
+        this.onShowLogs = action;
     }
 
     @Override

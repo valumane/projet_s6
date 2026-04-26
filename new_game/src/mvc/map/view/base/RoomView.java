@@ -4,6 +4,7 @@ import java.util.List;
 
 import common.map.Room;
 import mvc.map.ItemPlacement;
+import mvc.map.RoomPlacement;
 import mvc.mvc.View;
 
 public abstract class RoomView implements View {
@@ -25,6 +26,9 @@ public abstract class RoomView implements View {
     }
 
     public void displayPlacedItems(List<ItemPlacement> placedItems) {
+    }
+
+    public void displayVisitedRooms(List<RoomPlacement> visitedRooms, int currentGridX, int currentGridY) {
     }
 
     public void setOnMoveNorth(Runnable action) {

@@ -8,10 +8,19 @@ JFX="/usr/share/openjfx/lib"
 javac --module-path "$JFX" --add-modules javafx.controls,javafx.graphics \
       -d out -sourcepath src @sources.txt || exit 1
 
-if [ -z "$1" ]
-then
+case "$1" in
+  "")
     java -cp out application.Main
-else
+    ;;
+  gui)
     java --module-path "$JFX" --add-modules javafx.controls,javafx.graphics \
          -cp out application.GuiMain
-fi
+    ;;
+  random)
+    java --module-path "$JFX" --add-modules javafx.controls,javafx.graphics \
+         -cp out application.RandomGuiMain
+    ;;
+  *)
+    echo "Usage: ./quickrun.sh [gui|random]"
+    ;;
+esac

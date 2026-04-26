@@ -12,11 +12,12 @@ public class HeroModel implements Model {
 
     public interface Listener {
         void onHealthChanged(int newHp);
+
         void onLocationChanged(String newLocation);
     }
 
-    private static final double DEFAULT_X = 230;
-    private static final double DEFAULT_Y = 150;
+    private static final double DEFAULT_X = 360;
+    private static final double DEFAULT_Y = 250;
 
     private final Hero hero;
     private final List<Listener> listeners = new ArrayList<>();

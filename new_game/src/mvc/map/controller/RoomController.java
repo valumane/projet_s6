@@ -16,12 +16,12 @@ import common.item.UsableItem;
 
 public class RoomController extends Controller {
 
-    private static final double STEP = 2.5; // vitesse de deplacement
+    private static final double STEP = 4;
 
-    private static final double MIN_X = 72;
-    private static final double MAX_X = 388;
-    private static final double MIN_Y = 52;
-    private static final double MAX_Y = 248;
+    private static final double MIN_X = 110;
+    private static final double MAX_X = 610;
+    private static final double MIN_Y = 90;
+    private static final double MAX_Y = 410;
 
     private static final double INTERACT_DISTANCE = 35.0;
 
@@ -49,6 +49,10 @@ public class RoomController extends Controller {
 
         viewCLI.displayRoom(currentRoom);
         viewGUI.displayPlacedItems(roomModel.getItemPlacements());
+        viewGUI.displayVisitedRooms(
+                roomModel.getVisitedRoomPlacements(),
+                roomModel.getCurrentGridX(),
+                roomModel.getCurrentGridY());
         viewGUI.displayRoom(currentRoom);
         viewGUI.displayHeroPosition(heroModel.getX(), heroModel.getY());
     }
@@ -134,7 +138,7 @@ public class RoomController extends Controller {
         }
 
         heroModel.setRoom(target);
-        roomModel.setRoom(target);
+        roomModel.moveTo(target, direction);
         heroModel.resetPosition();
 
         viewCLI.displayMove(direction, target.getName());
@@ -298,6 +302,10 @@ public class RoomController extends Controller {
 
         viewCLI.displayRoom(currentRoom);
         viewGUI.displayPlacedItems(roomModel.getItemPlacements());
+        viewGUI.displayVisitedRooms(
+                roomModel.getVisitedRoomPlacements(),
+                roomModel.getCurrentGridX(),
+                roomModel.getCurrentGridY());
         viewGUI.displayRoom(currentRoom);
         viewGUI.displayHeroPosition(heroModel.getX(), heroModel.getY());
     }

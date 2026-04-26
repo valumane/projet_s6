@@ -10,4 +10,7 @@ public abstract class GameView implements View {
     public abstract void setOnMoveWest(Runnable action);
 
     public abstract void setOnInteract(Runnable action);
+
+    public void setOnShowLogs(Runnable action) {
+    }
 }
