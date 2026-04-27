@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mvc.GameConfig;
 import mvc.menu.view.base.MainMenuView;
+import java.util.function.BiConsumer;
 
 public class MainMenuViewGUI extends MainMenuView {
 
@@ -37,6 +38,8 @@ public class MainMenuViewGUI extends MainMenuView {
     private Runnable onCreateLevel;
     private Runnable onSettings;
     private Runnable onQuit;
+
+    private BiConsumer<String, String> onApplySettings;
 
     public MainMenuViewGUI(Stage stage) {
         this.stage = stage;
@@ -136,11 +139,12 @@ public class MainMenuViewGUI extends MainMenuView {
 
         Button applyButton = new Button("Appliquer");
         applyButton.setOnAction(e -> {
-            GameConfig.setControlScheme(touchesCombo.getValue());
-            GameConfig.setResolution(resolutionCombo.getValue());
+            if (onApplySettings != null) {
+                onApplySettings.accept(touchesCombo.getValue(), resolutionCombo.getValue());
+            }
+
             settingsStage.close();
         });
-
         Button closeButton = new Button("Fermer");
         closeButton.setOnAction(e -> settingsStage.close());
 
@@ -208,4 +212,10 @@ public class MainMenuViewGUI extends MainMenuView {
             scoresBox.getChildren().add(new Label(score));
         }
     }
+
+    @Override
+    public void setOnApplySettings(BiConsumer<String, String> action) {
+        this.onApplySettings = action;
+    }
+
 }

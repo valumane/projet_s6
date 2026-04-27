@@ -265,8 +265,8 @@ public class RoomViewGUI extends RoomView {
         for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
 
-            double x = getItemX(i);
-            double y = getItemY(i);
+            double x = MapLayout.getItemX(i);
+            double y = MapLayout.getItemY(i);
 
             Circle itemMarker = new Circle(x, y, MapLayout.ITEM_RADIUS, Color.GOLDENROD);
             Text itemText = new Text(x + 14, y + 4, item.getName());
@@ -275,25 +275,7 @@ public class RoomViewGUI extends RoomView {
         }
     }
 
-    private double getItemX(int index) {
-        int columns = 3;
-        int col = index % columns;
-
-        double startX = ROOM_X + ROOM_W * 0.18;
-        double gapX = ROOM_W * 0.22;
-
-        return startX + col * gapX;
-    }
-
-    private double getItemY(int index) {
-        int columns = 3;
-        int row = index / columns;
-
-        double startY = ROOM_Y + ROOM_H * 0.28;
-        double gapY = ROOM_H * 0.14;
-
-        return startY + row * gapY;
-    }
+    
 
     private void drawVisitedRooms() {
         exploredMapPane.getChildren().clear();

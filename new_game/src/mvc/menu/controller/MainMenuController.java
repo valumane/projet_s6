@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import mvc.menu.model.MainMenuModel;
 import mvc.menu.view.gui.MainMenuViewGUI;
 import mvc.mvc.Controller;
+import mvc.GameConfig;
 
 public class MainMenuController extends Controller {
 
@@ -35,6 +36,12 @@ public class MainMenuController extends Controller {
         });
 
         view.setOnSettings(view::showSettingsWindow);
+
+        view.setOnApplySettings((controlScheme, resolution) -> {
+            GameConfig.setControlScheme(controlScheme);
+            GameConfig.setResolution(resolution);
+        });
+
         view.setOnQuit(Platform::exit);
     }
 

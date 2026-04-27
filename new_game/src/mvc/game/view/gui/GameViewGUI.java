@@ -378,9 +378,6 @@ public class GameViewGUI extends GameView {
         minimapContainer.setStyle("-fx-background-color: white;");
         minimapContainer.setPrefWidth(210);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
         topBar.getChildren().addAll(logsButton, roomInfoContainer, minimapContainer);
         return topBar;
     }

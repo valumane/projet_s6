@@ -39,17 +39,6 @@ public class ItemController extends Controller {
             }
         });
 
-        heroModel.addListener(new HeroModel.Listener() {
-            @Override
-            public void onHealthChanged(int newHp) {
-            }
-
-            @Override
-            public void onLocationChanged(String newLocation) {
-                ItemController.this.itemModel.syncState();
-            }
-        });
-
         this.viewGUI.setOnTake(this::onTakeItem);
         this.viewGUI.setOnDrop(this::onDropItem);
         this.viewGUI.setOnUse(this::onUseItem);

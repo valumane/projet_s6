@@ -161,46 +161,6 @@ public class DungeonGenerator {
         }
     }
 
-    private void lockRandomConnection(Map<Pos, Room> grid, Room start, Key key) {
-        List<LockedCandidate> candidates = new ArrayList<>();
-
-        for (Map.Entry<Pos, Room> entry : grid.entrySet()) {
-            Pos pos = entry.getKey();
-            Room room = entry.getValue();
-
-            for (String dir : DIRECTIONS) {
-                Pos next = move(pos, dir);
-                Room target = grid.get(next);
-
-                if (target == null) {
-                    continue;
-                }
-
-                if (room.getExit(dir) == null) {
-                    continue;
-                }
-
-                // éviter de verrouiller la room de départ directement
-                if (room == start) {
-                    continue;
-                }
-
-                candidates.add(new LockedCandidate(room, target, dir));
-            }
-        }
-
-        if (candidates.isEmpty()) {
-            return;
-        }
-
-        LockedCandidate chosen = candidates.get(random.nextInt(candidates.size()));
-
-        // remplace juste un côté par une locked exit
-        chosen.from.getExits().put(chosen.direction, new common.map.LockedExit(chosen.to, key));
-
-        // on met la clé dans la start room pour faire simple
-        start.addItem(key);
-    }
 
     private void connectBothWays(Room a, Room b, String dirFromAToB) {
         String reverse = reverse(dirFromAToB);
@@ -261,15 +221,4 @@ public class DungeonGenerator {
         }
     }
 
-    private static final class LockedCandidate {
-        private final Room from;
-        private final Room to;
-        private final String direction;
-
-        private LockedCandidate(Room from, Room to, String direction) {
-            this.from = from;
-            this.to = to;
-            this.direction = direction;
-        }
-    }
 }
