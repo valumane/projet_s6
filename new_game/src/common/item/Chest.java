@@ -43,14 +43,20 @@ public class Chest extends UsableItem {
             return;
         }
 
+        List<Item> movedItems = new ArrayList<>();
+
         for (Item item : new ArrayList<>(content)) {
-            h.addItem(item);
+            if (h.addItem(item)) {
+                movedItems.add(item);
+            }
         }
-        content.clear();
+
+        content.removeAll(movedItems);
     }
 
     @Override
     public String getDescription() {
-        return super.getDescription() + " (chest, " + (locked ? "locked" : "unlocked") + ", " + content.size() + " item(s))";
+        return super.getDescription() + " (chest, " + (locked ? "locked" : "unlocked") + ", " + content.size()
+                + " item(s))";
     }
 }

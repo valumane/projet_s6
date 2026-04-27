@@ -24,14 +24,18 @@ public class Hero extends Character {
         return this.backpack;
     }
 
-    public void addItem(Item item) {
-        if (item instanceof Weapon) {
-            Weapon weapon = (Weapon) item;
+    public boolean addItem(Item item) {
+        boolean added = this.backpack.addItem(item);
+
+        if (!added) {
+            return false;
+        }
+
+        if (item instanceof Weapon weapon) {
             this.damage += weapon.getDamage();
         }
-        // Voir ici si il ne faudra pas retirer l'objet de la piece, au moment ou on le
-        // récupère dans l'inventaire.
-        this.addToInventory(item);
+
+        return true;
     }
 
     // changement de lucas :
@@ -88,7 +92,7 @@ public class Hero extends Character {
     // à avoir sur soi
     @Override
     public void addToInventory(Item item) {
-        this.backpack.addItem(item);
+        addItem(item);
     }
 
     @Override

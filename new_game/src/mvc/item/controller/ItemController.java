@@ -74,6 +74,10 @@ public class ItemController extends Controller {
         itemModel.syncState();
     }
 
+    public void onInteractItem() {
+        itemModel.interact();
+    }
+
     private void updateActions() {
         boolean inInventory = itemModel.isInInventory();
         boolean inRoom = itemModel.isInCurrentRoom();

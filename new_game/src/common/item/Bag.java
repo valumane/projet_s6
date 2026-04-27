@@ -18,6 +18,9 @@ public class Bag extends Item {
     }
 
     public boolean addItem(Item i) {
+        if (content.size() >= capacity) {
+            return false;
+        }
         return content.add(i);
     }
 

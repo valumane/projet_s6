@@ -8,14 +8,19 @@ import mvc.entity.view.base.HeroView;
 
 public class HeroViewGUI extends HeroView {
 
-    private final VBox root = new VBox(6);
+    private final VBox root = new VBox(8);
 
+    private final Label titleLabel = new Label("Stats hero");
     private final Label heroLabel = new Label("Hero: ?");
+    private final Label hpLabel = new Label("HP: ?");
     private final Label locationLabel = new Label("Location: ?");
 
     public HeroViewGUI() {
-        root.getChildren().addAll(heroLabel, locationLabel);
-        root.setPadding(new Insets(10));
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        root.getChildren().addAll(titleLabel, heroLabel, hpLabel, locationLabel);
+        root.setPadding(new Insets(12));
+        root.setSpacing(8);
         root.setPrefWidth(220);
         root.setMinWidth(220);
     }
@@ -50,6 +55,11 @@ public class HeroViewGUI extends HeroView {
     }
 
     @Override
+    public void showHealth(int hpHero) {
+        Platform.runLater(() -> hpLabel.setText("HP: " + hpHero));
+    }
+
+    @Override
     public void showDropObject(String character, String item) {
     }
 
@@ -71,9 +81,5 @@ public class HeroViewGUI extends HeroView {
 
     @Override
     public void useHealingPower() {
-    }
-
-    @Override
-    public void showHealth(int hpHero) {
     }
 }

@@ -9,62 +9,61 @@ import common.map.LockedExit;
 import common.map.Room;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import mvc.map.ItemPlacement;
-import mvc.map.RoomPlacement;
+import mvc.GameConfig;
 import mvc.map.view.base.RoomView;
+import javafx.scene.layout.Region;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import common.item.Item;
+import mvc.map.MapLayout;
+import mvc.map.model.RoomPlacement;
 
 public class RoomViewGUI extends RoomView {
 
-    private static final double MAP_WIDTH = 720;
-    private static final double MAP_HEIGHT = 520;
+    private static final double MAP_WIDTH = MapLayout.MAP_WIDTH;
+    private static final double MAP_HEIGHT = MapLayout.MAP_HEIGHT;
 
-    private static final double ROOM_X = 90;
-    private static final double ROOM_Y = 70;
-    private static final double ROOM_W = 540;
-    private static final double ROOM_H = 360;
+    private static final double ROOM_X = MapLayout.ROOM_X;
+    private static final double ROOM_Y = MapLayout.ROOM_Y;
+    private static final double ROOM_W = MapLayout.ROOM_W;
+    private static final double ROOM_H = MapLayout.ROOM_H;
 
     private static final int MINI_MAP_SIZE = 3;
-    private static final double MINI_CELL_W = 105;
-    private static final double MINI_CELL_H = 82;
-    private static final double MINI_MARGIN_X = 18;
-    private static final double MINI_MARGIN_Y = 18;
+    private static final double MINI_CELL_W = 62;
+    private static final double MINI_CELL_H = 50;
+    private static final double MINI_MARGIN_X = 10;
+    private static final double MINI_MARGIN_Y = 10;
+
+    private final VBox miniMapBox = new VBox(8);
+    private final VBox helpBox = new VBox(8);
+    private final StackPane gameAreaBox = new StackPane();
 
     private final BorderPane root = new BorderPane();
 
     private final Label titleLabel = new Label("Room");
     private final Label exitsLabel = new Label("Exits: none");
 
-    private final TextArea descriptionArea = new TextArea();
+    private final Label descriptionArea = new Label();
 
     private final Pane mapPane = new Pane();
     private final Pane exploredMapPane = new Pane();
 
-    private final Button northButton = new Button("North");
-    private final Button southButton = new Button("South");
-    private final Button eastButton = new Button("East");
-    private final Button westButton = new Button("West");
+    private final Label helpLabel = new Label(GameConfig.getControlHelpText());
 
-    private final Label helpLabel = new Label("Déplacements : ZQSD | Interagir : E");
-
-    private final VBox infoBox = new VBox(8);
-    private final VBox playableBox = new VBox(12);
-    private final VBox explorationBox = new VBox(10);
+    private final VBox infoBox = new VBox(6);
 
     private final Consumer<String> logger;
 
@@ -72,58 +71,53 @@ public class RoomViewGUI extends RoomView {
     private double heroX = 360;
     private double heroY = 250;
 
-    private List<ItemPlacement> placedItems = new ArrayList<>();
     private List<RoomPlacement> visitedRooms = new ArrayList<>();
     private int currentGridX = 0;
     private int currentGridY = 0;
 
+    private Circle heroNode;
+    private Text heroTextNode;
+
     public RoomViewGUI(Consumer<String> logger) {
         this.logger = logger;
 
-        descriptionArea.setEditable(false);
-        descriptionArea.setWrapText(true);
-        descriptionArea.setPrefRowCount(4);
-        descriptionArea.setFocusTraversable(false);
-        descriptionArea.setPrefWidth(520);
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        exitsLabel.setStyle("-fx-font-size: 13px;");
 
         mapPane.setPrefSize(MAP_WIDTH, MAP_HEIGHT);
         mapPane.setMinSize(MAP_WIDTH, MAP_HEIGHT);
         mapPane.setFocusTraversable(false);
 
-        exploredMapPane.setPrefSize(360, 300);
-        exploredMapPane.setMinSize(360, 300);
+        exploredMapPane.setPrefSize(210, 170);
+        exploredMapPane.setMinSize(210, 170);
+        exploredMapPane.setMaxSize(210, 170);
         exploredMapPane.setFocusTraversable(false);
 
-        northButton.setFocusTraversable(false);
-        southButton.setFocusTraversable(false);
-        eastButton.setFocusTraversable(false);
-        westButton.setFocusTraversable(false);
+        descriptionArea.setWrapText(true);
+        descriptionArea.setFocusTraversable(false);
+        descriptionArea.setPrefWidth(520);
 
-        GridPane moves = new GridPane();
-        moves.setHgap(8);
-        moves.setVgap(8);
-        moves.add(northButton, 1, 0);
-        moves.add(westButton, 0, 1);
-        moves.add(eastButton, 2, 1);
-        moves.add(southButton, 1, 2);
+        descriptionArea.setMinHeight(Region.USE_PREF_SIZE);
+        descriptionArea.setPrefHeight(40);
+        descriptionArea.setMaxHeight(40);
 
         infoBox.getChildren().addAll(titleLabel, exitsLabel, descriptionArea);
-        infoBox.setPadding(new Insets(10));
-        infoBox.setPrefWidth(560);
+        infoBox.setPadding(new Insets(4, 8, 4, 8));
+        infoBox.setMaxHeight(Region.USE_PREF_SIZE);
 
-        playableBox.getChildren().addAll(mapPane, moves, helpLabel);
-        playableBox.setPadding(new Insets(10));
+        Label explorationLabel = new Label("Minimap");
+        miniMapBox.getChildren().addAll(explorationLabel, exploredMapPane);
+        miniMapBox.setAlignment(Pos.CENTER);
+        miniMapBox.setPadding(new Insets(8));
 
-        Label explorationLabel = new Label("Exploration 3x3");
-        explorationBox.getChildren().addAll(explorationLabel, exploredMapPane);
-        explorationBox.setPadding(new Insets(10));
-        explorationBox.setPrefWidth(380);
+        helpBox.getChildren().add(helpLabel);
+        helpBox.setAlignment(Pos.CENTER);
+        helpBox.setPadding(new Insets(8));
 
-        root.setCenter(playableBox);
-        root.setRight(explorationBox);
-        root.setPadding(new Insets(10));
-        BorderPane.setMargin(playableBox, new Insets(10));
-        BorderPane.setMargin(explorationBox, new Insets(10));
+        gameAreaBox.getChildren().add(mapPane);
+        gameAreaBox.setPrefSize(MAP_WIDTH, MAP_HEIGHT);
+        gameAreaBox.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        gameAreaBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
     }
 
     private Color getExitColor(String direction) {
@@ -147,22 +141,14 @@ public class RoomViewGUI extends RoomView {
         return root;
     }
 
+    public StackPane getGameArea() {
+        return gameAreaBox;
+    }
+
     private void log(String msg) {
         if (logger != null) {
             logger.accept(msg);
         }
-    }
-
-    private void setDirectionButtonVisible(Button button, boolean visible) {
-        button.setVisible(visible);
-        button.setManaged(visible);
-    }
-
-    private void updateDirectionButtons(Room room) {
-        setDirectionButtonVisible(northButton, room.getExit("north") != null);
-        setDirectionButtonVisible(southButton, room.getExit("south") != null);
-        setDirectionButtonVisible(eastButton, room.getExit("east") != null);
-        setDirectionButtonVisible(westButton, room.getExit("west") != null);
     }
 
     private void drawRoom() {
@@ -179,62 +165,113 @@ public class RoomViewGUI extends RoomView {
         roomRect.setStroke(Color.BLACK);
         roomRect.setStrokeWidth(10);
 
-        Circle hero = new Circle(heroX, heroY, 12, Color.DARKRED);
-        Text heroText = new Text(heroX - 18, heroY + 28, "Hero");
-        Text roomName = new Text(330, 105, currentRoom.getName());
+        heroNode = new Circle(heroX, heroY, MapLayout.HERO_RADIUS, Color.DARKRED);
+        heroTextNode = new Text(heroX - 18, heroY + 28, "Hero");
 
-        mapPane.getChildren().addAll(roomRect, roomName, hero, heroText);
+        Text roomName = new Text(getRoomCenterX() - 40, ROOM_Y + 18, currentRoom.getName());
+
+        mapPane.getChildren().addAll(roomRect, roomName, heroNode, heroTextNode);
         drawItems();
 
+        double horizontalExitW = Math.max(40, ROOM_W * 0.08);
+        double horizontalExitH = 10;
+
+        double verticalExitW = 10;
+        double verticalExitH = Math.max(40, ROOM_H * 0.08);
+
         if (currentRoom.getExit("north") != null) {
-            Rectangle northExit = new Rectangle(340, 65, 40, 10);
+            double x = getNorthExitX(horizontalExitW);
+            double y = getNorthExitY(horizontalExitH);
+
+            Rectangle northExit = new Rectangle(x, y, horizontalExitW, horizontalExitH);
             northExit.setFill(getExitColor("north"));
             northExit.setStroke(Color.BLACK);
-            Text northText = new Text(353, 55, "N");
+
+            Text northText = new Text(x + horizontalExitW / 2.0 - 4, y - 8, "N");
             mapPane.getChildren().addAll(northExit, northText);
         }
 
         if (currentRoom.getExit("south") != null) {
-            Rectangle southExit = new Rectangle(340, 425, 40, 10);
+            double x = getSouthExitX(horizontalExitW);
+            double y = getSouthExitY(horizontalExitH);
+
+            Rectangle southExit = new Rectangle(x, y, horizontalExitW, horizontalExitH);
             southExit.setFill(getExitColor("south"));
             southExit.setStroke(Color.BLACK);
-            Text southText = new Text(353, 460, "S");
+
+            Text southText = new Text(x + horizontalExitW / 2.0 - 4, y + 35, "S");
             mapPane.getChildren().addAll(southExit, southText);
         }
 
         if (currentRoom.getExit("west") != null) {
-            Rectangle westExit = new Rectangle(85, 230, 10, 40);
+            double x = getWestExitX(verticalExitW);
+            double y = getWestExitY(verticalExitH);
+
+            Rectangle westExit = new Rectangle(x, y, verticalExitW, verticalExitH);
             westExit.setFill(getExitColor("west"));
             westExit.setStroke(Color.BLACK);
-            Text westText = new Text(55, 250, "W");
+
+            Text westText = new Text(x - 28, y + verticalExitH / 2.0 + 4, "W");
             mapPane.getChildren().addAll(westExit, westText);
         }
 
         if (currentRoom.getExit("east") != null) {
-            Rectangle eastExit = new Rectangle(625, 230, 10, 40);
+            double x = getEastExitX(verticalExitW);
+            double y = getEastExitY(verticalExitH);
+
+            Rectangle eastExit = new Rectangle(x, y, verticalExitW, verticalExitH);
             eastExit.setFill(getExitColor("east"));
             eastExit.setStroke(Color.BLACK);
-            Text eastText = new Text(665, 250, "E");
+
+            Text eastText = new Text(x + 20, y + verticalExitH / 2.0 + 4, "E");
             mapPane.getChildren().addAll(eastExit, eastText);
         }
     }
 
     private void drawItems() {
-        if (placedItems == null || placedItems.isEmpty()) {
-            Text noItemText = new Text(300, 395, "No item in this room");
+        if (currentRoom == null) {
+            return;
+        }
+
+        List<Item> items = currentRoom.getItems();
+
+        if (items == null || items.isEmpty()) {
+            Text noItemText = new Text(getRoomCenterX() - 55, ROOM_Y + ROOM_H - 35, "No item in this room");
             mapPane.getChildren().add(noItemText);
             return;
         }
 
-        for (ItemPlacement placement : placedItems) {
-            double x = placement.getX();
-            double y = placement.getY();
+        for (int i = 0; i < items.size(); i++) {
+            Item item = items.get(i);
 
-            Circle itemMarker = new Circle(x, y, 7, Color.GOLDENROD);
-            Text itemText = new Text(x + 14, y + 4, placement.getItem().getName());
+            double x = getItemX(i);
+            double y = getItemY(i);
+
+            Circle itemMarker = new Circle(x, y, MapLayout.ITEM_RADIUS, Color.GOLDENROD);
+            Text itemText = new Text(x + 14, y + 4, item.getName());
 
             mapPane.getChildren().addAll(itemMarker, itemText);
         }
+    }
+
+    private double getItemX(int index) {
+        int columns = 3;
+        int col = index % columns;
+
+        double startX = ROOM_X + ROOM_W * 0.18;
+        double gapX = ROOM_W * 0.22;
+
+        return startX + col * gapX;
+    }
+
+    private double getItemY(int index) {
+        int columns = 3;
+        int row = index / columns;
+
+        double startY = ROOM_Y + ROOM_H * 0.28;
+        double gapY = ROOM_H * 0.14;
+
+        return startY + row * gapY;
     }
 
     private void drawVisitedRooms() {
@@ -248,8 +285,8 @@ public class RoomViewGUI extends RoomView {
                 Rectangle slot = new Rectangle(
                         MINI_MARGIN_X + col * MINI_CELL_W,
                         MINI_MARGIN_Y + row * MINI_CELL_H,
-                        MINI_CELL_W - 12,
-                        MINI_CELL_H - 12);
+                        MINI_CELL_W - 8,
+                        MINI_CELL_H - 8);
                 slot.setFill(Color.web("#f2f2f2"));
                 slot.setStroke(Color.LIGHTGRAY);
                 exploredMapPane.getChildren().add(slot);
@@ -341,14 +378,14 @@ public class RoomViewGUI extends RoomView {
                 int bCol = b.getGridX() - pageStartX;
                 int bRow = b.getGridY() - pageStartY;
 
-                double x1 = MINI_MARGIN_X + aCol * MINI_CELL_W + (MINI_CELL_W - 12) / 2.0;
-                double y1 = MINI_MARGIN_Y + aRow * MINI_CELL_H + (MINI_CELL_H - 12) / 2.0;
-                double x2 = MINI_MARGIN_X + bCol * MINI_CELL_W + (MINI_CELL_W - 12) / 2.0;
-                double y2 = MINI_MARGIN_Y + bRow * MINI_CELL_H + (MINI_CELL_H - 12) / 2.0;
+                double x1 = MINI_MARGIN_X + aCol * MINI_CELL_W + (MINI_CELL_W - 8) / 2.0;
+                double y1 = MINI_MARGIN_Y + aRow * MINI_CELL_H + (MINI_CELL_H - 8) / 2.0;
+                double x2 = MINI_MARGIN_X + bCol * MINI_CELL_W + (MINI_CELL_W - 8) / 2.0;
+                double y2 = MINI_MARGIN_Y + bRow * MINI_CELL_H + (MINI_CELL_H - 8) / 2.0;
 
                 Line link = new Line(x1, y1, x2, y2);
                 link.setStroke(connectionColor);
-                link.setStrokeWidth(3);
+                link.setStrokeWidth(2);
                 exploredMapPane.getChildren().add(link);
             }
         }
@@ -364,13 +401,13 @@ public class RoomViewGUI extends RoomView {
             double x = MINI_MARGIN_X + col * MINI_CELL_W;
             double y = MINI_MARGIN_Y + row * MINI_CELL_H;
 
-            Rectangle unknownRect = new Rectangle(x, y, MINI_CELL_W - 12, MINI_CELL_H - 12);
+            Rectangle unknownRect = new Rectangle(x, y, MINI_CELL_W - 8, MINI_CELL_H - 8);
             unknownRect.setFill(Color.web("#fff8dc"));
             unknownRect.setStroke(entry.getValue());
-            unknownRect.setStrokeWidth(2);
-            unknownRect.getStrokeDashArray().addAll(6.0, 4.0);
+            unknownRect.setStrokeWidth(1.5);
+            unknownRect.getStrokeDashArray().addAll(4.0, 3.0);
 
-            Text questionMark = new Text(x + 42, y + 42, "?");
+            Text questionMark = new Text(x + 24, y + 27, "?");
 
             exploredMapPane.getChildren().addAll(unknownRect, questionMark);
         }
@@ -382,23 +419,14 @@ public class RoomViewGUI extends RoomView {
             double x = MINI_MARGIN_X + col * MINI_CELL_W;
             double y = MINI_MARGIN_Y + row * MINI_CELL_H;
 
-            Rectangle roomRect = new Rectangle(x, y, MINI_CELL_W - 12, MINI_CELL_H - 12);
+            Rectangle roomRect = new Rectangle(x, y, MINI_CELL_W - 8, MINI_CELL_H - 8);
             boolean isCurrent = placement.getGridX() == currentGridX && placement.getGridY() == currentGridY;
 
             roomRect.setFill(isCurrent ? Color.LIGHTBLUE : Color.WHITE);
             roomRect.setStroke(isCurrent ? Color.DODGERBLUE : Color.BLACK);
-            roomRect.setStrokeWidth(isCurrent ? 3 : 2);
+            roomRect.setStrokeWidth(isCurrent ? 2.5 : 1.5);
 
-            String roomName = placement.getRoom().getName();
-            if (roomName.length() > 12) {
-                roomName = roomName.substring(0, 12) + ".";
-            }
-
-            Text nameText = new Text(x + 10, y + 28, roomName);
-            Text coordText = new Text(x + 10, y + 48,
-                    "(" + placement.getGridX() + "," + placement.getGridY() + ")");
-
-            exploredMapPane.getChildren().addAll(roomRect, nameText, coordText);
+            exploredMapPane.getChildren().add(roomRect);
         }
     }
 
@@ -423,16 +451,14 @@ public class RoomViewGUI extends RoomView {
         Platform.runLater(() -> {
             currentRoom = room;
 
-            titleLabel.setText("=== " + room.getName().toUpperCase() + " ===");
+            titleLabel.setText(room.getName());
             descriptionArea.setText(room.getDescription());
-
             if (room.getExits().isEmpty()) {
                 exitsLabel.setText("Exits: none");
             } else {
                 exitsLabel.setText("Exits: " + String.join(", ", room.getExits().keySet()));
             }
 
-            updateDirectionButtons(room);
             drawRoom();
         });
     }
@@ -442,15 +468,7 @@ public class RoomViewGUI extends RoomView {
         Platform.runLater(() -> {
             heroX = x;
             heroY = y;
-            drawRoom();
-        });
-    }
-
-    @Override
-    public void displayPlacedItems(List<ItemPlacement> placedItems) {
-        Platform.runLater(() -> {
-            this.placedItems = new ArrayList<>(placedItems);
-            drawRoom();
+            updateHeroNode();
         });
     }
 
@@ -481,36 +499,29 @@ public class RoomViewGUI extends RoomView {
 
     @Override
     public void setOnMoveNorth(Runnable action) {
-        Platform.runLater(() -> northButton.setOnAction(e -> action.run()));
     }
 
     @Override
     public void setOnMoveSouth(Runnable action) {
-        Platform.runLater(() -> southButton.setOnAction(e -> action.run()));
     }
 
     @Override
     public void setOnMoveEast(Runnable action) {
-        Platform.runLater(() -> eastButton.setOnAction(e -> action.run()));
     }
 
     @Override
     public void setOnMoveWest(Runnable action) {
-        Platform.runLater(() -> westButton.setOnAction(e -> action.run()));
     }
 
     private int getPageStart(int current) {
-        // Premier bloc centré sur l'origine : [-1, 0, 1]
         if (current >= -1 && current <= 1) {
             return -1;
         }
 
-        // Blocs à droite : [2..4], [5..7], [8..10], ...
         if (current >= 2) {
             return 2 + ((current - 2) / MINI_MAP_SIZE) * MINI_MAP_SIZE;
         }
 
-        // Blocs à gauche : [-4..-2], [-7..-5], [-10..-8], ...
         return -4 - (((-current) - 2) / MINI_MAP_SIZE) * MINI_MAP_SIZE;
     }
 
@@ -546,4 +557,67 @@ public class RoomViewGUI extends RoomView {
         return Color.LIMEGREEN;
     }
 
+    public VBox getMiniMapBox() {
+        return miniMapBox;
+    }
+
+    public VBox getHelpBox() {
+        return helpBox;
+    }
+
+    public StackPane getGameAreaBox() {
+        return gameAreaBox;
+    }
+
+    private double getRoomCenterX() {
+        return ROOM_X + ROOM_W / 2.0;
+    }
+
+    private double getRoomCenterY() {
+        return ROOM_Y + ROOM_H / 2.0;
+    }
+
+    private double getNorthExitX(double exitWidth) {
+        return ROOM_X + (ROOM_W - exitWidth) / 2.0;
+    }
+
+    private double getNorthExitY(double exitHeight) {
+        return ROOM_Y - exitHeight / 2.0;
+    }
+
+    private double getSouthExitX(double exitWidth) {
+        return ROOM_X + (ROOM_W - exitWidth) / 2.0;
+    }
+
+    private double getSouthExitY(double exitHeight) {
+        return ROOM_Y + ROOM_H - exitHeight / 2.0;
+    }
+
+    private double getWestExitX(double exitWidth) {
+        return ROOM_X - exitWidth / 2.0;
+    }
+
+    private double getWestExitY(double exitHeight) {
+        return ROOM_Y + (ROOM_H - exitHeight) / 2.0;
+    }
+
+    private double getEastExitX(double exitWidth) {
+        return ROOM_X + ROOM_W - exitWidth / 2.0;
+    }
+
+    private double getEastExitY(double exitHeight) {
+        return ROOM_Y + (ROOM_H - exitHeight) / 2.0;
+    }
+
+    private void updateHeroNode() {
+        if (heroNode == null || heroTextNode == null) {
+            return;
+        }
+
+        heroNode.setCenterX(heroX);
+        heroNode.setCenterY(heroY);
+
+        heroTextNode.setX(heroX - 18);
+        heroTextNode.setY(heroY + 28);
+    }
 }

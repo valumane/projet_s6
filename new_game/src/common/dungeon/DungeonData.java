@@ -1,4 +1,4 @@
-package application;
+package common.dungeon;
 
 import common.item.Key;
 import common.map.Room;

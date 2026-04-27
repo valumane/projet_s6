@@ -7,6 +7,7 @@ import common.entity.Hero;
 import common.item.Item;
 import common.map.Room;
 import mvc.mvc.Model;
+import mvc.map.MapLayout;
 
 public class HeroModel implements Model {
 
@@ -16,8 +17,13 @@ public class HeroModel implements Model {
         void onLocationChanged(String newLocation);
     }
 
-    private static final double DEFAULT_X = 360;
-    private static final double DEFAULT_Y = 250;
+    private static final double ROOM_X = MapLayout.ROOM_X;
+    private static final double ROOM_Y = MapLayout.ROOM_Y;
+    private static final double ROOM_W = MapLayout.ROOM_W;
+    private static final double ROOM_H = MapLayout.ROOM_H;
+
+    private static final double DEFAULT_X = ROOM_X + ROOM_W / 2.0;
+    private static final double DEFAULT_Y = ROOM_Y + ROOM_H / 2.0;
 
     private final Hero hero;
     private final List<Listener> listeners = new ArrayList<>();
@@ -59,6 +65,44 @@ public class HeroModel implements Model {
     public void syncState() {
         notifyHealthChanged();
         notifyLocationChanged();
+    }
+
+    public void placeAfterCrossing(String direction) {
+        double x = this.x;
+        double y = this.y;
+
+        double minX = ROOM_X + MapLayout.HERO_RADIUS;
+        double maxX = ROOM_X + ROOM_W - MapLayout.HERO_RADIUS;
+        double minY = ROOM_Y + MapLayout.HERO_RADIUS;
+        double maxY = ROOM_Y + ROOM_H - MapLayout.HERO_RADIUS;
+
+        double enterMargin = 35.0;
+
+        switch (direction) {
+            case "north" -> {
+                x = clamp(x, minX, maxX);
+                y = maxY - enterMargin;
+            }
+            case "south" -> {
+                x = clamp(x, minX, maxX);
+                y = minY + enterMargin;
+            }
+            case "east" -> {
+                x = minX + enterMargin;
+                y = clamp(y, minY, maxY);
+            }
+            case "west" -> {
+                x = maxX - enterMargin;
+                y = clamp(y, minY, maxY);
+            }
+            default -> resetPosition();
+        }
+
+        setPosition(x, y);
+    }
+
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     public Hero getHero() {

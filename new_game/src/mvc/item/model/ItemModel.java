@@ -77,11 +77,41 @@ public class ItemModel implements Model {
             return;
         }
 
+        if (!heroModel.getHero().addItem(item)) {
+            notifyMessage("Inventory is full.");
+            notifyState();
+            return;
+        }
+
         heroModel.getRoom().removeItem(item);
-        heroModel.getHero().addItem(item);
 
         notifyMessage(heroModel.getName() + " takes " + item.getName() + ".");
         heroModel.syncState();
+        notifyState();
+    }
+
+    public void interact() {
+        if (item instanceof Chest) {
+            use();
+            return;
+        }
+
+        if (isInCurrentRoom() && item.canBeTaken()) {
+            take();
+            return;
+        }
+
+        if (isInInventory() && item.canBeUsed()) {
+            use();
+            return;
+        }
+
+        if (item.canBeUsed()) {
+            use();
+            return;
+        }
+
+        notifyMessage("Nothing happens.");
         notifyState();
     }
 

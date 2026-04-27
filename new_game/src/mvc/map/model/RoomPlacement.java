@@ -1,4 +1,4 @@
-package mvc.map;
+package mvc.map.model;
 
 import common.map.Room;
 
