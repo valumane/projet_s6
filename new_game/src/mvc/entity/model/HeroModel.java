@@ -8,6 +8,8 @@ import common.item.Item;
 import common.map.Room;
 import mvc.mvc.Model;
 import mvc.map.MapLayout;
+import common.item.Scroll;
+import common.item.Weapon;
 
 public class HeroModel implements Model {
 
@@ -153,5 +155,90 @@ public class HeroModel implements Model {
     public void resetPosition() {
         this.x = DEFAULT_X;
         this.y = DEFAULT_Y;
+    }
+
+    public int getDamage() {
+        return hero.getDamage();
+    }
+
+    public int getMaxHealth() {
+        return hero.getMaxHp();
+    }
+
+    public void increaseMaxHp(int amount) {
+        hero.increaseMaxHp(amount);
+        notifyHealthChanged();
+    }
+
+    public void increaseBaseDamage(int amount) {
+        hero.increaseBaseDamage(amount);
+    }
+
+    public void healToMax() {
+        hero.setHp(hero.getMaxHp());
+        notifyHealthChanged();
+    }
+
+    public List<Item> getInventory() {
+        return hero.getInventory();
+    }
+
+    public Weapon getEquippedWeapon() {
+        return hero.getEquippedWeapon();
+    }
+
+    public String getEquippedWeaponName() {
+        return hero.getEquippedWeaponName();
+    }
+
+    public boolean isEquippedWeaponRanged() {
+        return hero.isEquippedWeaponRanged();
+    }
+
+    public boolean isEquippedWeaponMelee() {
+        return hero.isEquippedWeaponMelee();
+    }
+
+    public String useInventorySlot(int slotIndex) {
+        List<Item> inventory = hero.getInventory();
+
+        if (slotIndex < 0 || slotIndex >= 9) {
+            return "Case invalide.";
+        }
+
+        if (slotIndex >= inventory.size()) {
+            return "Aucun objet dans cette case.";
+        }
+
+        Item item = inventory.get(slotIndex);
+
+        if (item instanceof Weapon weapon) {
+            boolean equipped = hero.equipWeapon(weapon);
+
+            if (equipped) {
+                syncState();
+                return "Arme équipée : " + weapon.getName() + " | dégâts : " + hero.getDamage();
+            }
+
+            return "Impossible d'équiper cette arme.";
+        }
+
+        if (item instanceof Scroll scroll) {
+            scroll.use(hero);
+            syncState();
+            return "Sort utilisé : " + scroll.getName() + " | HP : " + hero.getHp() + "/" + hero.getMaxHp();
+        }
+
+        return "Aucun effet : " + item.getName();
+    }
+
+    public void healPercent(int percent) {
+        hero.healPercentOfMaxHp(percent);
+        notifyHealthChanged();
+    }
+
+    public void increaseDamageByPercent(int percent) {
+        hero.increaseDamagePercent(percent);
+        syncState();
     }
 }

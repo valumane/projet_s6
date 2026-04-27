@@ -30,6 +30,8 @@ import java.util.Set;
 import common.item.Item;
 import mvc.map.MapLayout;
 import mvc.map.model.RoomPlacement;
+import mvc.entity.model.EnemySnapshot;
+import mvc.entity.model.ProjectileSnapshot;
 
 public class RoomViewGUI extends RoomView {
 
@@ -65,6 +67,13 @@ public class RoomViewGUI extends RoomView {
 
     private final VBox infoBox = new VBox(6);
 
+    private final Pane enemiesLayer = new Pane();
+    private final Pane projectilesLayer = new Pane();
+
+    private Line heroFacingNode;
+    private double heroFacingX = 0;
+    private double heroFacingY = -1;
+
     private final Consumer<String> logger;
 
     private Room currentRoom;
@@ -77,6 +86,9 @@ public class RoomViewGUI extends RoomView {
 
     private Circle heroNode;
     private Text heroTextNode;
+
+    private static final long HERO_ATTACK_FLASH_NS = 160_000_000L;
+    private long heroAttackFlashUntil = 0L;
 
     public RoomViewGUI(Consumer<String> logger) {
         this.logger = logger;
@@ -165,13 +177,22 @@ public class RoomViewGUI extends RoomView {
         roomRect.setStroke(Color.BLACK);
         roomRect.setStrokeWidth(10);
 
+        heroFacingNode = new Line(
+                heroX,
+                heroY,
+                heroX + heroFacingX * 38,
+                heroY + heroFacingY * 38);
+        heroFacingNode.setStroke(isHeroAttackFlashing() ? Color.GOLD : Color.BLACK);
+        heroFacingNode.setStrokeWidth(3);
+
         heroNode = new Circle(heroX, heroY, MapLayout.HERO_RADIUS, Color.DARKRED);
         heroTextNode = new Text(heroX - 18, heroY + 28, "Hero");
-
         Text roomName = new Text(getRoomCenterX() - 40, ROOM_Y + 18, currentRoom.getName());
 
-        mapPane.getChildren().addAll(roomRect, roomName, heroNode, heroTextNode);
+        mapPane.getChildren().addAll(roomRect, roomName);
         drawItems();
+
+        mapPane.getChildren().addAll(enemiesLayer, projectilesLayer, heroFacingNode, heroNode, heroTextNode);
 
         double horizontalExitW = Math.max(40, ROOM_W * 0.08);
         double horizontalExitH = 10;
@@ -619,5 +640,103 @@ public class RoomViewGUI extends RoomView {
 
         heroTextNode.setX(heroX - 18);
         heroTextNode.setY(heroY + 28);
+
+        if (heroFacingNode != null) {
+            heroFacingNode.setStartX(heroX);
+            heroFacingNode.setStartY(heroY);
+            heroFacingNode.setEndX(heroX + heroFacingX * 38);
+            heroFacingNode.setEndY(heroY + heroFacingY * 38);
+            heroFacingNode.setStroke(isHeroAttackFlashing() ? Color.GOLD : Color.BLACK);
+        }
+    }
+
+    @Override
+    public void displayHeroAttackFlash() {
+        Platform.runLater(() -> {
+            heroAttackFlashUntil = System.nanoTime() + HERO_ATTACK_FLASH_NS;
+            updateHeroNode();
+        });
+    }
+
+    @Override
+    public void displayHeroFacing(double dx, double dy) {
+        Platform.runLater(() -> {
+            double length = Math.hypot(dx, dy);
+
+            if (length <= 0.001) {
+                return;
+            }
+
+            heroFacingX = dx / length;
+            heroFacingY = dy / length;
+
+            updateHeroNode();
+        });
+    }
+
+    @Override
+    public void displayEnemies(List<EnemySnapshot> enemies) {
+        Platform.runLater(() -> {
+            enemiesLayer.getChildren().clear();
+
+            if (enemies == null) {
+                return;
+            }
+
+            for (EnemySnapshot enemy : enemies) {
+                Color color;
+
+                if (enemy.isHighlighted()) {
+                    color = Color.GOLD;
+                } else if (enemy.isKeyHolder()) {
+                    color = Color.HOTPINK;
+                } else if ("archer".equals(enemy.getKind())) {
+                    color = Color.FORESTGREEN;
+                } else {
+                    color = Color.DARKORANGE;
+                }
+                Circle body = new Circle(enemy.getX(), enemy.getY(), 18, color);
+                body.setStroke(Color.BLACK);
+
+                Line facing = new Line(
+                        enemy.getX(),
+                        enemy.getY(),
+                        enemy.getX() + enemy.getFacingX() * 32,
+                        enemy.getY() + enemy.getFacingY() * 32);
+                facing.setStroke(Color.BLACK);
+                facing.setStrokeWidth(2);
+
+                Text label = new Text(
+                        enemy.getX() - 28,
+                        enemy.getY() + 34,
+                        enemy.getName() + " " + enemy.getHp() + "/" + enemy.getMaxHp());
+
+                enemiesLayer.getChildren().addAll(facing, body, label);
+            }
+
+            updateHeroNode();
+        });
+    }
+
+    @Override
+    public void displayProjectiles(List<ProjectileSnapshot> projectiles) {
+        Platform.runLater(() -> {
+            projectilesLayer.getChildren().clear();
+
+            if (projectiles == null) {
+                return;
+            }
+
+            for (ProjectileSnapshot projectile : projectiles) {
+                Color projectileColor = projectile.isFromHero() ? Color.SADDLEBROWN : Color.DARKBLUE;
+                Circle shot = new Circle(projectile.getX(), projectile.getY(), 6, projectileColor);
+                shot.setStroke(Color.BLACK);
+                projectilesLayer.getChildren().add(shot);
+            }
+        });
+    }
+
+    private boolean isHeroAttackFlashing() {
+        return System.nanoTime() < heroAttackFlashUntil;
     }
 }

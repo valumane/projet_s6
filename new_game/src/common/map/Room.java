@@ -18,6 +18,7 @@ public class Room implements Serializable {
     private final Map<String, Exit> exits;
     private final List<Item> items;
     private final List<Character> characters;
+    private boolean bossRoom;
 
     public Room(String name, String description) {
         this.name = name;
@@ -83,5 +84,13 @@ public class Room implements Serializable {
 
     public void enter(Hero h) {
         // comportement spécial si besoin
+    }
+
+    public boolean isBossRoom() {
+        return bossRoom;
+    }
+
+    public void setBossRoom(boolean bossRoom) {
+        this.bossRoom = bossRoom;
     }
 }

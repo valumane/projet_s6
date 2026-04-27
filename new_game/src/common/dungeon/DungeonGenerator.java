@@ -24,7 +24,7 @@ public class DungeonGenerator {
             "The atmosphere is strangely calm."
     };
 
-    private static final String[] DIRECTIONS = {"north", "south", "east", "west"};
+    private static final String[] DIRECTIONS = { "north", "south", "east", "west" };
 
     private final Random random;
 
@@ -69,10 +69,73 @@ public class DungeonGenerator {
 
         addExtraConnections(grid, roomCount / 3);
 
-        Key key = new Key("Golden Key", "A key to a special door");
-        lockRandomConnection(grid, start, key);
+        Room bossRoom = chooseBossRoom(grid, start);
+        bossRoom.setBossRoom(true);
 
-        return new DungeonData(start, rooms, key);
+        Key key = new Key("Boss Key", "A key to the boss room");
+        lockAllEntrancesToBossRoom(grid, bossRoom, key);
+
+        return new DungeonData(start, rooms, key, bossRoom);
+    }
+
+    private Room chooseBossRoom(Map<Pos, Room> grid, Room start) {
+        Room bestRoom = null;
+        int bestDistance = -1;
+
+        for (Map.Entry<Pos, Room> entry : grid.entrySet()) {
+            Room room = entry.getValue();
+
+            if (room == start) {
+                continue;
+            }
+
+            Pos pos = entry.getKey();
+            int distance = Math.abs(pos.x) + Math.abs(pos.y);
+
+            if (distance > bestDistance) {
+                bestDistance = distance;
+                bestRoom = room;
+            }
+        }
+
+        if (bestRoom == null) {
+            throw new IllegalStateException("No boss room candidate found.");
+        }
+
+        return bestRoom;
+    }
+
+    private void lockAllEntrancesToBossRoom(Map<Pos, Room> grid, Room bossRoom, Key key) {
+        Pos bossPos = null;
+
+        for (Map.Entry<Pos, Room> entry : grid.entrySet()) {
+            if (entry.getValue() == bossRoom) {
+                bossPos = entry.getKey();
+                break;
+            }
+        }
+
+        if (bossPos == null) {
+            throw new IllegalStateException("Boss room position not found.");
+        }
+
+        for (String dirFromBossToNeighbor : DIRECTIONS) {
+            Pos neighborPos = move(bossPos, dirFromBossToNeighbor);
+            Room neighbor = grid.get(neighborPos);
+
+            if (neighbor == null) {
+                continue;
+            }
+
+            String dirFromNeighborToBoss = reverse(dirFromBossToNeighbor);
+
+            if (neighbor.getExit(dirFromNeighborToBoss) != null
+                    && neighbor.getExit(dirFromNeighborToBoss).getTarget() == bossRoom) {
+                neighbor.getExits().put(
+                        dirFromNeighborToBoss,
+                        new common.map.LockedExit(bossRoom, key));
+            }
+        }
     }
 
     private void addExtraConnections(Map<Pos, Room> grid, int attempts) {
@@ -185,8 +248,10 @@ public class DungeonGenerator {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Pos pos)) return false;
+            if (this == o)
+                return true;
+            if (!(o instanceof Pos pos))
+                return false;
             return x == pos.x && y == pos.y;
         }
 

@@ -40,7 +40,7 @@ public class ExitController extends Controller {
             String keyName = lockedExit.getKey().getName();
 
             boolean hasKey = h.getInventory().stream()
-                    .anyMatch(item -> item.getName().equalsIgnoreCase(keyName));
+                    .anyMatch(item -> item == lockedExit.getKey());
 
             if (hasKey) {
                 exitModel.unlock(h);

@@ -20,6 +20,10 @@ public class LockedExit extends Exit {
 
     public void unlock(Hero h) {
         locked = false;
+
+        if (h != null) {
+            h.removeFromInventory(key);
+        }
     }
 
     public Key getKey() {

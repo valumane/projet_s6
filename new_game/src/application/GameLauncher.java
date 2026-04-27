@@ -23,38 +23,98 @@ import mvc.map.controller.RoomController;
 import mvc.map.model.RoomModel;
 import mvc.map.view.cli.RoomViewCLI;
 import mvc.map.view.gui.RoomViewGUI;
+import common.entity.Archer;
+import common.entity.Berserker;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import common.entity.Enemy;
 
 public final class GameLauncher {
 
-    private static final int DEFAULT_HERO_DAMAGE = 10;
-    private static final int DEFAULT_HERO_BAG_CAPACITY = 5;
+    private static final int DEFAULT_HERO_DAMAGE = 0;
+    private static final int DEFAULT_HERO_BAG_CAPACITY = 9;
 
     private GameLauncher() {
     }
 
     public static void startRandomGame(Stage stage) {
+        startRandomGame(stage, null);
+    }
+
+    private static void startRandomGame(Stage stage, Hero existingHero) {
         DungeonGenerator generator = new DungeonGenerator(System.currentTimeMillis());
         DungeonData dungeon = generator.generate(12);
 
         Room startRoom = dungeon.getStartRoom();
+        Room bossRoom = dungeon.getBossRoom();
 
-        Hero hero = new Hero(
-                "Hero",
-                100,
-                new Bag("Backpack", DEFAULT_HERO_BAG_CAPACITY),
-                startRoom,
-                DEFAULT_HERO_DAMAGE);
+        Hero hero;
 
-        Weapon sword = new Weapon("Sword", 18);
+        if (existingHero == null) {
+            hero = new Hero(
+                    "Hero",
+                    100,
+                    new Bag("Backpack", DEFAULT_HERO_BAG_CAPACITY),
+                    startRoom,
+                    DEFAULT_HERO_DAMAGE);
+
+            Weapon basicSword = new Weapon("Épée basique", 10, Weapon.WeaponType.MELEE);
+            Weapon basicBow = new Weapon("Arc basique", 10, Weapon.WeaponType.RANGED);
+
+            hero.addItem(basicSword);
+            hero.addItem(basicBow);
+            hero.equipWeapon(basicSword);
+        } else {
+            hero = existingHero;
+            hero.setCurrentRoom(startRoom);
+        }
+
         Scroll healingScroll = new Scroll("Healing Scroll", new HealSpell(25));
         Chest chest = new Chest("Wooden Chest", false, "A small chest full of loot");
 
         chest.addItem(new Item("Ruby", "A shiny red gem"));
         chest.addItem(new Item("Coin", "An old gold coin"));
 
-        startRoom.addItem(sword);
         startRoom.addItem(healingScroll);
         startRoom.addItem(chest);
+
+        List<Enemy> keyCandidates = new ArrayList<>();
+
+        int i = 0;
+        for (Room room : dungeon.getRooms()) {
+            if (room == startRoom) {
+                continue;
+            }
+
+            if (room == bossRoom) {
+                room.addCharacter(new Berserker(5));
+                room.addCharacter(new Archer(5));
+                continue;
+            }
+
+            int difficulty = Math.min(5, 1 + i / 3);
+
+            Enemy enemy;
+
+            if (i % 2 == 0) {
+                enemy = new Berserker(difficulty);
+            } else {
+                enemy = new Archer(difficulty);
+            }
+
+            room.addCharacter(enemy);
+            keyCandidates.add(enemy);
+
+            i++;
+        }
+
+        if (!keyCandidates.isEmpty()) {
+            Enemy keyHolder = keyCandidates.get(ThreadLocalRandom.current().nextInt(keyCandidates.size()));
+            keyHolder.addToInventory(dungeon.getGoldenKey());
+        } else {
+            startRoom.addItem(dungeon.getGoldenKey());
+        }
 
         HeroModel heroModel = new HeroModel(hero);
         RoomModel roomModel = new RoomModel(heroModel.getRoom());
@@ -90,14 +150,20 @@ public final class GameLauncher {
             logWindowGUI.append("Settings from pause menu will be connected later.");
             logWindowGUI.showWindow();
         });
-        
+
         new HeroController(heroModel, heroViewCLI, heroViewGUI);
 
         RoomController roomController = new RoomController(
                 roomModel,
                 heroModel,
                 roomViewCLI,
-                roomViewGUI);
+                roomViewGUI,
+                () -> {
+                    logWindowGUI.append("New random level generated.");
+                    logWindowGUI.showWindow();
+                    gameViewGUI.hide();
+                    GameLauncher.startRandomGame(stage, hero);
+                });
 
         new GameController(new GameModel(), gameViewGUI, roomController, heroModel);
 

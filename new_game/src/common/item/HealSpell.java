@@ -13,7 +13,7 @@ public class HealSpell extends Spell {
     @Override
     public void cast(Hero caster) {
         int before = caster.getHp();
-        int after = before + healAmount;
+        int after = Math.min(caster.getMaxHp(), before + healAmount);
 
         caster.setHp(after);
     }

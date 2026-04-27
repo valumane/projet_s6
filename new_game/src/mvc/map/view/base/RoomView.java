@@ -5,6 +5,8 @@ import java.util.List;
 import common.map.Room;
 import mvc.map.model.RoomPlacement;
 import mvc.mvc.View;
+import mvc.entity.model.EnemySnapshot;
+import mvc.entity.model.ProjectileSnapshot;
 
 public abstract class RoomView implements View {
 
@@ -40,5 +42,17 @@ public abstract class RoomView implements View {
     }
 
     public void setOnMoveWest(Runnable action) {
+    }
+
+    public void displayHeroFacing(double dx, double dy) {
+    }
+
+    public void displayEnemies(List<EnemySnapshot> enemies) {
+    }
+
+    public void displayProjectiles(List<ProjectileSnapshot> projectiles) {
+    }
+
+    public void displayHeroAttackFlash() {
     }
 }

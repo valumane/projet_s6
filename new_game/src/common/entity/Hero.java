@@ -11,13 +11,19 @@ public class Hero extends Character {
 
     private final Bag backpack;
     private Room room;
-    private int damage;
+
+    private int baseDamage;
+    private int maxHp;
+    private double damageMultiplier = 1.0;
+
+    private Weapon equippedWeapon;
 
     public Hero(String name, int hp, Bag backpack, Room room, int baseDamage) {
         super(name, hp);
         this.backpack = backpack;
         this.room = room;
-        this.damage = baseDamage;
+        this.baseDamage = baseDamage;
+        this.maxHp = hp;
     }
 
     public Bag getBackpack() {
@@ -25,30 +31,9 @@ public class Hero extends Character {
     }
 
     public boolean addItem(Item item) {
-        boolean added = this.backpack.addItem(item);
-
-        if (!added) {
-            return false;
-        }
-
-        if (item instanceof Weapon weapon) {
-            this.damage += weapon.getDamage();
-        }
-
-        return true;
+        return this.backpack.addItem(item);
     }
 
-    // changement de lucas :
-    // changé car on supprimé un objet dans la boucle
-    // donc java itere une liste d'objet et on supprime un objet de la meme liste en
-    // meme temps
-    // genre le foreach il s'attend pas que tu modifie la liste qu'il parcour
-    // donc quand on remove on modifie la liste en dehors de l'iterateur
-    // pas envie de savoir si sa aurait posé un probleme ou non mais par intuition
-    // supprimé un objet d'une liste qui est entrain d'itéré c bof bof
-    // enfin, dans un for sa pose pas de probleme, mais la c un foreach, c un
-    // iterateur transformé chelou
-    // donc solution ? on recup l'objet qu'on veut delete ET ENSUITE on le delete
     public Item dropItem(String itemName) {
         Item found = null;
 
@@ -63,17 +48,48 @@ public class Hero extends Character {
             return null;
         }
 
-        if (found instanceof Weapon) {
-            Weapon weapon = (Weapon) found;
-            this.damage -= weapon.getDamage();
+        if (found == equippedWeapon) {
+            equippedWeapon = null;
         }
 
         this.removeFromInventory(found);
-        this.room.addItem(found);
+
+        if (this.room != null) {
+            this.room.addItem(found);
+        }
+
         return found;
     }
 
-    // Getter and setters
+    public boolean equipWeapon(Weapon weapon) {
+        if (weapon == null) {
+            return false;
+        }
+
+        if (!getInventory().contains(weapon)) {
+            return false;
+        }
+
+        this.equippedWeapon = weapon;
+        return true;
+    }
+
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
+    }
+
+    public String getEquippedWeaponName() {
+        return equippedWeapon == null ? "aucune" : equippedWeapon.getName();
+    }
+
+    public boolean isEquippedWeaponRanged() {
+        return equippedWeapon != null && equippedWeapon.isRanged();
+    }
+
+    public boolean isEquippedWeaponMelee() {
+        return equippedWeapon != null && equippedWeapon.isMelee();
+    }
+
     public Room getRoom() {
         return this.room;
     }
@@ -82,14 +98,11 @@ public class Hero extends Character {
         this.room = r;
     }
 
-    // Les items du héro sont dans le bagpack
     @Override
     public List<Item> getInventory() {
         return this.backpack.getContent();
     }
 
-    // On pourra utiliser la limite du sac pour limiter le nombre d'objets possible
-    // à avoir sur soi
     @Override
     public void addToInventory(Item item) {
         addItem(item);
@@ -97,6 +110,55 @@ public class Hero extends Character {
 
     @Override
     public void removeFromInventory(Item item) {
+        if (item == equippedWeapon) {
+            equippedWeapon = null;
+        }
+
         this.backpack.removeItem(item);
+    }
+
+    public int getDamage() {
+        int weaponDamage = equippedWeapon == null ? 0 : equippedWeapon.getDamage();
+        int rawDamage = baseDamage + weaponDamage;
+
+        return Math.max(1, (int) Math.round(rawDamage * damageMultiplier));
+    }
+
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void increaseMaxHp(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        maxHp += amount;
+        setHp(Math.min(maxHp, getHp() + amount));
+    }
+
+    public void increaseBaseDamage(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        baseDamage += amount;
+    }
+
+    public void increaseDamagePercent(int percent) {
+        if (percent <= 0) {
+            return;
+        }
+
+        damageMultiplier *= 1.0 + percent / 100.0;
+    }
+
+    public void healPercentOfMaxHp(int percent) {
+        if (percent <= 0) {
+            return;
+        }
+
+        int healAmount = Math.max(1, maxHp * percent / 100);
+        setHp(Math.min(maxHp, getHp() + healAmount));
     }
 }

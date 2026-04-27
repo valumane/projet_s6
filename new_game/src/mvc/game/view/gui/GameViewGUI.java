@@ -28,6 +28,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import java.util.function.LongConsumer;
+import java.util.function.IntConsumer;
 
 public class GameViewGUI extends GameView {
 
@@ -44,6 +46,7 @@ public class GameViewGUI extends GameView {
     private Runnable onTakeItem;
     private Runnable onShowLogs;
     private Runnable onToggleInventory;
+    private Runnable onAttack;
 
     private Runnable onResetGame;
     private Runnable onSaveGame;
@@ -53,7 +56,10 @@ public class GameViewGUI extends GameView {
 
     private final StackPane sceneRoot = new StackPane();
     private final VBox pauseOverlay = new VBox(14);
+    private final VBox gameOverOverlay = new VBox(14);
+
     private boolean paused = false;
+    private boolean gameOver = false;
 
     private boolean northPressed;
     private boolean southPressed;
@@ -63,6 +69,11 @@ public class GameViewGUI extends GameView {
     private final VBox inventoryBox = new VBox(8);
     private final Label inventoryTitle = new Label("Inventaire");
     private final VBox inventoryItemsBox = new VBox(6);
+
+    private LongConsumer onGameTick;
+
+    private IntConsumer onUseInventorySlot;
+    private final Label infoLabel = new Label("Arme équipée : aucune");
 
     private final AnimationTimer timer = new AnimationTimer() {
         @Override
@@ -75,13 +86,24 @@ public class GameViewGUI extends GameView {
                 onMoveEast.run();
             if (westPressed && onMoveWest != null)
                 onMoveWest.run();
+
+            if (onGameTick != null) {
+                onGameTick.accept(now);
+            }
         }
     };
+
+    @Override
+    public void setOnGameTick(LongConsumer action) {
+        this.onGameTick = action;
+    }
 
     public GameViewGUI(Stage stage, HeroViewGUI heroViewGUI, RoomViewGUI roomViewGUI) {
         this.stage = stage;
 
         logsButton.setFocusTraversable(false);
+        infoLabel.setFocusTraversable(false);
+        infoLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
         logsButton.setOnAction(e -> {
             if (onShowLogs != null) {
                 onShowLogs.run();
@@ -102,10 +124,15 @@ public class GameViewGUI extends GameView {
         root.setPadding(new Insets(10));
 
         buildPauseOverlay();
+        buildGameOverOverlay();
 
-        sceneRoot.getChildren().addAll(root, pauseOverlay);
+        sceneRoot.getChildren().addAll(root, pauseOverlay, gameOverOverlay);
+
         pauseOverlay.setVisible(false);
         pauseOverlay.setManaged(false);
+
+        gameOverOverlay.setVisible(false);
+        gameOverOverlay.setManaged(false);
 
         scene = new Scene(sceneRoot, GameConfig.getWindowWidth(), GameConfig.getWindowHeight());
 
@@ -118,6 +145,65 @@ public class GameViewGUI extends GameView {
 
         installKeyboardHandling();
         scene.setOnMouseClicked(event -> scene.getRoot().requestFocus());
+    }
+
+    private void buildGameOverOverlay() {
+        Label title = new Label("GAME OVER");
+        title.setStyle("-fx-font-size: 42px; -fx-font-weight: bold;");
+        title.setTextFill(Color.RED);
+
+        Label subtitle = new Label("Your hero is dead.");
+        subtitle.setStyle("-fx-font-size: 18px;");
+        subtitle.setTextFill(Color.WHITE);
+
+        Button restartButton = new Button("Restart");
+        Button menuButton = new Button("Quit to menu");
+        Button quitDesktopButton = new Button("Quit to desktop");
+
+        Button[] buttons = {
+                restartButton,
+                menuButton,
+                quitDesktopButton
+        };
+
+        for (Button button : buttons) {
+            button.setMinWidth(220);
+            button.setFocusTraversable(false);
+            button.setStyle("-fx-font-size: 16px;");
+        }
+
+        restartButton.setOnAction(e -> {
+            if (onResetGame != null) {
+                onResetGame.run();
+            }
+        });
+
+        menuButton.setOnAction(e -> {
+            if (onQuitToMenu != null) {
+                onQuitToMenu.run();
+            }
+        });
+
+        quitDesktopButton.setOnAction(e -> {
+            if (onQuitToDesktop != null) {
+                onQuitToDesktop.run();
+            }
+        });
+
+        gameOverOverlay.getChildren().addAll(
+                title,
+                subtitle,
+                restartButton,
+                menuButton,
+                quitDesktopButton);
+
+        gameOverOverlay.setAlignment(Pos.CENTER);
+        gameOverOverlay.setPadding(new Insets(30));
+        gameOverOverlay.setBackground(new Background(
+                new BackgroundFill(
+                        Color.rgb(0, 0, 0, 0.82),
+                        CornerRadii.EMPTY,
+                        Insets.EMPTY)));
     }
 
     private void buildPauseOverlay() {
@@ -225,6 +311,10 @@ public class GameViewGUI extends GameView {
     }
 
     private void hidePauseMenu() {
+        if (gameOver) {
+            return;
+        }
+
         paused = false;
 
         pauseOverlay.setVisible(false);
@@ -324,20 +414,28 @@ public class GameViewGUI extends GameView {
     }
 
     private HBox buildBottomBar(RoomViewGUI roomViewGUI) {
-        HBox bottomBar = new HBox();
+        HBox bottomBar = new HBox(12);
         bottomBar.setPadding(new Insets(0, 10, 10, 10));
-        bottomBar.setAlignment(Pos.CENTER_RIGHT);
+        bottomBar.setAlignment(Pos.CENTER_LEFT);
 
         VBox helpContainer = new VBox(roomViewGUI.getHelpBox());
         helpContainer.setStyle("-fx-background-color: white;");
 
-        bottomBar.getChildren().add(helpContainer);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        bottomBar.getChildren().addAll(infoLabel, spacer, helpContainer);
         return bottomBar;
     }
 
     private void installKeyboardHandling() {
         scene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
+
+            if (gameOver) {
+                event.consume();
+                return;
+            }
 
             if (code == KeyCode.ESCAPE) {
                 togglePauseMenu();
@@ -346,6 +444,15 @@ public class GameViewGUI extends GameView {
             }
 
             if (paused) {
+                event.consume();
+                return;
+            }
+
+            int inventorySlot = inventorySlotFromKey(code);
+            if (inventorySlot != -1) {
+                if (onUseInventorySlot != null) {
+                    onUseInventorySlot.accept(inventorySlot);
+                }
                 event.consume();
                 return;
             }
@@ -362,6 +469,11 @@ public class GameViewGUI extends GameView {
                 if (onTakeItem != null) {
                     onTakeItem.run();
                 }
+            } else if (code == KeyCode.SPACE) {
+                if (onAttack != null) {
+                    onAttack.run();
+                }
+                event.consume();
             } else if (code == KeyCode.I) {
                 if (onToggleInventory != null) {
                     onToggleInventory.run();
@@ -382,6 +494,31 @@ public class GameViewGUI extends GameView {
                 eastPressed = false;
             }
         });
+    }
+
+    private int inventorySlotFromKey(KeyCode code) {
+        return switch (code) {
+            case DIGIT1, NUMPAD1 -> 0;
+            case DIGIT2, NUMPAD2 -> 1;
+            case DIGIT3, NUMPAD3 -> 2;
+            case DIGIT4, NUMPAD4 -> 3;
+            case DIGIT5, NUMPAD5 -> 4;
+            case DIGIT6, NUMPAD6 -> 5;
+            case DIGIT7, NUMPAD7 -> 6;
+            case DIGIT8, NUMPAD8 -> 7;
+            case DIGIT9, NUMPAD9 -> 8;
+            default -> -1;
+        };
+    }
+
+    @Override
+    public void setOnUseInventorySlot(IntConsumer action) {
+        this.onUseInventorySlot = action;
+    }
+
+    @Override
+    public void displayInfo(String message) {
+        Platform.runLater(() -> infoLabel.setText(message));
     }
 
     @Override
@@ -449,7 +586,10 @@ public class GameViewGUI extends GameView {
         Platform.runLater(() -> {
             stage.show();
             scene.getRoot().requestFocus();
-            timer.start();
+
+            if (!gameOver) {
+                timer.start();
+            }
         });
     }
 
@@ -483,5 +623,32 @@ public class GameViewGUI extends GameView {
     public void toggleInventoryOverlay() {
         // Inventaire fixe à gauche :
         // on ne masque plus, on laisse juste le refresh se faire.
+    }
+
+    @Override
+    public void setOnAttack(Runnable action) {
+        this.onAttack = action;
+    }
+
+    @Override
+    public void displayGameOver() {
+        Platform.runLater(() -> {
+            gameOver = true;
+            paused = false;
+
+            northPressed = false;
+            southPressed = false;
+            eastPressed = false;
+            westPressed = false;
+
+            timer.stop();
+
+            pauseOverlay.setVisible(false);
+            pauseOverlay.setManaged(false);
+
+            gameOverOverlay.setVisible(true);
+            gameOverOverlay.setManaged(true);
+            gameOverOverlay.toFront();
+        });
     }
 }

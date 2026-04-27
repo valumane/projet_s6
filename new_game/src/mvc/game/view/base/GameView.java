@@ -39,4 +39,19 @@ public abstract class GameView implements View {
 
     public void setOnSettings(Runnable action) {
     }
+
+    public void setOnGameTick(java.util.function.LongConsumer action) {
+    }
+
+    public void setOnAttack(Runnable action) {
+    }
+
+    public void displayGameOver() {
+    }
+
+    public void setOnUseInventorySlot(java.util.function.IntConsumer action) {
+    }
+
+    public void displayInfo(String message) {
+    }
 }

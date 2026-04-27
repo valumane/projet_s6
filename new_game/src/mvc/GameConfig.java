@@ -4,7 +4,7 @@ import javafx.scene.input.KeyCode;
 
 public final class GameConfig {
 
-    private static String controlScheme = "ZQSD + E";
+    private static String controlScheme = "ZQSD + E + Space";
     private static int windowWidth = 1200;
     private static int windowHeight = 800;
 
@@ -45,8 +45,8 @@ public final class GameConfig {
 
     public static String getControlHelpText() {
         return controlScheme.startsWith("WASD")
-                ? "Déplacements : WASD | Interagir : E"
-                : "Déplacements : ZQSD | Interagir : E";
+                ? "Déplacements : WASD | Interagir : E | Attaquer : Espace"
+                : "Déplacements : ZQSD | Interagir : E | Attaquer : Espace";
     }
 
     public static void setResolution(String value) {
