@@ -22,9 +22,7 @@ public class MainMenuController extends Controller {
         this.stage = stage;
 
         view.setScores(List.of(
-                "1. Lucas - 12 rooms",
-                "2. Bob - 9 rooms",
-                "3. Alice - 7 rooms"));
+                ""));
 
         view.setOnNewGame(this::startNewGame);
 

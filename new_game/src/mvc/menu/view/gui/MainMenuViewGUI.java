@@ -44,7 +44,7 @@ public class MainMenuViewGUI extends MainMenuView {
         Label titleLabel = new Label("JeuxQuiJeux");
         titleLabel.setStyle("-fx-font-size: 34px; -fx-font-weight: bold;");
 
-        Label authorsLabel = new Label("Auteurs : prénom1, prénom2, prénom3, prénom4");
+        Label authorsLabel = new Label("Auteurs : lucas, mathis, tom, leonard");
         authorsLabel.setStyle("-fx-font-size: 13px;");
 
         newGameButton.setMaxWidth(Double.MAX_VALUE);
