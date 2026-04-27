@@ -55,4 +55,14 @@ public abstract class RoomView implements View {
 
     public void displayHeroAttackFlash() {
     }
+
+    public void displaySecondHeroPosition(double x, double y) {
+    }
+
+    public void displaySecondHeroFacing(double dx, double dy) {
+    }
+
+    public void displaySecondHeroAttackFlash() {
+    }
+
 }

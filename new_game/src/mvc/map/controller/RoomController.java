@@ -33,16 +33,19 @@ public class RoomController extends Controller {
 
     private final RoomModel roomModel;
     private final HeroModel heroModel;
+    private final HeroModel secondHeroModel;
+
     private final RoomView viewCLI;
     private final RoomView viewGUI;
 
     private final CombatController combatController;
     private final RoomItemInteractionController itemInteractionController;
+    private final RoomItemInteractionController secondItemInteractionController;
 
     private long movementLockedUntil = 0L;
 
     public RoomController(RoomModel roomModel, HeroModel heroModel, RoomView viewCLI, RoomView viewGUI) {
-        this(roomModel, heroModel, viewCLI, viewGUI, null);
+        this(roomModel, heroModel, null, viewCLI, viewGUI, null);
     }
 
     public RoomController(
@@ -52,16 +55,29 @@ public class RoomController extends Controller {
             RoomView viewGUI,
             Runnable onBossRoomCleared
     ) {
+        this(roomModel, heroModel, null, viewCLI, viewGUI, onBossRoomCleared);
+    }
+
+    public RoomController(
+            RoomModel roomModel,
+            HeroModel heroModel,
+            HeroModel secondHeroModel,
+            RoomView viewCLI,
+            RoomView viewGUI,
+            Runnable onBossRoomCleared
+    ) {
         super(roomModel, viewCLI, viewGUI);
 
         this.roomModel = roomModel;
         this.heroModel = heroModel;
+        this.secondHeroModel = secondHeroModel;
         this.viewCLI = viewCLI;
         this.viewGUI = viewGUI;
 
         this.combatController = new CombatController(
                 roomModel,
                 heroModel,
+                secondHeroModel,
                 viewCLI,
                 viewGUI,
                 onBossRoomCleared,
@@ -76,8 +92,24 @@ public class RoomController extends Controller {
                 this::refreshRoomViews
         );
 
+        if (secondHeroModel == null) {
+            this.secondItemInteractionController = null;
+        } else {
+            this.secondItemInteractionController = new RoomItemInteractionController(
+                    roomModel,
+                    secondHeroModel,
+                    viewCLI,
+                    viewGUI,
+                    this::refreshRoomViews
+            );
+        }
+
         this.subControllers.add(combatController);
         this.subControllers.add(itemInteractionController);
+
+        if (secondItemInteractionController != null) {
+            this.subControllers.add(secondItemInteractionController);
+        }
     }
 
     public void onEnterRoom() {
@@ -89,7 +121,7 @@ public class RoomController extends Controller {
 
         viewCLI.displayRoom(currentRoom);
 
-        viewGUI.displayHeroPosition(heroModel.getX(), heroModel.getY());
+        displayHeroPositions();
 
         viewGUI.displayVisitedRooms(
                 roomModel.getVisitedRoomPlacements(),
@@ -100,9 +132,22 @@ public class RoomController extends Controller {
         combatController.onEnterRoom();
 
         viewGUI.displayRoom(currentRoom);
+        displayHeroPositions();
     }
 
     public void heroMove(String direction) {
+        moveHero(heroModel, false, direction);
+    }
+
+    public void secondHeroMove(String direction) {
+        if (secondHeroModel == null) {
+            return;
+        }
+
+        moveHero(secondHeroModel, true, direction);
+    }
+
+    private void moveHero(HeroModel movingHero, boolean secondPlayer, String direction) {
         if (System.nanoTime() < movementLockedUntil) {
             return;
         }
@@ -126,14 +171,18 @@ public class RoomController extends Controller {
             }
         }
 
-        viewGUI.displayHeroFacing(dx, dy);
+        if (secondPlayer) {
+            viewGUI.displaySecondHeroFacing(dx, dy);
+        } else {
+            viewGUI.displayHeroFacing(dx, dy);
+        }
 
-        double nextX = heroModel.getX() + dx;
-        double nextY = heroModel.getY() + dy;
+        double nextX = movingHero.getX() + dx;
+        double nextY = movingHero.getY() + dy;
 
         if (nextX < MIN_X) {
             if (currentRoom.getExit("west") != null) {
-                crossExit("west");
+                crossExit(movingHero, "west");
                 return;
             }
 
@@ -142,7 +191,7 @@ public class RoomController extends Controller {
 
         if (nextX > MAX_X) {
             if (currentRoom.getExit("east") != null) {
-                crossExit("east");
+                crossExit(movingHero, "east");
                 return;
             }
 
@@ -151,7 +200,7 @@ public class RoomController extends Controller {
 
         if (nextY < MIN_Y) {
             if (currentRoom.getExit("north") != null) {
-                crossExit("north");
+                crossExit(movingHero, "north");
                 return;
             }
 
@@ -160,15 +209,20 @@ public class RoomController extends Controller {
 
         if (nextY > MAX_Y) {
             if (currentRoom.getExit("south") != null) {
-                crossExit("south");
+                crossExit(movingHero, "south");
                 return;
             }
 
             nextY = MAX_Y;
         }
 
-        heroModel.setPosition(nextX, nextY);
-        viewGUI.displayHeroPosition(nextX, nextY);
+        movingHero.setPosition(nextX, nextY);
+
+        if (secondPlayer) {
+            viewGUI.displaySecondHeroPosition(nextX, nextY);
+        } else {
+            viewGUI.displayHeroPosition(nextX, nextY);
+        }
     }
 
     public void goTo(String direction) {
@@ -186,10 +240,10 @@ public class RoomController extends Controller {
             return;
         }
 
-        crossExit(direction);
+        crossExit(heroModel, direction);
     }
 
-    private void crossExit(String direction) {
+    private void crossExit(HeroModel actor, String direction) {
         Room currentRoom = roomModel.getRoom();
 
         if (currentRoom == null) {
@@ -210,17 +264,24 @@ public class RoomController extends Controller {
                 new ExitViewGUI(viewGUI::displayMessage)
         );
 
-        exitController.onUnlock(heroModel.getHero());
+        exitController.onUnlock(actor.getHero());
 
-        Room target = exitController.onCross(heroModel.getHero());
+        Room target = exitController.onCross(actor.getHero());
 
         if (target == null) {
             return;
         }
 
-        heroModel.setRoom(target);
         roomModel.moveTo(target, direction);
+
+        heroModel.setRoom(target);
         heroModel.placeAfterCrossing(direction);
+
+        if (secondHeroModel != null) {
+            secondHeroModel.setRoom(target);
+            secondHeroModel.placeAfterCrossing(direction);
+            separateHeroesIfOverlapping();
+        }
 
         combatController.clearProjectiles();
 
@@ -232,6 +293,22 @@ public class RoomController extends Controller {
         onEnterRoom();
     }
 
+    private void separateHeroesIfOverlapping() {
+        if (secondHeroModel == null) {
+            return;
+        }
+
+        double dx = secondHeroModel.getX() - heroModel.getX();
+        double dy = secondHeroModel.getY() - heroModel.getY();
+
+        if (Math.hypot(dx, dy) > MapLayout.HERO_RADIUS * 1.5) {
+            return;
+        }
+
+        double newX = Math.min(MAX_X, heroModel.getX() + MapLayout.HERO_RADIUS * 2.4);
+        secondHeroModel.setPosition(newX, heroModel.getY());
+    }
+
     public void updateEnemies(long now) {
         combatController.update(now);
     }
@@ -240,8 +317,20 @@ public class RoomController extends Controller {
         combatController.attackNearby();
     }
 
+    public void secondAttackNearby() {
+        if (secondHeroModel != null) {
+            combatController.secondAttackNearby();
+        }
+    }
+
     public void interactNearby() {
         itemInteractionController.interactNearby();
+    }
+
+    public void secondInteractNearby() {
+        if (secondItemInteractionController != null) {
+            secondItemInteractionController.interactNearby();
+        }
     }
 
     public void interactCli() {
@@ -257,7 +346,7 @@ public class RoomController extends Controller {
 
         viewCLI.displayRoom(currentRoom);
 
-        viewGUI.displayHeroPosition(heroModel.getX(), heroModel.getY());
+        displayHeroPositions();
 
         viewGUI.displayVisitedRooms(
                 roomModel.getVisitedRoomPlacements(),
@@ -266,5 +355,14 @@ public class RoomController extends Controller {
         );
 
         viewGUI.displayRoom(currentRoom);
+        displayHeroPositions();
+    }
+
+    private void displayHeroPositions() {
+        viewGUI.displayHeroPosition(heroModel.getX(), heroModel.getY());
+
+        if (secondHeroModel != null) {
+            viewGUI.displaySecondHeroPosition(secondHeroModel.getX(), secondHeroModel.getY());
+        }
     }
 }

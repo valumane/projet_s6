@@ -43,6 +43,27 @@ public class CombatController extends Controller {
 
     private boolean bossRoomRewardGiven = false;
     private long nextPlayerAttackTime = 0L;
+    private long nextSecondPlayerAttackTime = 0L;
+    private final HeroModel secondHeroModel;
+
+    public CombatController(
+            RoomModel roomModel,
+            HeroModel heroModel,
+            HeroModel secondHeroModel,
+            RoomView viewCLI,
+            RoomView viewGUI,
+            Runnable onBossRoomCleared,
+            Runnable refreshRoomViews) {
+        super(roomModel, viewCLI, viewGUI);
+
+        this.roomModel = roomModel;
+        this.heroModel = heroModel;
+        this.secondHeroModel = secondHeroModel;
+        this.viewCLI = viewCLI;
+        this.viewGUI = viewGUI;
+        this.onBossRoomCleared = onBossRoomCleared;
+        this.refreshRoomViews = refreshRoomViews;
+    }
 
     public CombatController(
             RoomModel roomModel,
@@ -50,16 +71,8 @@ public class CombatController extends Controller {
             RoomView viewCLI,
             RoomView viewGUI,
             Runnable onBossRoomCleared,
-            Runnable refreshRoomViews
-    ) {
-        super(roomModel, viewCLI, viewGUI);
-
-        this.roomModel = roomModel;
-        this.heroModel = heroModel;
-        this.viewCLI = viewCLI;
-        this.viewGUI = viewGUI;
-        this.onBossRoomCleared = onBossRoomCleared;
-        this.refreshRoomViews = refreshRoomViews;
+            Runnable refreshRoomViews) {
+        this(roomModel, heroModel, null, viewCLI, viewGUI, onBossRoomCleared, refreshRoomViews);
     }
 
     public void onEnterRoom() {
@@ -81,23 +94,29 @@ public class CombatController extends Controller {
 
         syncEnemiesForCurrentRoom();
 
-        updatePlayerAutoAttack(now);
+        updatePlayerAutoAttack(heroModel, false, now);
+
+        if (secondHeroModel != null) {
+            updatePlayerAutoAttack(secondHeroModel, true, now);
+        }
 
         for (EnemyModel enemyModel : getCurrentEnemyModels()) {
-            enemyModel.update(heroModel, now, projectiles);
+            HeroModel target = findNearestHero(enemyModel.getX(), enemyModel.getY());
+
+            if (target != null) {
+                enemyModel.update(target, now, projectiles);
+            }
         }
 
         for (ProjectileModel projectile : projectiles) {
-            projectile.update(heroModel);
+            projectile.update(getAliveHeroes());
         }
 
         updateHeroProjectileHits(now);
 
         projectiles.removeIf(projectile -> !projectile.isAlive());
 
-        currentRoom.getCharacters().removeIf(character ->
-                character instanceof Enemy enemy && !enemy.isAlive()
-        );
+        currentRoom.getCharacters().removeIf(character -> character instanceof Enemy enemy && !enemy.isAlive());
 
         enemyModels.entrySet().removeIf(entry -> !entry.getKey().isAlive());
 
@@ -106,52 +125,70 @@ public class CombatController extends Controller {
     }
 
     public void attackNearby() {
+        attackNearby(heroModel, false);
+    }
+
+    public void secondAttackNearby() {
+        if (secondHeroModel == null) {
+            return;
+        }
+
+        attackNearby(secondHeroModel, true);
+    }
+
+    private void attackNearby(HeroModel attacker, boolean secondPlayer) {
         Room currentRoom = roomModel.getRoom();
 
-        if (currentRoom == null) {
+        if (currentRoom == null || attacker == null) {
             return;
         }
 
-        if (heroModel.getEquippedWeapon() == null) {
-            viewCLI.displayMessage("No weapon equipped.");
-            viewGUI.displayMessage("No weapon equipped.");
+        if (attacker.getEquippedWeapon() == null) {
+
+            displayMessage(attacker.getName() + " has no weapon equipped.");
             return;
         }
 
-        NearestEnemy nearestEnemy = findNearestEnemy();
+        NearestEnemy nearestEnemy = findNearestEnemy(attacker);
 
         if (nearestEnemy == null) {
-            viewCLI.displayMessage("There is no enemy nearby.");
-            viewGUI.displayMessage("There is no enemy nearby.");
             return;
         }
 
         long now = System.nanoTime();
 
-        if (now < nextPlayerAttackTime) {
+        if (isPlayerAttackOnCooldown(secondPlayer, now)) {
             return;
         }
 
-        if (heroModel.isEquippedWeaponRanged()) {
+        if (attacker.isEquippedWeaponRanged()) {
             if (nearestEnemy.distance > PLAYER_BOW_RANGE) {
-                viewCLI.displayMessage("Enemy is too far away.");
-                viewGUI.displayMessage("Enemy is too far away.");
                 return;
             }
 
-            nextPlayerAttackTime = now + PLAYER_BOW_COOLDOWN_NS;
-            shootHeroArrow(nearestEnemy.enemyModel, now);
+            setNextPlayerAttackTime(secondPlayer, now + PLAYER_BOW_COOLDOWN_NS);
+            shootHeroArrow(attacker, nearestEnemy.enemyModel, now, secondPlayer);
             return;
         }
 
         if (nearestEnemy.distance > PLAYER_SWORD_RANGE) {
-            viewCLI.displayMessage("Enemy is too far away.");
-            viewGUI.displayMessage("Enemy is too far away.");
             return;
         }
 
-        nextPlayerAttackTime = now + PLAYER_SWORD_COOLDOWN_NS;
-        attackEnemy(nearestEnemy.enemyModel, heroModel.getEquippedWeaponName(), now);
+        setNextPlayerAttackTime(secondPlayer, now + PLAYER_SWORD_COOLDOWN_NS);
+        attackEnemy(attacker, nearestEnemy.enemyModel, attacker.getEquippedWeaponName(), now, secondPlayer);
+    }
+
+    private boolean isPlayerAttackOnCooldown(boolean secondPlayer, long now) {
+        return now < (secondPlayer ? nextSecondPlayerAttackTime : nextPlayerAttackTime);
+    }
+
+    private void setNextPlayerAttackTime(boolean secondPlayer, long value) {
+        if (secondPlayer) {
+            nextSecondPlayerAttackTime = value;
+        } else {
+            nextPlayerAttackTime = value;
+        }
     }
 
     private void syncEnemiesForCurrentRoom() {
@@ -213,18 +250,16 @@ public class CombatController extends Controller {
         viewGUI.displayEnemies(
                 getCurrentEnemyModels().stream()
                         .map(EnemyModel::snapshot)
-                        .toList()
-        );
+                        .toList());
 
         viewGUI.displayProjectiles(
                 projectiles.stream()
                         .map(ProjectileModel::snapshot)
-                        .toList()
-        );
+                        .toList());
     }
 
     private void updateHeroAutoFacing() {
-        NearestEnemy nearest = findNearestEnemy();
+        NearestEnemy nearest = findNearestEnemy(heroModel);
 
         if (nearest == null) {
             return;
@@ -239,13 +274,17 @@ public class CombatController extends Controller {
         }
     }
 
-    private NearestEnemy findNearestEnemy() {
+    private NearestEnemy findNearestEnemy(HeroModel attacker) {
+        if (attacker == null) {
+            return null;
+        }
+
         EnemyModel nearestEnemy = null;
         double bestDistance = Double.MAX_VALUE;
 
         for (EnemyModel enemyModel : getCurrentEnemyModels()) {
-            double dx = heroModel.getX() - enemyModel.getX();
-            double dy = heroModel.getY() - enemyModel.getY();
+            double dx = attacker.getX() - enemyModel.getX();
+            double dy = attacker.getY() - enemyModel.getY();
             double distance = Math.hypot(dx, dy);
 
             if (distance < bestDistance) {
@@ -261,53 +300,57 @@ public class CombatController extends Controller {
         return new NearestEnemy(nearestEnemy, bestDistance);
     }
 
-    private void updatePlayerAutoAttack(long now) {
+    private void updatePlayerAutoAttack(HeroModel attacker, boolean secondPlayer, long now) {
         Room currentRoom = roomModel.getRoom();
 
-        if (currentRoom == null) {
+        if (currentRoom == null || attacker == null || attacker.getHealth() <= 0) {
             return;
         }
 
-        if (heroModel.getEquippedWeapon() == null) {
+        if (attacker.getEquippedWeapon() == null) {
             return;
         }
 
-        if (now < nextPlayerAttackTime) {
+        if (isPlayerAttackOnCooldown(secondPlayer, now)) {
             return;
         }
 
-        NearestEnemy nearestEnemy = findNearestEnemy();
+        NearestEnemy nearestEnemy = findNearestEnemy(attacker);
 
         if (nearestEnemy == null) {
             return;
         }
 
-        double dx = nearestEnemy.enemyModel.getX() - heroModel.getX();
-        double dy = nearestEnemy.enemyModel.getY() - heroModel.getY();
+        double dx = nearestEnemy.enemyModel.getX() - attacker.getX();
+        double dy = nearestEnemy.enemyModel.getY() - attacker.getY();
         double distance = Math.hypot(dx, dy);
 
         if (distance > 0.001) {
-            viewGUI.displayHeroFacing(dx / distance, dy / distance);
+            if (secondPlayer) {
+                viewGUI.displaySecondHeroFacing(dx / distance, dy / distance);
+            } else {
+                viewGUI.displayHeroFacing(dx / distance, dy / distance);
+            }
         }
 
-        if (heroModel.isEquippedWeaponRanged()) {
+        if (attacker.isEquippedWeaponRanged()) {
             if (nearestEnemy.distance <= PLAYER_BOW_RANGE) {
-                nextPlayerAttackTime = now + PLAYER_BOW_COOLDOWN_NS;
-                shootHeroArrow(nearestEnemy.enemyModel, now);
+                setNextPlayerAttackTime(secondPlayer, now + PLAYER_BOW_COOLDOWN_NS);
+                shootHeroArrow(attacker, nearestEnemy.enemyModel, now, secondPlayer);
             }
 
             return;
         }
 
         if (nearestEnemy.distance <= PLAYER_SWORD_RANGE) {
-            nextPlayerAttackTime = now + PLAYER_SWORD_COOLDOWN_NS;
-            attackEnemy(nearestEnemy.enemyModel, heroModel.getEquippedWeaponName(), now);
+            setNextPlayerAttackTime(secondPlayer, now + PLAYER_SWORD_COOLDOWN_NS);
+            attackEnemy(attacker, nearestEnemy.enemyModel, attacker.getEquippedWeaponName(), now, secondPlayer);
         }
     }
 
-    private void shootHeroArrow(EnemyModel target, long now) {
-        double dx = target.getX() - heroModel.getX();
-        double dy = target.getY() - heroModel.getY();
+    private void shootHeroArrow(HeroModel attacker, EnemyModel target, long now, boolean secondPlayer) {
+        double dx = target.getX() - attacker.getX();
+        double dy = target.getY() - attacker.getY();
         double distance = Math.hypot(dx, dy);
 
         if (distance <= 0.001) {
@@ -317,24 +360,27 @@ public class CombatController extends Controller {
         double vx = dx / distance * PLAYER_ARROW_SPEED;
         double vy = dy / distance * PLAYER_ARROW_SPEED;
 
-        int damage = Math.max(1, heroModel.getDamage());
+        int damage = Math.max(1, attacker.getDamage());
 
         projectiles.add(new ProjectileModel(
-                heroModel.getX(),
-                heroModel.getY(),
+                attacker.getX(),
+                attacker.getY(),
                 vx,
                 vy,
                 damage,
-                ProjectileModel.Owner.HERO
-        ));
+                ProjectileModel.Owner.HERO));
 
-        viewGUI.displayHeroFacing(dx / distance, dy / distance);
-        viewGUI.displayHeroAttackFlash();
+        if (secondPlayer) {
+            viewGUI.displaySecondHeroFacing(dx / distance, dy / distance);
+            viewGUI.displaySecondHeroAttackFlash();
+        } else {
+            viewGUI.displayHeroFacing(dx / distance, dy / distance);
+            viewGUI.displayHeroAttackFlash();
+        }
 
         target.flashHit(now);
 
-        viewCLI.displayMessage("You shoot an arrow at " + target.getEnemy().getName() + ".");
-        viewGUI.displayMessage("You shoot an arrow at " + target.getEnemy().getName() + ".");
+        displayMessage(attacker.getName() + " shoots an arrow at " + target.getEnemy().getName() + ".");
 
         displayEnemiesAndProjectiles();
     }
@@ -360,10 +406,7 @@ public class CombatController extends Controller {
                     enemyModel.flashHit(now);
                     projectile.kill();
 
-                    viewCLI.displayMessage(
-                            "Arrow hits " + enemyModel.getEnemy().getName() + " for " + realDamage + " damage.");
-                    viewGUI.displayMessage(
-                            "Arrow hits " + enemyModel.getEnemy().getName() + " for " + realDamage + " damage.");
+                    displayMessage("Arrow hits " + enemyModel.getEnemy().getName() + " for " + realDamage + " damage.");
 
                     if (!enemyModel.isAlive()) {
                         handleEnemyDefeated(enemyModel);
@@ -375,17 +418,22 @@ public class CombatController extends Controller {
         }
     }
 
-    private void attackEnemy(EnemyModel enemyModel, String attackName, long now) {
-        int damage = heroModel.getDamage();
+    private void attackEnemy(HeroModel attacker, EnemyModel enemyModel, String attackName, long now,
+            boolean secondPlayer) {
+        int damage = attacker.getDamage();
         int realDamage = enemyModel.receiveDamage(damage);
 
         enemyModel.flashHit(now);
-        viewGUI.displayHeroAttackFlash();
 
-        viewCLI.displayMessage("You attack " + enemyModel.getEnemy().getName() + " with " + attackName + " for "
-                + realDamage + " damage.");
-        viewGUI.displayMessage("You attack " + enemyModel.getEnemy().getName() + " with " + attackName + " for "
-                + realDamage + " damage.");
+        if (secondPlayer) {
+            viewGUI.displaySecondHeroAttackFlash();
+        } else {
+            viewGUI.displayHeroAttackFlash();
+        }
+
+        displayMessage(attacker.getName() + " attacks " + enemyModel.getEnemy().getName()
+                + " with " + attackName + " for " + realDamage + " damage.");
+
 
         if (!enemyModel.isAlive()) {
             handleEnemyDefeated(enemyModel);
@@ -402,24 +450,32 @@ public class CombatController extends Controller {
             currentRoom.removeCharacter(enemyModel.getEnemy());
         }
 
-        viewCLI.displayMessage(enemyModel.getEnemy().getName() + " is defeated.");
-        viewGUI.displayMessage(enemyModel.getEnemy().getName() + " is defeated.");
+        displayMessage(enemyModel.getEnemy().getName() + " is defeated.");
 
-        heroModel.healPercent(10);
-        heroModel.increaseDamageByPercent(20);
-
-        String rewardMessage = "Kill reward: +10% HP regenerated and +20% damage. HP: "
-                + heroModel.getHealth() + "/" + heroModel.getMaxHealth()
-                + " | Damage: " + heroModel.getDamage() + ".";
-
-        viewCLI.displayMessage(rewardMessage);
-        viewGUI.displayMessage(rewardMessage);
+        for (HeroModel hero : getAliveHeroes()) {
+            applyKillReward(hero);
+        }
 
         checkBossRoomCleared(currentRoom);
 
         if (refreshRoomViews != null) {
             refreshRoomViews.run();
         }
+    }
+
+    private void applyKillReward(HeroModel rewardedHero) {
+        if (rewardedHero == null || rewardedHero.getHealth() <= 0) {
+            return;
+        }
+
+        rewardedHero.healPercent(10);
+        rewardedHero.increaseDamageByPercent(20);
+
+        displayMessage(
+                rewardedHero.getName()
+                        + " kill reward: +10% HP regenerated and +20% damage. HP: "
+                        + rewardedHero.getHealth() + "/" + rewardedHero.getMaxHealth()
+                        + " | Damage: " + rewardedHero.getDamage() + ".");
     }
 
     private void dropEnemyInventory(Enemy enemy, Room room) {
@@ -433,8 +489,7 @@ public class CombatController extends Controller {
             enemy.removeFromInventory(item);
             room.addItem(item);
 
-            viewCLI.displayMessage(enemy.getName() + " dropped " + item.getName() + ".");
-            viewGUI.displayMessage(enemy.getName() + " dropped " + item.getName() + ".");
+            displayMessage(enemy.getName() + " dropped " + item.getName() + ".");
         }
     }
 
@@ -462,8 +517,7 @@ public class CombatController extends Controller {
             String message = "Boss room cleared! Reward: +" + bonus + " max HP. Current HP: "
                     + heroModel.getHealth() + "/" + heroModel.getMaxHealth() + ".";
 
-            viewCLI.displayMessage(message);
-            viewGUI.displayMessage(message);
+            displayMessage(message);
         } else {
             int bonus = 5;
             heroModel.increaseBaseDamage(bonus);
@@ -471,8 +525,7 @@ public class CombatController extends Controller {
             String message = "Boss room cleared! Reward: +" + bonus + " base damage. Current damage: "
                     + heroModel.getDamage() + ".";
 
-            viewCLI.displayMessage(message);
-            viewGUI.displayMessage(message);
+            displayMessage(message);
         }
 
         if (onBossRoomCleared != null) {
@@ -499,4 +552,42 @@ public class CombatController extends Controller {
             this.distance = distance;
         }
     }
+
+    private List<HeroModel> getAliveHeroes() {
+        List<HeroModel> heroes = new ArrayList<>();
+
+        if (heroModel != null && heroModel.getHealth() > 0) {
+            heroes.add(heroModel);
+        }
+
+        if (secondHeroModel != null && secondHeroModel.getHealth() > 0) {
+            heroes.add(secondHeroModel);
+        }
+
+        return heroes;
+    }
+
+    private HeroModel findNearestHero(double x, double y) {
+        HeroModel nearest = null;
+        double bestDistance = Double.MAX_VALUE;
+
+        for (HeroModel hero : getAliveHeroes()) {
+            double dx = hero.getX() - x;
+            double dy = hero.getY() - y;
+            double distance = Math.hypot(dx, dy);
+
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                nearest = hero;
+            }
+        }
+
+        return nearest;
+    }
+
+    private void displayMessage(String message) {
+        viewCLI.displayMessage(message);
+        viewGUI.displayMessage(message);
+    }
+
 }

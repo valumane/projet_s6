@@ -87,8 +87,20 @@ public class RoomViewGUI extends RoomView {
     private Circle heroNode;
     private Text heroTextNode;
 
+    private Circle secondHeroNode;
+    private Text secondHeroTextNode;
+    private Line secondHeroFacingNode;
+
+    private double secondHeroX = MapLayout.getRoomCenterX() + 55;
+    private double secondHeroY = MapLayout.getRoomCenterY();
+
+    private double secondHeroFacingX = 0;
+    private double secondHeroFacingY = -1;
+
     private static final long HERO_ATTACK_FLASH_NS = 160_000_000L;
     private long heroAttackFlashUntil = 0L;
+
+    private long secondHeroAttackFlashUntil = 0L;
 
     public RoomViewGUI(Consumer<String> logger) {
         this.logger = logger;
@@ -186,13 +198,43 @@ public class RoomViewGUI extends RoomView {
         heroFacingNode.setStrokeWidth(3);
 
         heroNode = new Circle(heroX, heroY, MapLayout.HERO_RADIUS, Color.DARKRED);
-        heroTextNode = new Text(heroX - 18, heroY + 28, "Hero");
+        heroTextNode = new Text(heroX - 18, heroY + 28, "Hero 1");
+
+        if (GameConfig.isTwoPlayers()) {
+            secondHeroFacingNode = new Line(
+                    secondHeroX,
+                    secondHeroY,
+                    secondHeroX + secondHeroFacingX * 38,
+                    secondHeroY + secondHeroFacingY * 38);
+            secondHeroFacingNode.setStroke(Color.BLACK);
+            secondHeroFacingNode.setStrokeWidth(3);
+
+            secondHeroNode = new Circle(secondHeroX, secondHeroY, MapLayout.HERO_RADIUS, Color.DARKBLUE);
+            secondHeroTextNode = new Text(secondHeroX - 18, secondHeroY + 28, "Hero 2");
+        } else {
+            secondHeroFacingNode = null;
+            secondHeroNode = null;
+            secondHeroTextNode = null;
+        }
+
         Text roomName = new Text(getRoomCenterX() - 40, ROOM_Y + 18, currentRoom.getName());
 
         mapPane.getChildren().addAll(roomRect, roomName);
         drawItems();
 
-        mapPane.getChildren().addAll(enemiesLayer, projectilesLayer, heroFacingNode, heroNode, heroTextNode);
+        mapPane.getChildren().addAll(
+                enemiesLayer,
+                projectilesLayer,
+                heroFacingNode,
+                heroNode,
+                heroTextNode);
+
+        if (GameConfig.isTwoPlayers()) {
+            mapPane.getChildren().addAll(
+                    secondHeroFacingNode,
+                    secondHeroNode,
+                    secondHeroTextNode);
+        }
 
         double horizontalExitW = Math.max(40, ROOM_W * 0.08);
         double horizontalExitH = 10;
@@ -274,8 +316,6 @@ public class RoomViewGUI extends RoomView {
             mapPane.getChildren().addAll(itemMarker, itemText);
         }
     }
-
-    
 
     private void drawVisitedRooms() {
         exploredMapPane.getChildren().clear();
@@ -638,6 +678,63 @@ public class RoomViewGUI extends RoomView {
             heroAttackFlashUntil = System.nanoTime() + HERO_ATTACK_FLASH_NS;
             updateHeroNode();
         });
+    }
+
+    @Override
+    public void displaySecondHeroPosition(double x, double y) {
+        Platform.runLater(() -> {
+            secondHeroX = x;
+            secondHeroY = y;
+            updateSecondHeroNode();
+        });
+    }
+
+    private void updateSecondHeroNode() {
+        if (secondHeroNode == null || secondHeroTextNode == null) {
+            return;
+        }
+
+        secondHeroNode.setCenterX(secondHeroX);
+        secondHeroNode.setCenterY(secondHeroY);
+
+        secondHeroTextNode.setX(secondHeroX - 18);
+        secondHeroTextNode.setY(secondHeroY + 28);
+
+        if (secondHeroFacingNode != null) {
+            secondHeroFacingNode.setStartX(secondHeroX);
+            secondHeroFacingNode.setStartY(secondHeroY);
+            secondHeroFacingNode.setEndX(secondHeroX + secondHeroFacingX * 38);
+            secondHeroFacingNode.setEndY(secondHeroY + secondHeroFacingY * 38);
+            secondHeroFacingNode.setStroke(isSecondHeroAttackFlashing() ? Color.GOLD : Color.BLACK);
+        }
+    }
+
+    @Override
+    public void displaySecondHeroFacing(double dx, double dy) {
+        Platform.runLater(() -> {
+            double length = Math.hypot(dx, dy);
+
+            if (length <= 0.001) {
+                return;
+            }
+
+            secondHeroFacingX = dx / length;
+            secondHeroFacingY = dy / length;
+
+            updateSecondHeroNode();
+        });
+    }
+
+    @Override
+    public void displaySecondHeroAttackFlash() {
+        Platform.runLater(() -> {
+            secondHeroAttackFlashUntil = System.nanoTime() + HERO_ATTACK_FLASH_NS;
+            updateSecondHeroNode();
+        });
+    }
+
+    private boolean isSecondHeroAttackFlashing() {
+        return System.nanoTime() < secondHeroAttackFlashUntil;
     }
 
     @Override

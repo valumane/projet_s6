@@ -1,6 +1,7 @@
 package mvc.entity.model;
 
 import mvc.map.MapLayout;
+import java.util.List;
 
 public class ProjectileModel {
 
@@ -33,6 +34,10 @@ public class ProjectileModel {
     }
 
     public void update(HeroModel heroModel) {
+        update(List.of(heroModel));
+    }
+
+    public void update(List<HeroModel> heroes) {
         if (!alive) {
             return;
         }
@@ -54,13 +59,24 @@ public class ProjectileModel {
             return;
         }
 
-        double dx = heroModel.getX() - x;
-        double dy = heroModel.getY() - y;
-        double distance = Math.hypot(dx, dy);
+        if (heroes == null) {
+            return;
+        }
 
-        if (distance <= MapLayout.HERO_RADIUS + PROJECTILE_RADIUS) {
-            heroModel.removeHp(damage);
-            alive = false;
+        for (HeroModel heroModel : heroes) {
+            if (heroModel == null || heroModel.getHealth() <= 0) {
+                continue;
+            }
+
+            double dx = heroModel.getX() - x;
+            double dy = heroModel.getY() - y;
+            double distance = Math.hypot(dx, dy);
+
+            if (distance <= MapLayout.HERO_RADIUS + PROJECTILE_RADIUS) {
+                heroModel.removeHp(damage);
+                alive = false;
+                return;
+            }
         }
     }
 

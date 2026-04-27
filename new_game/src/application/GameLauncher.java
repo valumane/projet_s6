@@ -2,6 +2,9 @@ package application;
 
 import common.dungeon.DungeonData;
 import common.dungeon.DungeonGenerator;
+import common.entity.Archer;
+import common.entity.Berserker;
+import common.entity.Enemy;
 import common.entity.Hero;
 import common.item.Bag;
 import common.item.Chest;
@@ -10,7 +13,11 @@ import common.item.Item;
 import common.item.Scroll;
 import common.item.Weapon;
 import common.map.Room;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import javafx.stage.Stage;
+import mvc.GameConfig;
 import mvc.entity.controller.HeroController;
 import mvc.entity.model.HeroModel;
 import mvc.entity.view.cli.HeroViewCLI;
@@ -23,12 +30,6 @@ import mvc.map.controller.RoomController;
 import mvc.map.model.RoomModel;
 import mvc.map.view.cli.RoomViewCLI;
 import mvc.map.view.gui.RoomViewGUI;
-import common.entity.Archer;
-import common.entity.Berserker;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import common.entity.Enemy;
 
 public final class GameLauncher {
 
@@ -39,10 +40,17 @@ public final class GameLauncher {
     }
 
     public static void startRandomGame(Stage stage) {
-        startRandomGame(stage, null);
+        startRandomGame(stage, GameConfig.getPlayerCount(), null);
     }
 
-    private static void startRandomGame(Stage stage, Hero existingHero) {
+    public static void startRandomGame(Stage stage, int playerCount) {
+        startRandomGame(stage, playerCount, null);
+    }
+
+    private static void startRandomGame(Stage stage, int playerCount, Hero existingHero) {
+        int safePlayerCount = playerCount == 2 ? 2 : 1;
+        GameConfig.setPlayerCount(safePlayerCount);
+
         DungeonGenerator generator = new DungeonGenerator(System.currentTimeMillis());
         DungeonData dungeon = generator.generate(12);
 
@@ -117,21 +125,46 @@ public final class GameLauncher {
         }
 
         HeroModel heroModel = new HeroModel(hero);
+        HeroModel secondHeroModel = null;
+
         RoomModel roomModel = new RoomModel(heroModel.getRoom());
 
         HeroViewCLI heroViewCLI = new HeroViewCLI();
         RoomViewCLI roomViewCLI = new RoomViewCLI();
 
         HeroViewGUI heroViewGUI = new HeroViewGUI();
+        HeroViewGUI secondHeroViewGUI = null;
+
+        if (safePlayerCount == 2) {
+            Hero secondHero = new Hero(
+                    "Hero 2",
+                    100,
+                    new Bag("Backpack J2", DEFAULT_HERO_BAG_CAPACITY),
+                    startRoom,
+                    DEFAULT_HERO_DAMAGE);
+
+            Weapon secondBasicSword = new Weapon("Épée basique", 10, Weapon.WeaponType.MELEE);
+            Weapon secondBasicBow = new Weapon("Arc basique", 10, Weapon.WeaponType.RANGED);
+
+            secondHero.addItem(secondBasicSword);
+            secondHero.addItem(secondBasicBow);
+            secondHero.equipWeapon(secondBasicSword);
+
+            secondHeroModel = new HeroModel(secondHero);
+            secondHeroModel.setPosition(heroModel.getX() + 55, heroModel.getY());
+
+            secondHeroViewGUI = new HeroViewGUI();
+        }
+
         LogWindowGUI logWindowGUI = new LogWindowGUI();
         RoomViewGUI roomViewGUI = new RoomViewGUI(logWindowGUI::append);
 
-        GameViewGUI gameViewGUI = new GameViewGUI(stage, heroViewGUI, roomViewGUI);
+        GameViewGUI gameViewGUI = new GameViewGUI(stage, heroViewGUI, secondHeroViewGUI, roomViewGUI);
         gameViewGUI.setOnShowLogs(logWindowGUI::showWindow);
 
         gameViewGUI.setOnResetGame(() -> {
             gameViewGUI.hide();
-            GameLauncher.startRandomGame(stage);
+            GameLauncher.startRandomGame(stage, safePlayerCount);
         });
 
         gameViewGUI.setOnSaveGame(() -> {
@@ -153,22 +186,33 @@ public final class GameLauncher {
 
         new HeroController(heroModel, heroViewCLI, heroViewGUI);
 
+        if (secondHeroModel != null && secondHeroViewGUI != null) {
+            new HeroController(secondHeroModel, new HeroViewCLI(), secondHeroViewGUI);
+        }
+
         RoomController roomController = new RoomController(
                 roomModel,
                 heroModel,
+                secondHeroModel,
                 roomViewCLI,
                 roomViewGUI,
                 () -> {
                     logWindowGUI.append("New random level generated.");
                     logWindowGUI.showWindow();
                     gameViewGUI.hide();
-                    GameLauncher.startRandomGame(stage, hero);
+                    GameLauncher.startRandomGame(stage, safePlayerCount, hero);
                 });
 
-        new GameController(new GameModel(), gameViewGUI, roomController, heroModel);
+        new GameController(new GameModel(), gameViewGUI, roomController, heroModel, secondHeroModel);
 
         heroViewGUI.setHeroName(hero.getName());
         heroModel.syncState();
+
+        if (secondHeroModel != null && secondHeroViewGUI != null) {
+            secondHeroViewGUI.setHeroName(secondHeroModel.getHero().getName());
+            secondHeroModel.syncState();
+        }
+
         roomController.onEnterRoom();
 
         gameViewGUI.show();

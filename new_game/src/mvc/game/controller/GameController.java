@@ -16,31 +16,58 @@ public class GameController extends Controller {
     private final GameView gameView;
     private final RoomController roomController;
     private final HeroModel heroModel;
+    private final HeroModel secondHeroModel;
 
     private boolean gameOver = false;
 
     public GameController(GameModel gameModel, GameView gameView, RoomController roomController, HeroModel heroModel) {
+        this(gameModel, gameView, roomController, heroModel, null);
+    }
+
+    public GameController(
+            GameModel gameModel,
+            GameView gameView,
+            RoomController roomController,
+            HeroModel heroModel,
+            HeroModel secondHeroModel
+    ) {
         super(gameModel, gameView, gameView);
 
         this.gameView = gameView;
         this.roomController = roomController;
         this.heroModel = heroModel;
+        this.secondHeroModel = secondHeroModel;
 
         this.gameView.setOnMoveNorth(() -> moveHero("north"));
         this.gameView.setOnMoveSouth(() -> moveHero("south"));
         this.gameView.setOnMoveEast(() -> moveHero("east"));
         this.gameView.setOnMoveWest(() -> moveHero("west"));
 
+        this.gameView.setOnPlayer2MoveNorth(() -> moveSecondHero("north"));
+        this.gameView.setOnPlayer2MoveSouth(() -> moveSecondHero("south"));
+        this.gameView.setOnPlayer2MoveEast(() -> moveSecondHero("east"));
+        this.gameView.setOnPlayer2MoveWest(() -> moveSecondHero("west"));
+
         this.gameView.setOnInteract(this::interact);
-        this.gameView.setOnToggleInventory(this::refreshInventory);
-        this.gameView.setOnUseInventorySlot(this::useInventorySlot);
+        this.gameView.setOnPlayer2Interact(this::secondInteract);
+
+        this.gameView.setOnToggleInventory(this::refreshInventories);
+
+        this.gameView.setOnUseInventorySlot(slot -> useInventorySlot(heroModel, slot, false));
+        this.gameView.setOnPlayer2UseInventorySlot(slot -> {
+            if (secondHeroModel != null) {
+                useInventorySlot(secondHeroModel, slot, true);
+            }
+        });
+
         this.gameView.setOnGameTick(this::updateGame);
         this.gameView.setOnAttack(this::attack);
 
         this.heroModel.addListener(new HeroModel.Listener() {
             @Override
             public void onHealthChanged(int newHp) {
-                refreshInventory();
+                refreshInventories();
+                refreshInfoBars();
 
                 if (newHp <= 0 && !gameOver) {
                     gameOver = true;
@@ -50,12 +77,34 @@ public class GameController extends Controller {
 
             @Override
             public void onLocationChanged(String newLocation) {
-                refreshInventory();
+                refreshInventories();
+                refreshInfoBars();
             }
         });
 
-        refreshInventory();
-        refreshInfoBar();
+        if (secondHeroModel != null) {
+            this.secondHeroModel.addListener(new HeroModel.Listener() {
+                @Override
+                public void onHealthChanged(int newHp) {
+                    refreshInventories();
+                    refreshInfoBars();
+
+                    if (newHp <= 0 && !gameOver) {
+                        gameOver = true;
+                        GameController.this.gameView.displayGameOver();
+                    }
+                }
+
+                @Override
+                public void onLocationChanged(String newLocation) {
+                    refreshInventories();
+                    refreshInfoBars();
+                }
+            });
+        }
+
+        refreshInventories();
+        refreshInfoBars();
     }
 
     private void moveHero(String direction) {
@@ -66,14 +115,32 @@ public class GameController extends Controller {
         roomController.heroMove(direction);
     }
 
+    private void moveSecondHero(String direction) {
+        if (gameOver || secondHeroModel == null) {
+            return;
+        }
+
+        roomController.secondHeroMove(direction);
+    }
+
     private void interact() {
         if (gameOver) {
             return;
         }
 
         roomController.interactNearby();
-        refreshInventory();
-        refreshInfoBar();
+        refreshInventories();
+        refreshInfoBars();
+    }
+
+    private void secondInteract() {
+        if (gameOver || secondHeroModel == null) {
+            return;
+        }
+
+        roomController.secondInteractNearby();
+        refreshInventories();
+        refreshInfoBars();
     }
 
     private void attack() {
@@ -82,8 +149,13 @@ public class GameController extends Controller {
         }
 
         roomController.attackNearby();
-        refreshInventory();
-        refreshInfoBar();
+
+        if (secondHeroModel != null) {
+            roomController.secondAttackNearby();
+        }
+
+        refreshInventories();
+        refreshInfoBars();
     }
 
     private void updateGame(long now) {
@@ -94,19 +166,33 @@ public class GameController extends Controller {
         roomController.updateEnemies(now);
     }
 
-    private void useInventorySlot(int slotIndex) {
+    private void useInventorySlot(HeroModel targetHero, int slotIndex, boolean secondPlayer) {
         if (gameOver) {
             return;
         }
 
-        String message = heroModel.useInventorySlot(slotIndex);
+        String message = targetHero.useInventorySlot(slotIndex);
 
-        gameView.displayInfo(message);
-        refreshInventory();
+        if (secondPlayer) {
+            gameView.displayPlayer2Info("J2 : " + message);
+        } else {
+            gameView.displayInfo("J1 : " + message);
+        }
+
+        refreshInventories();
+        refreshInfoBars();
     }
 
-    private void refreshInventory() {
-        List<Item> inventory = heroModel.getInventory();
+    private void refreshInventories() {
+        gameView.displayInventory(buildInventoryLabels(heroModel));
+
+        if (secondHeroModel != null) {
+            gameView.displayPlayer2Inventory(buildInventoryLabels(secondHeroModel));
+        }
+    }
+
+    private List<String> buildInventoryLabels(HeroModel model) {
+        List<Item> inventory = model.getInventory();
         List<String> labels = new ArrayList<>();
 
         for (int i = 0; i < 9; i++) {
@@ -118,20 +204,27 @@ public class GameController extends Controller {
             Item item = inventory.get(i);
             String text = (i + 1) + ". " + item.getName();
 
-            if (item instanceof Weapon weapon && weapon == heroModel.getEquippedWeapon()) {
+            if (item instanceof Weapon weapon && weapon == model.getEquippedWeapon()) {
                 text += " [équipée]";
             }
 
             labels.add(text);
         }
 
-        gameView.displayInventory(labels);
+        return labels;
     }
 
-    private void refreshInfoBar() {
+    private void refreshInfoBars() {
         gameView.displayInfo(
-                "Arme équipée : " + heroModel.getEquippedWeaponName()
+                "J1 | Arme équipée : " + heroModel.getEquippedWeaponName()
                         + " | dégâts : " + heroModel.getDamage()
         );
+
+        if (secondHeroModel != null) {
+            gameView.displayPlayer2Info(
+                    "J2 | Arme équipée : " + secondHeroModel.getEquippedWeaponName()
+                            + " | dégâts : " + secondHeroModel.getDamage()
+            );
+        }
     }
 }
