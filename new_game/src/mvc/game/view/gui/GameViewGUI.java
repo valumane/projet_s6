@@ -837,4 +837,13 @@ public class GameViewGUI extends GameView {
             gameOverOverlay.toFront();
         });
     }
+
+    public void applyCurrentResolution() {
+        Platform.runLater(() -> {
+            stage.setWidth(GameConfig.getWindowWidth());
+            stage.setHeight(GameConfig.getWindowHeight());
+            stage.centerOnScreen();
+            scene.getRoot().requestFocus();
+        });
+    }
 }

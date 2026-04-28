@@ -30,6 +30,7 @@ import mvc.map.controller.RoomController;
 import mvc.map.model.RoomModel;
 import mvc.map.view.cli.RoomViewCLI;
 import mvc.map.view.gui.RoomViewGUI;
+import mvc.menu.view.gui.GameConfigurationDialog;
 
 public final class GameLauncher {
 
@@ -180,8 +181,17 @@ public final class GameLauncher {
         gameViewGUI.setOnQuitToDesktop(javafx.application.Platform::exit);
 
         gameViewGUI.setOnSettings(() -> {
-            logWindowGUI.append("Settings from pause menu will be connected later.");
-            logWindowGUI.showWindow();
+            GameConfigurationDialog.show(stage, "Paramètres en jeu", false, result -> {
+                GameConfig.setResolution(result.getResolution());
+
+                if (GameConfig.isTwoPlayers()) {
+                    GameConfig.setPlayerControls(result.getPlayer1Controls(), result.getPlayer2Controls());
+                } else {
+                    GameConfig.setPlayer1Controls(result.getPlayer1Controls());
+                }
+
+                gameViewGUI.applyCurrentResolution();
+            });
         });
 
         new HeroController(heroModel, heroViewCLI, heroViewGUI);

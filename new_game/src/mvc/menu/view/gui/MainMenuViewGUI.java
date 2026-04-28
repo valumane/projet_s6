@@ -1,6 +1,5 @@
 package mvc.menu.view.gui;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -9,18 +8,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mvc.GameConfig;
 import mvc.PlayerControls;
@@ -135,202 +128,39 @@ public class MainMenuViewGUI extends MainMenuView {
     }
 
     public void showNewGameWindow() {
-        Stage newGameStage = new Stage();
-        newGameStage.initOwner(stage);
-        newGameStage.initModality(Modality.APPLICATION_MODAL);
-        newGameStage.setTitle("Nouvelle partie");
-
-        PlayerControls initialP1 = GameConfig.getPlayer1Controls();
-        PlayerControls initialP2 = GameConfig.getPlayer2Controls();
-
-        ToggleGroup playerCountGroup = new ToggleGroup();
-        RadioButton onePlayerRadio = new RadioButton("1 joueur");
-        RadioButton twoPlayersRadio = new RadioButton("2 joueurs");
-        onePlayerRadio.setToggleGroup(playerCountGroup);
-        twoPlayersRadio.setToggleGroup(playerCountGroup);
-
-        if (GameConfig.getPlayerCount() == 2) {
-            twoPlayersRadio.setSelected(true);
-        } else {
-            onePlayerRadio.setSelected(true);
-        }
-
-        HBox playerChoiceBox = new HBox(18, onePlayerRadio, twoPlayersRadio);
-        playerChoiceBox.setAlignment(Pos.CENTER_LEFT);
-
-        Label hintLabel = new Label("Clique sur une touche pour la modifier, puis appuie sur la nouvelle touche.");
-        hintLabel.setWrapText(true);
-        Label errorLabel = new Label("");
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-
-        KeyCell[] p1Inventory = createInventoryCells(initialP1);
-        KeyCell[] p2Inventory = createInventoryCells(initialP2);
-
-        KeyCell p1Forward = new KeyCell(initialP1.getMoveUp());
-        KeyCell p1Backward = new KeyCell(initialP1.getMoveDown());
-        KeyCell p1Left = new KeyCell(initialP1.getMoveLeft());
-        KeyCell p1Right = new KeyCell(initialP1.getMoveRight());
-        KeyCell p1Interact = new KeyCell(initialP1.getInteract());
-
-        KeyCell p2Forward = new KeyCell(initialP2.getMoveUp());
-        KeyCell p2Backward = new KeyCell(initialP2.getMoveDown());
-        KeyCell p2Left = new KeyCell(initialP2.getMoveLeft());
-        KeyCell p2Right = new KeyCell(initialP2.getMoveRight());
-        KeyCell p2Interact = new KeyCell(initialP2.getInteract());
-
-        List<Region> player2Rows = new ArrayList<>();
-
-        GridPane inventoryGrid = buildInventoryGrid(p1Inventory, p2Inventory, player2Rows);
-        GridPane movementGrid = buildMovementGrid(
-                p1Forward, p1Backward, p1Right, p1Left,
-                p2Forward, p2Backward, p2Right, p2Left,
-                player2Rows);
-        GridPane interactGrid = buildInteractGrid(p1Interact, p2Interact, player2Rows);
-
-        registerCapture(p1Inventory);
-        registerCapture(p2Inventory);
-        registerCapture(p1Forward, p1Backward, p1Left, p1Right, p1Interact);
-        registerCapture(p2Forward, p2Backward, p2Left, p2Right, p2Interact);
-
-        Runnable refreshPlayer2Visibility = () -> {
-            boolean twoPlayers = twoPlayersRadio.isSelected();
-            for (Region node : player2Rows) {
-                node.setVisible(twoPlayers);
-                node.setManaged(twoPlayers);
-            }
-        };
-
-        playerCountGroup.selectedToggleProperty().addListener((obs, oldValue, newValue) -> refreshPlayer2Visibility.run());
-        refreshPlayer2Visibility.run();
-
-        Button resetDefaultButton = new Button("Touches par défaut");
-        resetDefaultButton.setOnAction(e -> {
-            PlayerControls defaultP1 = GameConfig.createDefaultPlayer1Controls();
-            PlayerControls defaultP2 = GameConfig.createDefaultPlayer2Controls();
-
-            applyControlsToCells(defaultP1, p1Forward, p1Backward, p1Left, p1Right, p1Interact, p1Inventory);
-            applyControlsToCells(defaultP2, p2Forward, p2Backward, p2Left, p2Right, p2Interact, p2Inventory);
-            errorLabel.setText("");
-            hintLabel.setText("Touches par défaut rétablies.");
-        });
-
-        Button startButton = new Button("Lancer la partie");
-        startButton.setDefaultButton(true);
-        startButton.setOnAction(e -> {
-            int playerCount = twoPlayersRadio.isSelected() ? 2 : 1;
-
-            PlayerControls p1 = buildControls(p1Forward, p1Backward, p1Left, p1Right, p1Interact, p1Inventory);
-            PlayerControls p2 = buildControls(p2Forward, p2Backward, p2Left, p2Right, p2Interact, p2Inventory);
-
-            String error = validateControls(playerCount, p1, p2);
-            if (error != null) {
-                errorLabel.setText(error);
-                return;
-            }
-
+        GameConfigurationDialog.show(stage, "Nouvelle partie", true, result -> {
             if (onStartConfiguredGame != null) {
-                onStartConfiguredGame.accept(playerCount, new PlayerControls[] { p1, p2 });
+                onStartConfiguredGame.accept(
+                        result.getPlayerCount(),
+                        new PlayerControls[] {
+                                result.getPlayer1Controls(),
+                                result.getPlayer2Controls()
+                        });
             }
-
-            newGameStage.close();
         });
-
-        Button cancelButton = new Button("Annuler");
-        cancelButton.setCancelButton(true);
-        cancelButton.setOnAction(e -> newGameStage.close());
-
-        HBox buttonsBox = new HBox(12, resetDefaultButton, startButton, cancelButton);
-        buttonsBox.setAlignment(Pos.CENTER_RIGHT);
-
-        Label title = new Label("Nouvelle partie");
-        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-
-        VBox box = new VBox(14,
-                title,
-                playerChoiceBox,
-                hintLabel,
-                sectionTitle("Inventaire"),
-                inventoryGrid,
-                sectionTitle("Mouvement"),
-                movementGrid,
-                sectionTitle("Interagir"),
-                interactGrid,
-                errorLabel,
-                buttonsBox);
-
-        box.setPadding(new Insets(22));
-        box.setAlignment(Pos.CENTER_LEFT);
-        box.setStyle("-fx-background-color: #f4f4f4;");
-
-        Scene newGameScene = new Scene(box, 900, 620);
-        newGameScene.setOnKeyPressed(event -> {
-            if (waitingKeyCell == null) {
-                return;
-            }
-
-            KeyCode code = event.getCode();
-
-            if (code == KeyCode.ESCAPE) {
-                waitingKeyCell.refreshText();
-                waitingKeyCell = null;
-                hintLabel.setText("Modification annulée.");
-                event.consume();
-                return;
-            }
-
-            if (isForbiddenKey(code)) {
-                hintLabel.setText("Touche non acceptée pour une action de jeu.");
-                event.consume();
-                return;
-            }
-
-            waitingKeyCell.setKeyCode(code);
-            waitingKeyCell = null;
-            hintLabel.setText("Touche modifiée. Tu peux en modifier une autre ou lancer la partie.");
-            errorLabel.setText("");
-            event.consume();
-        });
-
-        newGameStage.setScene(newGameScene);
-        newGameStage.showAndWait();
     }
 
     public void showSettingsWindow() {
-        Stage settingsStage = new Stage();
-        settingsStage.initOwner(stage);
-        settingsStage.initModality(Modality.APPLICATION_MODAL);
-        settingsStage.setTitle("Paramètres");
-
-        Label resolutionLabel = new Label("Résolution");
-
-        ComboBox<String> resolutionCombo = new ComboBox<>();
-        resolutionCombo.getItems().addAll("1200x800", "1600x900");
-        resolutionCombo.setValue(GameConfig.getResolution());
-
-        Button applyButton = new Button("Appliquer");
-        applyButton.setOnAction(e -> {
+        GameConfigurationDialog.show(stage, "Paramètres", true, result -> {
             if (onApplySettings != null) {
-                onApplySettings.accept(GameConfig.getControlScheme(), resolutionCombo.getValue());
+                onApplySettings.accept(
+                        result.getPlayerCount() == 2 ? "2 joueurs" : "1 joueur",
+                        result.getResolution());
             }
 
-            settingsStage.close();
+            if (onStartConfiguredGame != null) {
+                // ici on ne lance pas une partie, donc on ne fait rien
+                // on garde juste la cohérence de config globale
+            }
+
+            GameConfig.setPlayerCount(result.getPlayerCount());
+
+            if (result.getPlayerCount() == 2) {
+                GameConfig.setPlayerControls(result.getPlayer1Controls(), result.getPlayer2Controls());
+            } else {
+                GameConfig.setPlayer1Controls(result.getPlayer1Controls());
+            }
         });
-
-        Button closeButton = new Button("Fermer");
-        closeButton.setOnAction(e -> settingsStage.close());
-
-        VBox box = new VBox(12,
-                resolutionLabel,
-                resolutionCombo,
-                applyButton,
-                closeButton);
-
-        box.setPadding(new Insets(20));
-        box.setAlignment(Pos.CENTER_LEFT);
-
-        Scene settingsScene = new Scene(box, 320, 180);
-        settingsStage.setScene(settingsScene);
-        settingsStage.showAndWait();
     }
 
     private Label sectionTitle(String text) {
@@ -384,8 +214,7 @@ public class MainMenuViewGUI extends MainMenuView {
             KeyCell p2Backward,
             KeyCell p2Right,
             KeyCell p2Left,
-            List<Region> player2Rows
-    ) {
+            List<Region> player2Rows) {
         GridPane grid = createGrid();
         grid.add(createHeaderLabel(""), 0, 0);
         grid.add(createHeaderLabel("Avancer"), 1, 0);
@@ -475,8 +304,7 @@ public class MainMenuViewGUI extends MainMenuView {
             KeyCell left,
             KeyCell right,
             KeyCell interact,
-            KeyCell[] inventory
-    ) {
+            KeyCell[] inventory) {
         KeyCode[] inventoryKeys = new KeyCode[inventory.length];
 
         for (int i = 0; i < inventory.length; i++) {
@@ -499,8 +327,7 @@ public class MainMenuViewGUI extends MainMenuView {
             KeyCell left,
             KeyCell right,
             KeyCell interact,
-            KeyCell[] inventory
-    ) {
+            KeyCell[] inventory) {
         forward.setKeyCode(controls.getMoveUp());
         backward.setKeyCode(controls.getMoveDown());
         left.setKeyCode(controls.getMoveLeft());
