@@ -1,6 +1,6 @@
 package mvc.map.view.cli;
 
-import common.langage.Langage;
+import common.language.Language;
 import common.item.Item;
 import common.map.Room;
 import mvc.map.view.base.RoomView;
@@ -27,22 +27,22 @@ public class RoomViewCLI extends RoomView {
 
     private void displayExits(Room room) {
         if (room.getExits().isEmpty()) {
-            System.out.println(Langage.t("cli.exitsNone"));
+            System.out.println(Language.t("cli.exitsNone"));
         } else {
             String translatedExits = room.getExits().keySet().stream()
-                    .map(Langage::dir)
+                    .map(Language::dir)
                     .collect(Collectors.joining(", "));
-            System.out.println(Langage.t("cli.exits") + " : " + translatedExits);
+            System.out.println(Language.t("cli.exits") + " : " + translatedExits);
         }
     }
 
     private void displayItems(Room room) {
         if (room.getItems().isEmpty()) {
-            System.out.println(Langage.t("cli.itemsNone"));
+            System.out.println(Language.t("cli.itemsNone"));
             return;
         }
 
-        System.out.println(Langage.t("cli.items") + " :");
+        System.out.println(Language.t("cli.items") + " :");
         for (Item item : room.getItems()) {
             System.out.println("- " + item.getName());
         }
@@ -50,12 +50,12 @@ public class RoomViewCLI extends RoomView {
 
     @Override
     public void displayMove(String direction, String roomName) {
-        System.out.println(Langage.tf("cli.youGo", Langage.dir(direction), roomName));
+        System.out.println(Language.tf("cli.youGo", Language.dir(direction), roomName));
     }
 
     @Override
     public void displayNoExit(String direction) {
-        System.out.println(Langage.tf("cli.noExit", Langage.dir(direction)));
+        System.out.println(Language.tf("cli.noExit", Language.dir(direction)));
     }
 
     @Override

@@ -3,7 +3,7 @@ package mvc.game.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import common.langage.Langage;
+import common.language.Language;
 import common.item.Item;
 import common.item.Weapon;
 import mvc.entity.model.HeroModel;
@@ -198,7 +198,7 @@ public class GameController extends Controller {
 
         for (int i = 0; i < 9; i++) {
             if (i >= inventory.size()) {
-                labels.add((i + 1) + ". " + Langage.t("game.emptySlot"));
+                labels.add((i + 1) + ". " + Language.t("game.emptySlot"));
                 continue;
             }
 
@@ -206,7 +206,7 @@ public class GameController extends Controller {
             String text = (i + 1) + ". " + item.getName();
 
             if (item instanceof Weapon weapon && weapon == model.getEquippedWeapon()) {
-                text += " " + Langage.t("game.equipped");
+                text += " " + Language.t("game.equipped");
             }
 
             labels.add(text);
@@ -217,14 +217,14 @@ public class GameController extends Controller {
 
     private void refreshInfoBars() {
         gameView.displayInfo(
-                "J1 | " + Langage.t("game.weaponInfo") + " : " + heroModel.getEquippedWeaponName()
-                        + " | " + Langage.t("game.damage") + " : " + heroModel.getDamage()
+                "J1 | " + Language.t("game.weaponInfo") + " : " + heroModel.getEquippedWeaponName()
+                        + " | " + Language.t("game.damage") + " : " + heroModel.getDamage()
         );
 
         if (secondHeroModel != null) {
             gameView.displayPlayer2Info(
-                    "J2 | " + Langage.t("game.weaponInfo") + " : " + secondHeroModel.getEquippedWeaponName()
-                            + " | " + Langage.t("game.damage") + " : " + secondHeroModel.getDamage()
+                    "J2 | " + Language.t("game.weaponInfo") + " : " + secondHeroModel.getEquippedWeaponName()
+                            + " | " + Language.t("game.damage") + " : " + secondHeroModel.getDamage()
             );
         }
     }

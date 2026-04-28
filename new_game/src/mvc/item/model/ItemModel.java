@@ -1,7 +1,7 @@
 package mvc.item.model;
 
 import common.entity.Hero;
-import common.langage.Langage;
+import common.language.Language;
 import common.item.Chest;
 import common.item.Item;
 import common.item.Weapon;
@@ -61,32 +61,32 @@ public class ItemModel implements Model {
 
     public void take() {
         if (!item.canBeTaken()) {
-            notifyMessage(Langage.tf("item.cannotTake", item.getName()));
+            notifyMessage(Language.tf("item.cannotTake", item.getName()));
             notifyState();
             return;
         }
 
         if (isInInventory()) {
-            notifyMessage(Langage.tf("item.alreadyInInventory", item.getName()));
+            notifyMessage(Language.tf("item.alreadyInInventory", item.getName()));
             notifyState();
             return;
         }
 
         if (!isInCurrentRoom()) {
-            notifyMessage(Langage.tf("item.notInRoom", item.getName()));
+            notifyMessage(Language.tf("item.notInRoom", item.getName()));
             notifyState();
             return;
         }
 
         if (!heroModel.getHero().addItem(item)) {
-            notifyMessage(Langage.t("item.inventoryFull"));
+            notifyMessage(Language.t("item.inventoryFull"));
             notifyState();
             return;
         }
 
         heroModel.getRoom().removeItem(item);
 
-        notifyMessage(Langage.tf("item.heroTakes", heroModel.getName(), item.getName()));
+        notifyMessage(Language.tf("item.heroTakes", heroModel.getName(), item.getName()));
         heroModel.syncState();
         notifyState();
     }
@@ -112,28 +112,28 @@ public class ItemModel implements Model {
             return;
         }
 
-        notifyMessage(Langage.t("item.nothingHappens"));
+        notifyMessage(Language.t("item.nothingHappens"));
         notifyState();
     }
 
     public void drop() {
         if (!item.canBeDropped()) {
-            notifyMessage(Langage.tf("item.cannotDrop", item.getName()));
+            notifyMessage(Language.tf("item.cannotDrop", item.getName()));
             notifyState();
             return;
         }
 
         if (!isInInventory()) {
-            notifyMessage(Langage.tf("item.notInInventory", item.getName()));
+            notifyMessage(Language.tf("item.notInInventory", item.getName()));
             notifyState();
             return;
         }
 
         Item dropped = heroModel.drop(item.getName());
         if (dropped == null) {
-            notifyMessage(Langage.tf("item.notInInventory", item.getName()));
+            notifyMessage(Language.tf("item.notInInventory", item.getName()));
         } else {
-            notifyMessage(Langage.tf("item.heroDrops", heroModel.getName(), dropped.getName()));
+            notifyMessage(Language.tf("item.heroDrops", heroModel.getName(), dropped.getName()));
         }
 
         heroModel.syncState();
@@ -144,33 +144,33 @@ public class ItemModel implements Model {
         Hero hero = heroModel.getHero();
 
         if (!item.canBeUsed()) {
-            notifyMessage(Langage.tf("item.cannotUse", item.getName()));
+            notifyMessage(Language.tf("item.cannotUse", item.getName()));
             notifyState();
             return;
         }
 
         if (item instanceof Chest chest) {
             if (!isInCurrentRoom()) {
-                notifyMessage(Langage.tf("item.notInRoom", item.getName()));
+                notifyMessage(Language.tf("item.notInRoom", item.getName()));
                 notifyState();
                 return;
             }
 
             chest.use(hero);
-            notifyMessage(Langage.tf("item.youOpen", item.getName()));
+            notifyMessage(Language.tf("item.youOpen", item.getName()));
             heroModel.syncState();
             notifyState();
             return;
         }
 
         if (!isInInventory()) {
-            notifyMessage(Langage.tf("item.takeFirst", item.getName()));
+            notifyMessage(Language.tf("item.takeFirst", item.getName()));
             notifyState();
             return;
         }
 
         if (item instanceof Weapon) {
-            notifyMessage(Langage.tf("item.alreadyApplied", item.getName()));
+            notifyMessage(Language.tf("item.alreadyApplied", item.getName()));
             heroModel.syncState();
             notifyState();
             return;
@@ -179,7 +179,7 @@ public class ItemModel implements Model {
         UsableItem usableItem = (UsableItem) item;
         usableItem.use(hero);
 
-        notifyMessage(Langage.tf("item.youUse", item.getName()));
+        notifyMessage(Language.tf("item.youUse", item.getName()));
         heroModel.syncState();
         notifyState();
     }

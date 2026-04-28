@@ -2,7 +2,7 @@ package mvc.item.controller;
 
 import java.util.List;
 
-import common.langage.Langage;
+import common.language.Language;
 import common.item.Chest;
 import common.item.Item;
 import common.map.Room;
@@ -51,22 +51,22 @@ public class RoomItemInteractionController extends Controller {
         List<Item> items = currentRoom.getItems();
 
         if (items.isEmpty()) {
-            viewCLI.displayMessage(Langage.t("item.nothingToInteract"));
-            viewGUI.displayMessage(Langage.t("item.nothingToInteract"));
+            viewCLI.displayMessage(Language.t("item.nothingToInteract"));
+            viewGUI.displayMessage(Language.t("item.nothingToInteract"));
             return;
         }
 
         NearestItem nearest = findNearestItem(items);
 
         if (nearest == null) {
-            viewCLI.displayMessage(Langage.t("item.nothingToInteract"));
-            viewGUI.displayMessage(Langage.t("item.nothingToInteract"));
+            viewCLI.displayMessage(Language.t("item.nothingToInteract"));
+            viewGUI.displayMessage(Language.t("item.nothingToInteract"));
             return;
         }
 
         if (nearest.distance > INTERACT_DISTANCE) {
-            viewCLI.displayMessage(Langage.t("item.nothingNearby"));
-            viewGUI.displayMessage(Langage.t("item.nothingNearby"));
+            viewCLI.displayMessage(Language.t("item.nothingNearby"));
+            viewGUI.displayMessage(Language.t("item.nothingNearby"));
             return;
         }
 
@@ -108,7 +108,7 @@ public class RoomItemInteractionController extends Controller {
         }
 
         if (candidate == null) {
-            viewCLI.displayMessage(Langage.t("item.nothingToInteract"));
+            viewCLI.displayMessage(Language.t("item.nothingToInteract"));
             return;
         }
 

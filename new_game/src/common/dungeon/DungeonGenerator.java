@@ -1,6 +1,6 @@
 package common.dungeon;
 
-import common.langage.Langage;
+import common.language.Language;
 import common.item.Key;
 import common.map.Room;
 
@@ -35,7 +35,7 @@ public class DungeonGenerator {
         Map<Pos, Room> grid = new HashMap<>();
         List<Room> rooms = new ArrayList<>();
 
-        Room start = new Room(Langage.t("room.Entrance"), Langage.t("room.entranceDesc"));
+        Room start = new Room(Language.t("room.Entrance"), Language.t("room.entranceDesc"));
         Pos startPos = new Pos(0, 0);
 
         grid.put(startPos, start);
@@ -67,7 +67,7 @@ public class DungeonGenerator {
         Room bossRoom = chooseBossRoom(grid, start);
         bossRoom.setBossRoom(true);
 
-        Key key = new Key(Langage.t("item.bossKey"), Langage.t("item.bossKeyDesc"));
+        Key key = new Key(Language.t("item.bossKey"), Language.t("item.bossKeyDesc"));
         lockAllEntrancesToBossRoom(grid, bossRoom, key);
 
         return new DungeonData(start, rooms, key, bossRoom);
@@ -185,12 +185,12 @@ public class DungeonGenerator {
 
     private String randomName(int index) {
         String baseKey = ROOM_NAME_KEYS[random.nextInt(ROOM_NAME_KEYS.length)];
-        return Langage.t("room." + baseKey) + " " + index;
+        return Language.t("room." + baseKey) + " " + index;
     }
 
     private String randomDescription() {
         String key = ROOM_DESC_KEYS[random.nextInt(ROOM_DESC_KEYS.length)];
-        return Langage.t(key);
+        return Language.t(key);
     }
 
     private static final class Pos {

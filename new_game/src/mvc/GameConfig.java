@@ -1,6 +1,6 @@
 package mvc;
 
-import common.langage.Langage;
+import common.language.Language;
 import javafx.scene.input.KeyCode;
 
 public final class GameConfig {
@@ -21,14 +21,14 @@ public final class GameConfig {
 
     public static void setLanguage(String value) {
         if ("English".equals(value) || "EN".equals(value)) {
-            Langage.setLanguage(Langage.Language.EN);
+            Language.setLanguage(Language.Language.EN);
         } else {
-            Langage.setLanguage(Langage.Language.FR);
+            Language.setLanguage(Language.Language.FR);
         }
     }
 
     public static String getLanguage() {
-        return Langage.getLanguage().getDisplayName();
+        return Language.getLanguage().getDisplayName();
     }
 
     // ── Contrôles ──
