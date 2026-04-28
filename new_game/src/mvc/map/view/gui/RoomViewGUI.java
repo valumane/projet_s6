@@ -2,8 +2,10 @@ package mvc.map.view.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.function.Consumer;
 
+import common.languages.Languages;
 import common.map.Exit;
 import common.map.LockedExit;
 import common.map.Room;
@@ -55,8 +57,8 @@ public class RoomViewGUI extends RoomView {
 
     private final BorderPane root = new BorderPane();
 
-    private final Label titleLabel = new Label("Room");
-    private final Label exitsLabel = new Label("Exits: none");
+    private final Label titleLabel = new Label("");
+    private final Label exitsLabel = new Label(Languages.t("map.exitsNone"));
 
     private final Label descriptionArea = new Label();
 
@@ -129,7 +131,7 @@ public class RoomViewGUI extends RoomView {
         infoBox.setPadding(new Insets(4, 8, 4, 8));
         infoBox.setMaxHeight(Region.USE_PREF_SIZE);
 
-        Label explorationLabel = new Label("Minimap");
+        Label explorationLabel = new Label(Languages.t("map.minimap"));
         miniMapBox.getChildren().addAll(explorationLabel, exploredMapPane);
         miniMapBox.setAlignment(Pos.CENTER);
         miniMapBox.setPadding(new Insets(8));
@@ -198,7 +200,7 @@ public class RoomViewGUI extends RoomView {
         heroFacingNode.setStrokeWidth(3);
 
         heroNode = new Circle(heroX, heroY, MapLayout.HERO_RADIUS, Color.DARKRED);
-        heroTextNode = new Text(heroX - 18, heroY + 28, "Hero 1");
+        heroTextNode = new Text(heroX - 18, heroY + 28, Languages.t("map.heroLabel1"));
 
         if (GameConfig.isTwoPlayers()) {
             secondHeroFacingNode = new Line(
@@ -210,7 +212,7 @@ public class RoomViewGUI extends RoomView {
             secondHeroFacingNode.setStrokeWidth(3);
 
             secondHeroNode = new Circle(secondHeroX, secondHeroY, MapLayout.HERO_RADIUS, Color.DARKBLUE);
-            secondHeroTextNode = new Text(secondHeroX - 18, secondHeroY + 28, "Hero 2");
+            secondHeroTextNode = new Text(secondHeroX - 18, secondHeroY + 28, Languages.t("map.heroLabel2"));
         } else {
             secondHeroFacingNode = null;
             secondHeroNode = null;
@@ -250,7 +252,7 @@ public class RoomViewGUI extends RoomView {
             northExit.setFill(getExitColor("north"));
             northExit.setStroke(Color.BLACK);
 
-            Text northText = new Text(x + horizontalExitW / 2.0 - 4, y - 8, "N");
+            Text northText = new Text(x + horizontalExitW / 2.0 - 4, y - 8, Languages.dir("north").substring(0, 1).toUpperCase());
             mapPane.getChildren().addAll(northExit, northText);
         }
 
@@ -262,7 +264,7 @@ public class RoomViewGUI extends RoomView {
             southExit.setFill(getExitColor("south"));
             southExit.setStroke(Color.BLACK);
 
-            Text southText = new Text(x + horizontalExitW / 2.0 - 4, y + 35, "S");
+            Text southText = new Text(x + horizontalExitW / 2.0 - 4, y + 35, Languages.dir("south").substring(0, 1).toUpperCase());
             mapPane.getChildren().addAll(southExit, southText);
         }
 
@@ -274,7 +276,7 @@ public class RoomViewGUI extends RoomView {
             westExit.setFill(getExitColor("west"));
             westExit.setStroke(Color.BLACK);
 
-            Text westText = new Text(x - 28, y + verticalExitH / 2.0 + 4, "W");
+            Text westText = new Text(x - 28, y + verticalExitH / 2.0 + 4, Languages.dir("west").substring(0, 1).toUpperCase());
             mapPane.getChildren().addAll(westExit, westText);
         }
 
@@ -286,7 +288,7 @@ public class RoomViewGUI extends RoomView {
             eastExit.setFill(getExitColor("east"));
             eastExit.setStroke(Color.BLACK);
 
-            Text eastText = new Text(x + 20, y + verticalExitH / 2.0 + 4, "E");
+            Text eastText = new Text(x + 20, y + verticalExitH / 2.0 + 4, Languages.dir("east").substring(0, 1).toUpperCase());
             mapPane.getChildren().addAll(eastExit, eastText);
         }
     }
@@ -299,7 +301,7 @@ public class RoomViewGUI extends RoomView {
         List<Item> items = currentRoom.getItems();
 
         if (items == null || items.isEmpty()) {
-            Text noItemText = new Text(getRoomCenterX() - 55, ROOM_Y + ROOM_H - 35, "No item in this room");
+            Text noItemText = new Text(getRoomCenterX() - 55, ROOM_Y + ROOM_H - 35, Languages.t("map.noItems"));
             mapPane.getChildren().add(noItemText);
             return;
         }
@@ -497,9 +499,10 @@ public class RoomViewGUI extends RoomView {
             titleLabel.setText(room.getName());
             descriptionArea.setText(room.getDescription());
             if (room.getExits().isEmpty()) {
-                exitsLabel.setText("Exits: none");
+                exitsLabel.setText(Languages.t("map.exitsNone"));
             } else {
-                exitsLabel.setText("Exits: " + String.join(", ", room.getExits().keySet()));
+                String translatedExits = room.getExits().keySet().stream().map(Languages::dir).collect(Collectors.joining(", "));
+                exitsLabel.setText(Languages.tf("map.exits", translatedExits));
             }
 
             drawRoom();
@@ -527,12 +530,12 @@ public class RoomViewGUI extends RoomView {
 
     @Override
     public void displayMove(String direction, String roomName) {
-        log("You go " + direction + " and enter: " + roomName);
+        log(Languages.tf("cli.youGo", Languages.dir(direction), roomName));
     }
 
     @Override
     public void displayNoExit(String direction) {
-        log("There is no exit to the " + direction + ".");
+        log(Languages.tf("cli.noExit", Languages.dir(direction)));
     }
 
     @Override

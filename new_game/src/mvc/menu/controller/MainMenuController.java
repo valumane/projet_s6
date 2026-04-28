@@ -3,10 +3,10 @@ package mvc.menu.controller;
 import java.util.List;
 
 import application.GameLauncher;
+import common.languages.Languages;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import mvc.GameConfig;
-import mvc.PlayerControls;
 import mvc.menu.model.MainMenuModel;
 import mvc.menu.view.gui.MainMenuViewGUI;
 import mvc.mvc.Controller;
@@ -53,11 +53,11 @@ public class MainMenuController extends Controller {
         });
 
         view.setOnContinue(() -> {
-            System.out.println("Continue sera ajouté plus tard.");
+            System.out.println(Languages.t("game.continueNotReady"));
         });
 
         view.setOnCreateLevel(() -> {
-            System.out.println("Create Niveau sera ajouté plus tard.");
+            System.out.println(Languages.t("game.createLevelNotReady"));
         });
 
         view.setOnSettings(view::showSettingsWindow);

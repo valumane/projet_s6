@@ -2,6 +2,7 @@ package mvc.item.controller;
 
 import java.util.List;
 
+import common.languages.Languages;
 import common.item.Chest;
 import common.item.Item;
 import common.map.Room;
@@ -50,22 +51,22 @@ public class RoomItemInteractionController extends Controller {
         List<Item> items = currentRoom.getItems();
 
         if (items.isEmpty()) {
-            viewCLI.displayMessage("There is nothing to interact with.");
-            viewGUI.displayMessage("There is nothing to interact with.");
+            viewCLI.displayMessage(Languages.t("item.nothingToInteract"));
+            viewGUI.displayMessage(Languages.t("item.nothingToInteract"));
             return;
         }
 
         NearestItem nearest = findNearestItem(items);
 
         if (nearest == null) {
-            viewCLI.displayMessage("There is nothing to interact with.");
-            viewGUI.displayMessage("There is nothing to interact with.");
+            viewCLI.displayMessage(Languages.t("item.nothingToInteract"));
+            viewGUI.displayMessage(Languages.t("item.nothingToInteract"));
             return;
         }
 
         if (nearest.distance > INTERACT_DISTANCE) {
-            viewCLI.displayMessage("Nothing nearby to interact with.");
-            viewGUI.displayMessage("Nothing nearby to interact with.");
+            viewCLI.displayMessage(Languages.t("item.nothingNearby"));
+            viewGUI.displayMessage(Languages.t("item.nothingNearby"));
             return;
         }
 
@@ -107,7 +108,7 @@ public class RoomItemInteractionController extends Controller {
         }
 
         if (candidate == null) {
-            viewCLI.displayMessage("There is nothing to interact with.");
+            viewCLI.displayMessage(Languages.t("item.nothingToInteract"));
             return;
         }
 

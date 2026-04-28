@@ -1,5 +1,6 @@
 package common.dungeon;
 
+import common.languages.Languages;
 import common.item.Key;
 import common.map.Room;
 
@@ -7,21 +8,15 @@ import java.util.*;
 
 public class DungeonGenerator {
 
-    private static final String[] ROOM_NAMES = {
+    private static final String[] ROOM_NAME_KEYS = {
             "Entrance", "Corridor", "Vault", "Chapel", "Armory",
             "Library", "Storage", "Barracks", "Hall", "Cellar",
             "Kitchen", "Workshop", "Gallery", "Watchtower", "Crypt"
     };
 
-    private static final String[] ROOM_DESCRIPTIONS = {
-            "A cold and silent room.",
-            "Dust covers the floor.",
-            "You hear water dripping somewhere.",
-            "The walls are cracked and old.",
-            "An uneasy feeling fills the air.",
-            "There is almost nothing here.",
-            "A forgotten place of the dungeon.",
-            "The atmosphere is strangely calm."
+    private static final String[] ROOM_DESC_KEYS = {
+            "room.desc.0", "room.desc.1", "room.desc.2", "room.desc.3",
+            "room.desc.4", "room.desc.5", "room.desc.6", "room.desc.7"
     };
 
     private static final String[] DIRECTIONS = { "north", "south", "east", "west" };
@@ -40,7 +35,7 @@ public class DungeonGenerator {
         Map<Pos, Room> grid = new HashMap<>();
         List<Room> rooms = new ArrayList<>();
 
-        Room start = new Room("Entrance", "The beginning of the dungeon.");
+        Room start = new Room(Languages.t("room.Entrance"), Languages.t("room.entranceDesc"));
         Pos startPos = new Pos(0, 0);
 
         grid.put(startPos, start);
@@ -72,7 +67,7 @@ public class DungeonGenerator {
         Room bossRoom = chooseBossRoom(grid, start);
         bossRoom.setBossRoom(true);
 
-        Key key = new Key("Boss Key", "A key to the boss room");
+        Key key = new Key(Languages.t("item.bossKey"), Languages.t("item.bossKeyDesc"));
         lockAllEntrancesToBossRoom(grid, bossRoom, key);
 
         return new DungeonData(start, rooms, key, bossRoom);
@@ -189,12 +184,13 @@ public class DungeonGenerator {
     }
 
     private String randomName(int index) {
-        String base = ROOM_NAMES[random.nextInt(ROOM_NAMES.length)];
-        return base + " " + index;
+        String baseKey = ROOM_NAME_KEYS[random.nextInt(ROOM_NAME_KEYS.length)];
+        return Languages.t("room." + baseKey) + " " + index;
     }
 
     private String randomDescription() {
-        return ROOM_DESCRIPTIONS[random.nextInt(ROOM_DESCRIPTIONS.length)];
+        String key = ROOM_DESC_KEYS[random.nextInt(ROOM_DESC_KEYS.length)];
+        return Languages.t(key);
     }
 
     private static final class Pos {

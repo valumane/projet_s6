@@ -1,8 +1,11 @@
 package mvc.map.view.cli;
 
+import common.languages.Languages;
 import common.item.Item;
 import common.map.Room;
 import mvc.map.view.base.RoomView;
+
+import java.util.stream.Collectors;
 
 public class RoomViewCLI extends RoomView {
 
@@ -24,20 +27,22 @@ public class RoomViewCLI extends RoomView {
 
     private void displayExits(Room room) {
         if (room.getExits().isEmpty()) {
-            System.out.println("Exits : none");
+            System.out.println(Languages.t("cli.exitsNone"));
         } else {
-            System.out.print("Exits : ");
-            System.out.println(String.join(", ", room.getExits().keySet()));
+            String translatedExits = room.getExits().keySet().stream()
+                    .map(Languages::dir)
+                    .collect(Collectors.joining(", "));
+            System.out.println(Languages.t("cli.exits") + " : " + translatedExits);
         }
     }
 
     private void displayItems(Room room) {
         if (room.getItems().isEmpty()) {
-            System.out.println("Items : none");
+            System.out.println(Languages.t("cli.itemsNone"));
             return;
         }
 
-        System.out.println("Items :");
+        System.out.println(Languages.t("cli.items") + " :");
         for (Item item : room.getItems()) {
             System.out.println("- " + item.getName());
         }
@@ -45,12 +50,12 @@ public class RoomViewCLI extends RoomView {
 
     @Override
     public void displayMove(String direction, String roomName) {
-        System.out.println("You go " + direction + " and enter : " + roomName);
+        System.out.println(Languages.tf("cli.youGo", Languages.dir(direction), roomName));
     }
 
     @Override
     public void displayNoExit(String direction) {
-        System.out.println("There is no exit to the " + direction + ".");
+        System.out.println(Languages.tf("cli.noExit", Languages.dir(direction)));
     }
 
     @Override

@@ -6,6 +6,7 @@ import common.entity.Archer;
 import common.entity.Berserker;
 import common.entity.Enemy;
 import common.entity.Hero;
+import common.languages.Languages;
 import common.item.Bag;
 import common.item.Chest;
 import common.item.HealSpell;
@@ -62,14 +63,14 @@ public final class GameLauncher {
 
         if (existingHero == null) {
             hero = new Hero(
-                    "Hero",
+                    Languages.t("hero.name"),
                     100,
-                    new Bag("Backpack", DEFAULT_HERO_BAG_CAPACITY),
+                    new Bag(Languages.t("hero.backpack"), DEFAULT_HERO_BAG_CAPACITY),
                     startRoom,
                     DEFAULT_HERO_DAMAGE);
 
-            Weapon basicSword = new Weapon("Épée basique", 10, Weapon.WeaponType.MELEE);
-            Weapon basicBow = new Weapon("Arc basique", 10, Weapon.WeaponType.RANGED);
+            Weapon basicSword = new Weapon(Languages.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
+            Weapon basicBow = new Weapon(Languages.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
 
             hero.addItem(basicSword);
             hero.addItem(basicBow);
@@ -79,11 +80,11 @@ public final class GameLauncher {
             hero.setCurrentRoom(startRoom);
         }
 
-        Scroll healingScroll = new Scroll("Healing Scroll", new HealSpell(25));
-        Chest chest = new Chest("Wooden Chest", false, "A small chest full of loot");
+        Scroll healingScroll = new Scroll(Languages.t("item.healingScroll"), new HealSpell(25));
+        Chest chest = new Chest(Languages.t("item.woodenChest"), false, Languages.t("item.chestDesc"));
 
-        chest.addItem(new Item("Ruby", "A shiny red gem"));
-        chest.addItem(new Item("Coin", "An old gold coin"));
+        chest.addItem(new Item(Languages.t("item.ruby"), Languages.t("item.rubyDesc")));
+        chest.addItem(new Item(Languages.t("item.coin"), Languages.t("item.coinDesc")));
 
         startRoom.addItem(healingScroll);
         startRoom.addItem(chest);
@@ -138,14 +139,14 @@ public final class GameLauncher {
 
         if (safePlayerCount == 2) {
             Hero secondHero = new Hero(
-                    "Hero 2",
+                    Languages.t("hero.name2"),
                     100,
-                    new Bag("Backpack J2", DEFAULT_HERO_BAG_CAPACITY),
+                    new Bag(Languages.t("hero.backpackP2"), DEFAULT_HERO_BAG_CAPACITY),
                     startRoom,
                     DEFAULT_HERO_DAMAGE);
 
-            Weapon secondBasicSword = new Weapon("Épée basique", 10, Weapon.WeaponType.MELEE);
-            Weapon secondBasicBow = new Weapon("Arc basique", 10, Weapon.WeaponType.RANGED);
+            Weapon secondBasicSword = new Weapon(Languages.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
+            Weapon secondBasicBow = new Weapon(Languages.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
 
             secondHero.addItem(secondBasicSword);
             secondHero.addItem(secondBasicBow);
@@ -169,7 +170,7 @@ public final class GameLauncher {
         });
 
         gameViewGUI.setOnSaveGame(() -> {
-            logWindowGUI.append("Save is not implemented yet.");
+            logWindowGUI.append(Languages.t("game.saveNotReady"));
             logWindowGUI.showWindow();
         });
 
@@ -192,6 +193,8 @@ public final class GameLauncher {
 
                 gameViewGUI.applyCurrentResolution();
             });
+            logWindowGUI.append(Languages.t("game.settingsNotReady"));
+            logWindowGUI.showWindow();
         });
 
         new HeroController(heroModel, heroViewCLI, heroViewGUI);
@@ -207,7 +210,7 @@ public final class GameLauncher {
                 roomViewCLI,
                 roomViewGUI,
                 () -> {
-                    logWindowGUI.append("New random level generated.");
+                    logWindowGUI.append(Languages.t("game.newLevel"));
                     logWindowGUI.showWindow();
                     gameViewGUI.hide();
                     GameLauncher.startRandomGame(stage, safePlayerCount, hero);
