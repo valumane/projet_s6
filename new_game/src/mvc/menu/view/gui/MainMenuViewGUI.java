@@ -50,6 +50,9 @@ public class MainMenuViewGUI extends MainMenuView {
     private BiConsumer<Integer, PlayerControls[]> onStartConfiguredGame;
 
     private KeyCell waitingKeyCell;
+    
+    // classe interne. pour record, voir levelregistry
+    public record MapChoice(String displayName, java.nio.file.Path path, boolean isRandom) {}
 
     public MainMenuViewGUI(Stage stage) {
         this.stage = stage;
@@ -67,7 +70,6 @@ public class MainMenuViewGUI extends MainMenuView {
         quitButton.setMaxWidth(Double.MAX_VALUE);
 
         continueButton.setDisable(true);
-        createLevelButton.setDisable(true);
 
         newGameButton.setOnAction(e -> {
             if (onNewGame != null) {
@@ -213,24 +215,51 @@ public class MainMenuViewGUI extends MainMenuView {
             errorLabel.setText("");
             hintLabel.setText("Touches par défaut rétablies.");
         });
+        
+        
+        // Choix NIVEAU ================
+        Label mapLabel = new Label("Carte :");
+        mapLabel.setStyle("-fx-font-weight: bold;");
+
+        ComboBox<MapChoice> mapCombo = new ComboBox<>();
+
+        // par défaut
+        mapCombo.getItems().add(new MapChoice("Donjon aléatoire", null, true));
+
+        // custom
+        try {
+            for (common.leveleditor.LevelRegistry.LevelSummary s
+                    : common.leveleditor.LevelRegistry.loadSummaries()) {
+                mapCombo.getItems().add(new MapChoice(s.name() + " (custom)", s.path(), false));
+            }
+        } catch (Exception ignored) {}
+
+        mapCombo.setConverter(new javafx.util.StringConverter<>() {
+            @Override public String toString(MapChoice c) { return c == null ? "" : c.displayName(); }
+            @Override public MapChoice fromString(String s) { return null; }
+        });
+        mapCombo.getSelectionModel().selectFirst();
+        mapCombo.setMaxWidth(Double.MAX_VALUE);
+        
 
         Button startButton = new Button("Lancer la partie");
         startButton.setDefaultButton(true);
         startButton.setOnAction(e -> {
             int playerCount = twoPlayersRadio.isSelected() ? 2 : 1;
-
+            
             PlayerControls p1 = buildControls(p1Forward, p1Backward, p1Left, p1Right, p1Interact, p1Inventory);
             PlayerControls p2 = buildControls(p2Forward, p2Backward, p2Left, p2Right, p2Interact, p2Inventory);
 
             String error = validateControls(playerCount, p1, p2);
-            if (error != null) {
-                errorLabel.setText(error);
-                return;
+            if (error != null) { errorLabel.setText(error); return; }
+
+            MapChoice selectedMap = mapCombo.getValue();
+            if (onStartConfiguredGame != null) {
+                onStartConfiguredGame.accept(playerCount, new PlayerControls[]{ p1, p2 });
             }
 
-            if (onStartConfiguredGame != null) {
-                onStartConfiguredGame.accept(playerCount, new PlayerControls[] { p1, p2 });
-            }
+            GameConfig.setSelectedMap(selectedMap == null || selectedMap.isRandom()
+                ? null : selectedMap.path().toString());
 
             newGameStage.close();
         });
@@ -248,6 +277,8 @@ public class MainMenuViewGUI extends MainMenuView {
         VBox box = new VBox(14,
                 title,
                 playerChoiceBox,
+                mapLabel,
+                mapCombo,
                 hintLabel,
                 sectionTitle("Inventaire"),
                 inventoryGrid,
