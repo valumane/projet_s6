@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import common.languages.Languages;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -29,12 +30,24 @@ public final class GameConfigurationDialog {
         private final String resolution;
         private final PlayerControls player1Controls;
         private final PlayerControls player2Controls;
+        private final String language;
 
-        public Result(int playerCount, String resolution, PlayerControls player1Controls, PlayerControls player2Controls) {
+        public Result(
+                int playerCount,
+                String resolution,
+                String language,
+                PlayerControls player1Controls,
+                PlayerControls player2Controls
+        ) {
             this.playerCount = playerCount;
             this.resolution = resolution;
+            this.language = language;
             this.player1Controls = player1Controls;
             this.player2Controls = player2Controls;
+        }
+
+        public String getLanguage() {
+            return language;
         }
 
         public int getPlayerCount() {
@@ -89,6 +102,11 @@ public final class GameConfigurationDialog {
         resolutionCombo.getItems().addAll("1200x800", "1600x900");
         resolutionCombo.setValue(GameConfig.getResolution());
 
+        Label languageLabel = new Label(Languages.t("settings.language"));
+        ComboBox<String> languageCombo = new ComboBox<>();
+        languageCombo.getItems().addAll("Français", "English");
+        languageCombo.setValue(GameConfig.getLanguage());
+
         Label hintLabel = new Label("Clique sur une touche pour la modifier, puis appuie sur la nouvelle touche.");
         hintLabel.setWrapText(true);
 
@@ -116,7 +134,8 @@ public final class GameConfigurationDialog {
         GridPane movementGrid = buildMovementGrid(
                 p1Forward, p1Backward, p1Right, p1Left,
                 p2Forward, p2Backward, p2Right, p2Left,
-                player2Rows);
+                player2Rows
+        );
         GridPane interactGrid = buildInteractGrid(p1Interact, p2Interact, player2Rows);
 
         CaptureState captureState = new CaptureState();
@@ -133,6 +152,7 @@ public final class GameConfigurationDialog {
                 node.setManaged(twoPlayers);
             }
         };
+
         playerCountGroup.selectedToggleProperty().addListener((obs, oldValue, newValue) -> refreshPlayer2Visibility.run());
         refreshPlayer2Visibility.run();
 
@@ -163,7 +183,13 @@ public final class GameConfigurationDialog {
             }
 
             if (onApply != null) {
-                onApply.accept(new Result(playerCount, resolutionCombo.getValue(), p1, p2));
+                onApply.accept(new Result(
+                        playerCount,
+                        resolutionCombo.getValue(),
+                        languageCombo.getValue(),
+                        p1,
+                        p2
+                ));
             }
 
             dialog.close();
@@ -179,11 +205,14 @@ public final class GameConfigurationDialog {
         Label title = new Label(titleText);
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        VBox root = new VBox(14,
+        VBox root = new VBox(
+                14,
                 title,
                 playerChoiceBox,
                 resolutionLabel,
                 resolutionCombo,
+                languageLabel,
+                languageCombo,
                 hintLabel,
                 sectionTitle("Inventaire"),
                 inventoryGrid,
@@ -192,7 +221,8 @@ public final class GameConfigurationDialog {
                 sectionTitle("Interagir"),
                 interactGrid,
                 errorLabel,
-                buttonsBox);
+                buttonsBox
+        );
 
         root.setPadding(new Insets(22));
         root.setAlignment(Pos.CENTER_LEFT);

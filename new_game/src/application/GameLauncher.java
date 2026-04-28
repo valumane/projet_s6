@@ -182,7 +182,8 @@ public final class GameLauncher {
         gameViewGUI.setOnQuitToDesktop(javafx.application.Platform::exit);
 
         gameViewGUI.setOnSettings(() -> {
-            GameConfigurationDialog.show(stage, "Paramètres en jeu", false, result -> {
+            GameConfigurationDialog.show(stage, Languages.t("menu.settings"), false, result -> {
+                GameConfig.setLanguage(result.getLanguage());
                 GameConfig.setResolution(result.getResolution());
 
                 if (GameConfig.isTwoPlayers()) {
@@ -193,8 +194,6 @@ public final class GameLauncher {
 
                 gameViewGUI.applyCurrentResolution();
             });
-            logWindowGUI.append(Languages.t("game.settingsNotReady"));
-            logWindowGUI.showWindow();
         });
 
         new HeroController(heroModel, heroViewCLI, heroViewGUI);

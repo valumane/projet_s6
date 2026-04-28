@@ -10,7 +10,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -24,11 +23,15 @@ public class MainMenuViewGUI extends MainMenuView {
     private final BorderPane root = new BorderPane();
     private final Scene scene;
 
-    private final Button newGameButton = new Button(Languages.t("menu.newGame"));
-    private final Button continueButton = new Button(Languages.t("menu.continue"));
-    private final Button createLevelButton = new Button(Languages.t("menu.createLevel"));
-    private final Button settingsButton = new Button(Languages.t("menu.settings"));
-    private final Button quitButton = new Button(Languages.t("menu.quit"));
+    private final Label titleLabel = new Label();
+    private final Label authorsLabel = new Label();
+    private final Label scoreTitle = new Label();
+
+    private final Button newGameButton = new Button();
+    private final Button continueButton = new Button();
+    private final Button createLevelButton = new Button();
+    private final Button settingsButton = new Button();
+    private final Button quitButton = new Button();
 
     private final VBox scoresBox = new VBox(8);
 
@@ -44,11 +47,9 @@ public class MainMenuViewGUI extends MainMenuView {
     public MainMenuViewGUI(Stage stage) {
         this.stage = stage;
 
-        Label titleLabel = new Label(Languages.t("menu.title"));
         titleLabel.setStyle("-fx-font-size: 34px; -fx-font-weight: bold;");
-
-        Label authorsLabel = new Label(Languages.t("menu.authors"));
         authorsLabel.setStyle("-fx-font-size: 13px;");
+        scoreTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         newGameButton.setMaxWidth(Double.MAX_VALUE);
         continueButton.setMaxWidth(Double.MAX_VALUE);
@@ -101,16 +102,13 @@ public class MainMenuViewGUI extends MainMenuView {
         centerBox.setPadding(new Insets(30));
         centerBox.setPrefWidth(400);
 
-        Label scoreTitle = new Label(Languages.t("menu.highScores"));
-        scoreTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
         scoresBox.getChildren().add(scoreTitle);
         scoresBox.setPadding(new Insets(20));
         scoresBox.setMinWidth(220);
         scoresBox.setStyle(
                 "-fx-background-color: white;" +
-                        "-fx-border-color: black;" +
-                        "-fx-border-width: 1;");
+                "-fx-border-color: black;" +
+                "-fx-border-width: 1;");
 
         BorderPane.setMargin(centerBox, new Insets(20));
         BorderPane.setMargin(scoresBox, new Insets(20));
@@ -120,12 +118,37 @@ public class MainMenuViewGUI extends MainMenuView {
         root.setStyle("-fx-background-color: #f4f4f4;");
 
         scene = new Scene(root, 1100, 700);
-        stage.setTitle(Languages.t("menu.windowTitle"));
         stage.setScene(scene);
+
+        refreshTexts();
+    }
+
+    private void refreshTexts() {
+        stage.setTitle(Languages.t("menu.windowTitle"));
+        titleLabel.setText(Languages.t("menu.title"));
+        authorsLabel.setText(Languages.t("menu.authors"));
+        newGameButton.setText(Languages.t("menu.newGame"));
+        continueButton.setText(Languages.t("menu.continue"));
+        createLevelButton.setText(Languages.t("menu.createLevel"));
+        settingsButton.setText(Languages.t("menu.settings"));
+        quitButton.setText(Languages.t("menu.quit"));
+        scoreTitle.setText(Languages.t("menu.highScores"));
     }
 
     public void showNewGameWindow() {
-        GameConfigurationDialog.show(stage, "Nouvelle partie", true, result -> {
+        GameConfigurationDialog.show(stage, Languages.t("menu.newGame"), true, result -> {
+            GameConfig.setLanguage(result.getLanguage());
+            GameConfig.setResolution(result.getResolution());
+            GameConfig.setPlayerCount(result.getPlayerCount());
+
+            if (result.getPlayerCount() == 2) {
+                GameConfig.setPlayerControls(result.getPlayer1Controls(), result.getPlayer2Controls());
+            } else {
+                GameConfig.setPlayer1Controls(result.getPlayer1Controls());
+            }
+
+            refreshTexts();
+
             if (onStartConfiguredGame != null) {
                 onStartConfiguredGame.accept(
                         result.getPlayerCount(),
@@ -138,24 +161,23 @@ public class MainMenuViewGUI extends MainMenuView {
     }
 
     public void showSettingsWindow() {
-        GameConfigurationDialog.show(stage, "Paramètres", true, result -> {
-            if (onApplySettings != null) {
-                onApplySettings.accept(
-                        result.getPlayerCount() == 2 ? "2 joueurs" : "1 joueur",
-                        result.getResolution());
-            }
-
-            if (onStartConfiguredGame != null) {
-                // ici on ne lance pas une partie, donc on ne fait rien
-                // on garde juste la cohérence de config globale
-            }
-
+        GameConfigurationDialog.show(stage, Languages.t("menu.settings"), true, result -> {
+            GameConfig.setLanguage(result.getLanguage());
+            GameConfig.setResolution(result.getResolution());
             GameConfig.setPlayerCount(result.getPlayerCount());
 
             if (result.getPlayerCount() == 2) {
                 GameConfig.setPlayerControls(result.getPlayer1Controls(), result.getPlayer2Controls());
             } else {
                 GameConfig.setPlayer1Controls(result.getPlayer1Controls());
+            }
+
+            refreshTexts();
+
+            if (onApplySettings != null) {
+                onApplySettings.accept(
+                        String.valueOf(result.getPlayerCount()),
+                        result.getResolution());
             }
         });
     }
@@ -197,7 +219,7 @@ public class MainMenuViewGUI extends MainMenuView {
 
     @Override
     public void setScores(List<String> scores) {
-        scoresBox.getChildren().removeIf(node -> node instanceof Label && node != scoresBox.getChildren().get(0));
+        scoresBox.getChildren().removeIf(node -> node instanceof Label && node != scoreTitle);
 
         if (scores == null || scores.isEmpty()) {
             scoresBox.getChildren().add(new Label(Languages.t("menu.noScores")));
@@ -218,39 +240,4 @@ public class MainMenuViewGUI extends MainMenuView {
     public void setOnStartConfiguredGame(BiConsumer<Integer, PlayerControls[]> action) {
         this.onStartConfiguredGame = action;
     }
-
-    private static String formatKey(KeyCode code) {
-        if (code == null) {
-            return "?";
-        }
-
-        return switch (code) {
-            case DIGIT1 -> "& / 1";
-            case DIGIT2 -> "é / 2";
-            case DIGIT3 -> "\" / 3";
-            case DIGIT4 -> "' / 4";
-            case DIGIT5 -> "( / 5";
-            case DIGIT6 -> "- / 6";
-            case DIGIT7 -> "è / 7";
-            case DIGIT8 -> "_ / 8";
-            case DIGIT9 -> "ç / 9";
-            case NUMPAD1 -> Languages.t("key.numpad") + " 1";
-            case NUMPAD2 -> Languages.t("key.numpad") + " 2";
-            case NUMPAD3 -> Languages.t("key.numpad") + " 3";
-            case NUMPAD4 -> Languages.t("key.numpad") + " 4";
-            case NUMPAD5 -> Languages.t("key.numpad") + " 5";
-            case NUMPAD6 -> Languages.t("key.numpad") + " 6";
-            case NUMPAD7 -> Languages.t("key.numpad") + " 7";
-            case NUMPAD8 -> Languages.t("key.numpad") + " 8";
-            case NUMPAD9 -> Languages.t("key.numpad") + " 9";
-            case UP -> "↑";
-            case DOWN -> "↓";
-            case LEFT -> "←";
-            case RIGHT -> "→";
-            case ENTER -> Languages.t("key.enter");
-            case SPACE -> Languages.t("key.space");
-            default -> code.getName();
-        };
-    }
-
 }
