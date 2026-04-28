@@ -33,10 +33,26 @@ public class RoomLayoutController extends Controller {
         view.setOnSetDescription(this::setDescription);
         view.setOnSetStart(this::setStart);
         view.setOnSetBoss(this::setBoss);
-        view.setOnAddItem((idx, desc) -> { level.getRooms().get(idx).addItemDescriptor(desc); refresh(); });
-        view.setOnRemoveItem((idx, desc) -> { level.getRooms().get(idx).removeItemDescriptor(desc); refresh(); });
-        view.setOnAddEnemy((idx, desc) -> { level.getRooms().get(idx).addEnemyDescriptor(desc); refresh(); });
-        view.setOnRemoveEnemy((idx, desc) -> { level.getRooms().get(idx).removeEnemyDescriptor(desc); refresh(); });
+        view.setOnAddItem((idx, desc) -> {
+            level.getRooms().get(idx).addItemDescriptor(desc);
+            refresh();
+            if (idx == selectedIndex) view.showRoomPanel(level.getRooms().get(idx), idx);
+        });
+        view.setOnRemoveItem((idx, desc) -> {
+            level.getRooms().get(idx).removeItemDescriptor(desc);
+            refresh();
+            if (idx == selectedIndex) view.showRoomPanel(level.getRooms().get(idx), idx);
+        });
+        view.setOnAddEnemy((idx, desc) -> {
+            level.getRooms().get(idx).addEnemyDescriptor(desc);
+            refresh();
+            if (idx == selectedIndex) view.showRoomPanel(level.getRooms().get(idx), idx);
+        });
+        view.setOnRemoveEnemy((idx, desc) -> {
+            level.getRooms().get(idx).removeEnemyDescriptor(desc);
+            refresh();
+            if (idx == selectedIndex) view.showRoomPanel(level.getRooms().get(idx), idx);
+        });
         view.setOnSave(this::save);
         view.setOnCancel(() -> { view.hide(); onDone.run(); });
 
