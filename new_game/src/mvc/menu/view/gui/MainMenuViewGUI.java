@@ -254,12 +254,13 @@ public class MainMenuViewGUI extends MainMenuView {
             if (error != null) { errorLabel.setText(error); return; }
 
             MapChoice selectedMap = mapCombo.getValue();
+            
+            GameConfig.setSelectedMap(selectedMap == null || selectedMap.isRandom()
+                    ? null : selectedMap.path().toString());
+            
             if (onStartConfiguredGame != null) {
                 onStartConfiguredGame.accept(playerCount, new PlayerControls[]{ p1, p2 });
             }
-
-            GameConfig.setSelectedMap(selectedMap == null || selectedMap.isRandom()
-                ? null : selectedMap.path().toString());
 
             newGameStage.close();
         });
