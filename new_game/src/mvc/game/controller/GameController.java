@@ -3,6 +3,7 @@ package mvc.game.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.langage.Langage;
 import common.item.Item;
 import common.item.Weapon;
 import mvc.entity.model.HeroModel;
@@ -197,7 +198,7 @@ public class GameController extends Controller {
 
         for (int i = 0; i < 9; i++) {
             if (i >= inventory.size()) {
-                labels.add((i + 1) + ". (vide)");
+                labels.add((i + 1) + ". " + Langage.t("game.emptySlot"));
                 continue;
             }
 
@@ -205,7 +206,7 @@ public class GameController extends Controller {
             String text = (i + 1) + ". " + item.getName();
 
             if (item instanceof Weapon weapon && weapon == model.getEquippedWeapon()) {
-                text += " [équipée]";
+                text += " " + Langage.t("game.equipped");
             }
 
             labels.add(text);
@@ -216,14 +217,14 @@ public class GameController extends Controller {
 
     private void refreshInfoBars() {
         gameView.displayInfo(
-                "J1 | Arme équipée : " + heroModel.getEquippedWeaponName()
-                        + " | dégâts : " + heroModel.getDamage()
+                "J1 | " + Langage.t("game.weaponInfo") + " : " + heroModel.getEquippedWeaponName()
+                        + " | " + Langage.t("game.damage") + " : " + heroModel.getDamage()
         );
 
         if (secondHeroModel != null) {
             gameView.displayPlayer2Info(
-                    "J2 | Arme équipée : " + secondHeroModel.getEquippedWeaponName()
-                            + " | dégâts : " + secondHeroModel.getDamage()
+                    "J2 | " + Langage.t("game.weaponInfo") + " : " + secondHeroModel.getEquippedWeaponName()
+                            + " | " + Langage.t("game.damage") + " : " + secondHeroModel.getDamage()
             );
         }
     }

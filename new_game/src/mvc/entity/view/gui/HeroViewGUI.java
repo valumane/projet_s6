@@ -1,5 +1,6 @@
 package mvc.entity.view.gui;
 
+import common.langage.Langage;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -10,10 +11,10 @@ public class HeroViewGUI extends HeroView {
 
     private final VBox root = new VBox(8);
 
-    private final Label titleLabel = new Label("Stats hero");
-    private final Label heroLabel = new Label("Hero: ?");
+    private final Label titleLabel = new Label(Langage.t("game.statsHero"));
+    private final Label heroLabel = new Label(Langage.t("gui.heroLabel") + "?");
     private final Label hpLabel = new Label("HP: ?");
-    private final Label locationLabel = new Label("Location: ?");
+    private final Label locationLabel = new Label(Langage.t("gui.locationLabel") + "?");
 
     public HeroViewGUI() {
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
@@ -47,11 +48,11 @@ public class HeroViewGUI extends HeroView {
 
     @Override
     public void showLocation(String loc) {
-        Platform.runLater(() -> locationLabel.setText("Location: " + loc));
+        Platform.runLater(() -> locationLabel.setText(Langage.t("gui.locationLabel") + loc));
     }
 
     public void setHeroName(String name) {
-        Platform.runLater(() -> heroLabel.setText("Hero: " + name));
+        Platform.runLater(() -> heroLabel.setText(Langage.t("gui.heroLabel") + name));
     }
 
     @Override

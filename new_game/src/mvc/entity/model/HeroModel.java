@@ -6,6 +6,7 @@ import java.util.List;
 import common.entity.Hero;
 import common.item.Item;
 import common.map.Room;
+import common.langage.Langage;
 import mvc.mvc.Model;
 import mvc.map.MapLayout;
 import common.item.Scroll;
@@ -203,11 +204,11 @@ public class HeroModel implements Model {
         List<Item> inventory = hero.getInventory();
 
         if (slotIndex < 0 || slotIndex >= 9) {
-            return "Case invalide.";
+            return Langage.t("hero.invalidSlot");
         }
 
         if (slotIndex >= inventory.size()) {
-            return "Aucun objet dans cette case.";
+            return Langage.t("hero.noItemInSlot");
         }
 
         Item item = inventory.get(slotIndex);
@@ -217,19 +218,19 @@ public class HeroModel implements Model {
 
             if (equipped) {
                 syncState();
-                return "Arme équipée : " + weapon.getName() + " | dégâts : " + hero.getDamage();
+                return Langage.tf("hero.weaponEquipped", weapon.getName(), hero.getDamage());
             }
 
-            return "Impossible d'équiper cette arme.";
+            return Langage.t("hero.cannotEquip");
         }
 
         if (item instanceof Scroll scroll) {
             scroll.use(hero);
             syncState();
-            return "Sort utilisé : " + scroll.getName() + " | HP : " + hero.getHp() + "/" + hero.getMaxHp();
+            return Langage.tf("hero.spellUsed", scroll.getName(), hero.getHp(), hero.getMaxHp());
         }
 
-        return "Aucun effet : " + item.getName();
+        return Langage.tf("hero.noEffect", item.getName());
     }
 
     public void healPercent(int percent) {

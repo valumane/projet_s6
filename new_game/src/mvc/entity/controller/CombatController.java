@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import common.entity.Enemy;
+import common.langage.Langage;
 import common.item.Item;
 import common.map.Room;
 import mvc.entity.model.EnemyModel;
@@ -145,7 +146,7 @@ public class CombatController extends Controller {
 
         if (attacker.getEquippedWeapon() == null) {
 
-            displayMessage(attacker.getName() + " has no weapon equipped.");
+            displayMessage(Langage.tf("combat.noWeapon", attacker.getName()));
             return;
         }
 
@@ -380,7 +381,7 @@ public class CombatController extends Controller {
 
         target.flashHit(now);
 
-        displayMessage(attacker.getName() + " shoots an arrow at " + target.getEnemy().getName() + ".");
+        displayMessage(Langage.tf("combat.shootsArrow", attacker.getName(), target.getEnemy().getName()));
 
         displayEnemiesAndProjectiles();
     }
@@ -406,7 +407,7 @@ public class CombatController extends Controller {
                     enemyModel.flashHit(now);
                     projectile.kill();
 
-                    displayMessage("Arrow hits " + enemyModel.getEnemy().getName() + " for " + realDamage + " damage.");
+                    displayMessage(Langage.tf("combat.arrowHits", enemyModel.getEnemy().getName(), realDamage));
 
                     if (!enemyModel.isAlive()) {
                         handleEnemyDefeated(enemyModel);
@@ -419,7 +420,7 @@ public class CombatController extends Controller {
     }
 
     private void attackEnemy(HeroModel attacker, EnemyModel enemyModel, String attackName, long now,
-            boolean secondPlayer) {
+                             boolean secondPlayer) {
         int damage = attacker.getDamage();
         int realDamage = enemyModel.receiveDamage(damage);
 
@@ -431,8 +432,7 @@ public class CombatController extends Controller {
             viewGUI.displayHeroAttackFlash();
         }
 
-        displayMessage(attacker.getName() + " attacks " + enemyModel.getEnemy().getName()
-                + " with " + attackName + " for " + realDamage + " damage.");
+        displayMessage(Langage.tf("combat.meleeAttack", attacker.getName(), enemyModel.getEnemy().getName(), attackName, realDamage));
 
 
         if (!enemyModel.isAlive()) {
@@ -450,7 +450,7 @@ public class CombatController extends Controller {
             currentRoom.removeCharacter(enemyModel.getEnemy());
         }
 
-        displayMessage(enemyModel.getEnemy().getName() + " is defeated.");
+        displayMessage(Langage.tf("combat.defeated", enemyModel.getEnemy().getName()));
 
         for (HeroModel hero : getAliveHeroes()) {
             applyKillReward(hero);
@@ -471,11 +471,10 @@ public class CombatController extends Controller {
         rewardedHero.healPercent(10);
         rewardedHero.increaseDamageByPercent(20);
 
-        displayMessage(
-                rewardedHero.getName()
-                        + " kill reward: +10% HP regenerated and +20% damage. HP: "
-                        + rewardedHero.getHealth() + "/" + rewardedHero.getMaxHealth()
-                        + " | Damage: " + rewardedHero.getDamage() + ".");
+        displayMessage(Langage.tf("combat.killReward",
+                rewardedHero.getName(),
+                rewardedHero.getHealth(), rewardedHero.getMaxHealth(),
+                rewardedHero.getDamage()));
     }
 
     private void dropEnemyInventory(Enemy enemy, Room room) {
@@ -489,7 +488,7 @@ public class CombatController extends Controller {
             enemy.removeFromInventory(item);
             room.addItem(item);
 
-            displayMessage(enemy.getName() + " dropped " + item.getName() + ".");
+            displayMessage(Langage.tf("combat.dropped", enemy.getName(), item.getName()));
         }
     }
 
@@ -514,16 +513,16 @@ public class CombatController extends Controller {
             int bonus = 20;
             heroModel.increaseMaxHp(bonus);
 
-            String message = "Boss room cleared! Reward: +" + bonus + " max HP. Current HP: "
-                    + heroModel.getHealth() + "/" + heroModel.getMaxHealth() + ".";
+            String message = Langage.tf("combat.bossHP", bonus,
+                    heroModel.getHealth(), heroModel.getMaxHealth());
 
             displayMessage(message);
         } else {
             int bonus = 5;
             heroModel.increaseBaseDamage(bonus);
 
-            String message = "Boss room cleared! Reward: +" + bonus + " base damage. Current damage: "
-                    + heroModel.getDamage() + ".";
+            String message = Langage.tf("combat.bossDamage", bonus,
+                    heroModel.getDamage());
 
             displayMessage(message);
         }
