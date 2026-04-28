@@ -30,7 +30,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import common.language.Language;
+import common.languages.Languages;
 import mvc.GameConfig;
 import mvc.PlayerControls;
 import mvc.entity.view.gui.HeroViewGUI;
@@ -44,7 +44,7 @@ public class GameViewGUI extends GameView {
     private final BorderPane root = new BorderPane();
     private final Scene scene;
 
-    private final Button logsButton = new Button(Language.t("game.logs"));
+    private final Button logsButton = new Button(Languages.t("game.logs"));
 
     private Runnable onMoveNorth;
     private Runnable onMoveSouth;
@@ -86,11 +86,11 @@ public class GameViewGUI extends GameView {
     private boolean p2WestPressed;
 
     private final VBox inventoryBox1 = new VBox(8);
-    private final Label inventoryTitle1 = new Label(Language.t("game.inventoryTitle.p1"));
+    private final Label inventoryTitle1 = new Label(Languages.t("game.inventoryTitle.p1"));
     private final VBox inventoryItemsBox1 = new VBox(6);
 
     private final VBox inventoryBox2 = new VBox(8);
-    private final Label inventoryTitle2 = new Label(Language.t("game.inventoryTitle.p2"));
+    private final Label inventoryTitle2 = new Label(Languages.t("game.inventoryTitle.p2"));
     private final VBox inventoryItemsBox2 = new VBox(6);
 
     private LongConsumer onGameTick;
@@ -98,8 +98,8 @@ public class GameViewGUI extends GameView {
     private IntConsumer onUseInventorySlot;
     private IntConsumer onPlayer2UseInventorySlot;
 
-    private final Label infoLabel = new Label("J1 | " + Language.t("game.weaponInfo") + " : " + Language.t("game.weaponNone"));
-    private final Label infoLabel2 = new Label("J2 | " + Language.t("game.weaponInfo") + " : " + Language.t("game.weaponNone"));
+    private final Label infoLabel = new Label("J1 | " + Languages.t("game.weaponInfo") + " : " + Languages.t("game.weaponNone"));
+    private final Label infoLabel2 = new Label("J2 | " + Languages.t("game.weaponInfo") + " : " + Languages.t("game.weaponNone"));
 
     private final AnimationTimer timer = new AnimationTimer() {
         @Override
@@ -522,15 +522,15 @@ public class GameViewGUI extends GameView {
     }
 
     private void buildPauseOverlay() {
-        Label title = new Label(Language.t("pause.title"));
+        Label title = new Label(Languages.t("pause.title"));
         title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
-        Button continueButton = new Button(Language.t("pause.continue"));
-        Button resetButton = new Button(Language.t("pause.reset"));
-        Button saveButton = new Button(Language.t("pause.save"));
-        Button quitButton = new Button(Language.t("pause.quit"));
-        Button quitDesktopButton = new Button(Language.t("pause.quitDesktop"));
-        Button settingsButton = new Button(Language.t("pause.settings"));
+        Button continueButton = new Button(Languages.t("pause.continue"));
+        Button resetButton = new Button(Languages.t("pause.reset"));
+        Button saveButton = new Button(Languages.t("pause.save"));
+        Button quitButton = new Button(Languages.t("pause.quit"));
+        Button quitDesktopButton = new Button(Languages.t("pause.quitDesktop"));
+        Button settingsButton = new Button(Languages.t("pause.settings"));
 
         Button[] buttons = {
                 continueButton,
@@ -600,17 +600,17 @@ public class GameViewGUI extends GameView {
     }
 
     private void buildGameOverOverlay() {
-        Label title = new Label(Language.t("gameOver.title"));
+        Label title = new Label(Languages.t("gameOver.title"));
         title.setStyle("-fx-font-size: 42px; -fx-font-weight: bold;");
         title.setTextFill(Color.RED);
 
-        Label subtitle = new Label(Language.t("gameOver.subtitle"));
+        Label subtitle = new Label(Languages.t("gameOver.subtitle"));
         subtitle.setStyle("-fx-font-size: 18px;");
         subtitle.setTextFill(Color.WHITE);
 
-        Button restartButton = new Button(Language.t("gameOver.restart"));
-        Button menuButton = new Button(Language.t("gameOver.quitMenu"));
-        Button quitDesktopButton = new Button(Language.t("gameOver.quitDesktop"));
+        Button restartButton = new Button(Languages.t("gameOver.restart"));
+        Button menuButton = new Button(Languages.t("gameOver.quitMenu"));
+        Button quitDesktopButton = new Button(Languages.t("gameOver.quitDesktop"));
 
         Button[] buttons = {
                 restartButton,
@@ -798,7 +798,7 @@ public class GameViewGUI extends GameView {
             targetBox.getChildren().clear();
 
             if (items == null || items.isEmpty()) {
-                Label emptyLabel = new Label(Language.t("game.inventoryEmpty"));
+                Label emptyLabel = new Label(Languages.t("game.inventoryEmpty"));
                 targetBox.getChildren().add(emptyLabel);
                 return;
             }

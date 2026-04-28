@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import common.language.Language;
+import common.languages.Languages;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -32,11 +32,11 @@ public class MainMenuViewGUI extends MainMenuView {
     private final BorderPane root = new BorderPane();
     private final Scene scene;
 
-    private final Button newGameButton = new Button(Language.t("menu.newGame"));
-    private final Button continueButton = new Button(Language.t("menu.continue"));
-    private final Button createLevelButton = new Button(Language.t("menu.createLevel"));
-    private final Button settingsButton = new Button(Language.t("menu.settings"));
-    private final Button quitButton = new Button(Language.t("menu.quit"));
+    private final Button newGameButton = new Button(Languages.t("menu.newGame"));
+    private final Button continueButton = new Button(Languages.t("menu.continue"));
+    private final Button createLevelButton = new Button(Languages.t("menu.createLevel"));
+    private final Button settingsButton = new Button(Languages.t("menu.settings"));
+    private final Button quitButton = new Button(Languages.t("menu.quit"));
 
     private final VBox scoresBox = new VBox(8);
 
@@ -54,10 +54,10 @@ public class MainMenuViewGUI extends MainMenuView {
     public MainMenuViewGUI(Stage stage) {
         this.stage = stage;
 
-        Label titleLabel = new Label(Language.t("menu.title"));
+        Label titleLabel = new Label(Languages.t("menu.title"));
         titleLabel.setStyle("-fx-font-size: 34px; -fx-font-weight: bold;");
 
-        Label authorsLabel = new Label(Language.t("menu.authors"));
+        Label authorsLabel = new Label(Languages.t("menu.authors"));
         authorsLabel.setStyle("-fx-font-size: 13px;");
 
         newGameButton.setMaxWidth(Double.MAX_VALUE);
@@ -111,7 +111,7 @@ public class MainMenuViewGUI extends MainMenuView {
         centerBox.setPadding(new Insets(30));
         centerBox.setPrefWidth(400);
 
-        Label scoreTitle = new Label(Language.t("menu.highScores"));
+        Label scoreTitle = new Label(Languages.t("menu.highScores"));
         scoreTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         scoresBox.getChildren().add(scoreTitle);
@@ -130,7 +130,7 @@ public class MainMenuViewGUI extends MainMenuView {
         root.setStyle("-fx-background-color: #f4f4f4;");
 
         scene = new Scene(root, 1100, 700);
-        stage.setTitle(Language.t("menu.windowTitle"));
+        stage.setTitle(Languages.t("menu.windowTitle"));
         stage.setScene(scene);
     }
 
@@ -138,14 +138,14 @@ public class MainMenuViewGUI extends MainMenuView {
         Stage newGameStage = new Stage();
         newGameStage.initOwner(stage);
         newGameStage.initModality(Modality.APPLICATION_MODAL);
-        newGameStage.setTitle(Language.t("newGame.title"));
+        newGameStage.setTitle(Languages.t("newGame.title"));
 
         PlayerControls initialP1 = GameConfig.getPlayer1Controls();
         PlayerControls initialP2 = GameConfig.getPlayer2Controls();
 
         ToggleGroup playerCountGroup = new ToggleGroup();
-        RadioButton onePlayerRadio = new RadioButton(Language.t("newGame.1player"));
-        RadioButton twoPlayersRadio = new RadioButton(Language.t("newGame.2players"));
+        RadioButton onePlayerRadio = new RadioButton(Languages.t("newGame.1player"));
+        RadioButton twoPlayersRadio = new RadioButton(Languages.t("newGame.2players"));
         onePlayerRadio.setToggleGroup(playerCountGroup);
         twoPlayersRadio.setToggleGroup(playerCountGroup);
 
@@ -158,7 +158,7 @@ public class MainMenuViewGUI extends MainMenuView {
         HBox playerChoiceBox = new HBox(18, onePlayerRadio, twoPlayersRadio);
         playerChoiceBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label hintLabel = new Label(Language.t("newGame.hint"));
+        Label hintLabel = new Label(Languages.t("newGame.hint"));
         hintLabel.setWrapText(true);
         Label errorLabel = new Label("");
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
@@ -203,7 +203,7 @@ public class MainMenuViewGUI extends MainMenuView {
         playerCountGroup.selectedToggleProperty().addListener((obs, oldValue, newValue) -> refreshPlayer2Visibility.run());
         refreshPlayer2Visibility.run();
 
-        Button resetDefaultButton = new Button(Language.t("newGame.resetDefault"));
+        Button resetDefaultButton = new Button(Languages.t("newGame.resetDefault"));
         resetDefaultButton.setOnAction(e -> {
             PlayerControls defaultP1 = GameConfig.createDefaultPlayer1Controls();
             PlayerControls defaultP2 = GameConfig.createDefaultPlayer2Controls();
@@ -211,10 +211,10 @@ public class MainMenuViewGUI extends MainMenuView {
             applyControlsToCells(defaultP1, p1Forward, p1Backward, p1Left, p1Right, p1Interact, p1Inventory);
             applyControlsToCells(defaultP2, p2Forward, p2Backward, p2Left, p2Right, p2Interact, p2Inventory);
             errorLabel.setText("");
-            hintLabel.setText(Language.t("newGame.resetDone"));
+            hintLabel.setText(Languages.t("newGame.resetDone"));
         });
 
-        Button startButton = new Button(Language.t("newGame.start"));
+        Button startButton = new Button(Languages.t("newGame.start"));
         startButton.setDefaultButton(true);
         startButton.setOnAction(e -> {
             int playerCount = twoPlayersRadio.isSelected() ? 2 : 1;
@@ -235,25 +235,25 @@ public class MainMenuViewGUI extends MainMenuView {
             newGameStage.close();
         });
 
-        Button cancelButton = new Button(Language.t("newGame.cancel"));
+        Button cancelButton = new Button(Languages.t("newGame.cancel"));
         cancelButton.setCancelButton(true);
         cancelButton.setOnAction(e -> newGameStage.close());
 
         HBox buttonsBox = new HBox(12, resetDefaultButton, startButton, cancelButton);
         buttonsBox.setAlignment(Pos.CENTER_RIGHT);
 
-        Label title = new Label(Language.t("newGame.title"));
+        Label title = new Label(Languages.t("newGame.title"));
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
         VBox box = new VBox(14,
                 title,
                 playerChoiceBox,
                 hintLabel,
-                sectionTitle(Language.t("newGame.inventory")),
+                sectionTitle(Languages.t("newGame.inventory")),
                 inventoryGrid,
-                sectionTitle(Language.t("newGame.movement")),
+                sectionTitle(Languages.t("newGame.movement")),
                 movementGrid,
-                sectionTitle(Language.t("newGame.interact")),
+                sectionTitle(Languages.t("newGame.interact")),
                 interactGrid,
                 errorLabel,
                 buttonsBox);
@@ -273,20 +273,20 @@ public class MainMenuViewGUI extends MainMenuView {
             if (code == KeyCode.ESCAPE) {
                 waitingKeyCell.refreshText();
                 waitingKeyCell = null;
-                hintLabel.setText(Language.t("newGame.cancelCapture"));
+                hintLabel.setText(Languages.t("newGame.cancelCapture"));
                 event.consume();
                 return;
             }
 
             if (isForbiddenKey(code)) {
-                hintLabel.setText(Language.t("newGame.forbiddenKey"));
+                hintLabel.setText(Languages.t("newGame.forbiddenKey"));
                 event.consume();
                 return;
             }
 
             waitingKeyCell.setKeyCode(code);
             waitingKeyCell = null;
-            hintLabel.setText(Language.t("newGame.keyModified"));
+            hintLabel.setText(Languages.t("newGame.keyModified"));
             errorLabel.setText("");
             event.consume();
         });
@@ -299,21 +299,21 @@ public class MainMenuViewGUI extends MainMenuView {
         Stage settingsStage = new Stage();
         settingsStage.initOwner(stage);
         settingsStage.initModality(Modality.APPLICATION_MODAL);
-        settingsStage.setTitle(Language.t("settings.title"));
+        settingsStage.setTitle(Languages.t("settings.title"));
 
-        Label resolutionLabel = new Label(Language.t("settings.resolution"));
+        Label resolutionLabel = new Label(Languages.t("settings.resolution"));
 
         ComboBox<String> resolutionCombo = new ComboBox<>();
         resolutionCombo.getItems().addAll("1200x800", "1600x900");
         resolutionCombo.setValue(GameConfig.getResolution());
 
-        Label languageLabel = new Label(Language.t("settings.language"));
+        Label languageLabel = new Label(Languages.t("settings.language"));
 
         ComboBox<String> languageCombo = new ComboBox<>();
         languageCombo.getItems().addAll("Français", "English");
         languageCombo.setValue(GameConfig.getLanguage());
 
-        Button applyButton = new Button(Language.t("settings.apply"));
+        Button applyButton = new Button(Languages.t("settings.apply"));
         applyButton.setOnAction(e -> {
             GameConfig.setLanguage(languageCombo.getValue());
 
@@ -325,7 +325,7 @@ public class MainMenuViewGUI extends MainMenuView {
             settingsStage.close();
         });
 
-        Button closeButton = new Button(Language.t("settings.close"));
+        Button closeButton = new Button(Languages.t("settings.close"));
         closeButton.setOnAction(e -> settingsStage.close());
 
         VBox box = new VBox(12,
@@ -346,16 +346,16 @@ public class MainMenuViewGUI extends MainMenuView {
 
     /** Rafraîchit tous les textes du menu après changement de langue. */
     private void refreshMenuTexts() {
-        newGameButton.setText(Language.t("menu.newGame"));
-        continueButton.setText(Language.t("menu.continue"));
-        createLevelButton.setText(Language.t("menu.createLevel"));
-        settingsButton.setText(Language.t("menu.settings"));
-        quitButton.setText(Language.t("menu.quit"));
-        stage.setTitle(Language.t("menu.windowTitle"));
+        newGameButton.setText(Languages.t("menu.newGame"));
+        continueButton.setText(Languages.t("menu.continue"));
+        createLevelButton.setText(Languages.t("menu.createLevel"));
+        settingsButton.setText(Languages.t("menu.settings"));
+        quitButton.setText(Languages.t("menu.quit"));
+        stage.setTitle(Languages.t("menu.windowTitle"));
 
         if (!scoresBox.getChildren().isEmpty()
                 && scoresBox.getChildren().get(0) instanceof Label title) {
-            title.setText(Language.t("menu.highScores"));
+            title.setText(Languages.t("menu.highScores"));
         }
     }
 
@@ -384,12 +384,12 @@ public class MainMenuViewGUI extends MainMenuView {
             grid.add(createHeaderLabel("Slot " + (i + 1)), i + 1, 0);
         }
 
-        grid.add(createRowLabel(Language.t("newGame.player1")), 0, 1);
+        grid.add(createRowLabel(Languages.t("newGame.player1")), 0, 1);
         for (int i = 0; i < 9; i++) {
             grid.add(p1Inventory[i], i + 1, 1);
         }
 
-        Label p2Label = createRowLabel(Language.t("newGame.player2"));
+        Label p2Label = createRowLabel(Languages.t("newGame.player2"));
         player2Rows.add(p2Label);
         grid.add(p2Label, 0, 2);
 
@@ -414,18 +414,18 @@ public class MainMenuViewGUI extends MainMenuView {
     ) {
         GridPane grid = createGrid();
         grid.add(createHeaderLabel(""), 0, 0);
-        grid.add(createHeaderLabel(Language.t("newGame.forward")), 1, 0);
-        grid.add(createHeaderLabel(Language.t("newGame.backward")), 2, 0);
-        grid.add(createHeaderLabel(Language.t("newGame.moveRight")), 3, 0);
-        grid.add(createHeaderLabel(Language.t("newGame.moveLeft")), 4, 0);
+        grid.add(createHeaderLabel(Languages.t("newGame.forward")), 1, 0);
+        grid.add(createHeaderLabel(Languages.t("newGame.backward")), 2, 0);
+        grid.add(createHeaderLabel(Languages.t("newGame.moveRight")), 3, 0);
+        grid.add(createHeaderLabel(Languages.t("newGame.moveLeft")), 4, 0);
 
-        grid.add(createRowLabel(Language.t("newGame.player1")), 0, 1);
+        grid.add(createRowLabel(Languages.t("newGame.player1")), 0, 1);
         grid.add(p1Forward, 1, 1);
         grid.add(p1Backward, 2, 1);
         grid.add(p1Right, 3, 1);
         grid.add(p1Left, 4, 1);
 
-        Label p2Label = createRowLabel(Language.t("newGame.player2"));
+        Label p2Label = createRowLabel(Languages.t("newGame.player2"));
         player2Rows.add(p2Label);
         grid.add(p2Label, 0, 2);
 
@@ -444,12 +444,12 @@ public class MainMenuViewGUI extends MainMenuView {
     private GridPane buildInteractGrid(KeyCell p1Interact, KeyCell p2Interact, List<Region> player2Rows) {
         GridPane grid = createGrid();
         grid.add(createHeaderLabel(""), 0, 0);
-        grid.add(createHeaderLabel(Language.t("newGame.interact")), 1, 0);
+        grid.add(createHeaderLabel(Languages.t("newGame.interact")), 1, 0);
 
-        grid.add(createRowLabel(Language.t("newGame.player1")), 0, 1);
+        grid.add(createRowLabel(Languages.t("newGame.player1")), 0, 1);
         grid.add(p1Interact, 1, 1);
 
-        Label p2Label = createRowLabel(Language.t("newGame.player2"));
+        Label p2Label = createRowLabel(Languages.t("newGame.player2"));
         player2Rows.add(p2Label);
         player2Rows.add(p2Interact);
         grid.add(p2Label, 0, 2);
@@ -541,16 +541,16 @@ public class MainMenuViewGUI extends MainMenuView {
 
     private String validateControls(int playerCount, PlayerControls p1, PlayerControls p2) {
         if (p1.hasInternalConflict()) {
-            return Language.t("newGame.conflictP1");
+            return Languages.t("newGame.conflictP1");
         }
 
         if (playerCount == 2) {
             if (p2.hasInternalConflict()) {
-                return Language.t("newGame.conflictP2");
+                return Languages.t("newGame.conflictP2");
             }
 
             if (PlayerControls.hasConflict(p1, p2)) {
-                return Language.t("newGame.conflictBetween");
+                return Languages.t("newGame.conflictBetween");
             }
         }
 
@@ -606,7 +606,7 @@ public class MainMenuViewGUI extends MainMenuView {
         scoresBox.getChildren().removeIf(node -> node instanceof Label && node != scoresBox.getChildren().get(0));
 
         if (scores == null || scores.isEmpty()) {
-            scoresBox.getChildren().add(new Label(Language.t("menu.noScores")));
+            scoresBox.getChildren().add(new Label(Languages.t("menu.noScores")));
             return;
         }
 
@@ -640,21 +640,21 @@ public class MainMenuViewGUI extends MainMenuView {
             case DIGIT7 -> "è / 7";
             case DIGIT8 -> "_ / 8";
             case DIGIT9 -> "ç / 9";
-            case NUMPAD1 -> Language.t("key.numpad") + " 1";
-            case NUMPAD2 -> Language.t("key.numpad") + " 2";
-            case NUMPAD3 -> Language.t("key.numpad") + " 3";
-            case NUMPAD4 -> Language.t("key.numpad") + " 4";
-            case NUMPAD5 -> Language.t("key.numpad") + " 5";
-            case NUMPAD6 -> Language.t("key.numpad") + " 6";
-            case NUMPAD7 -> Language.t("key.numpad") + " 7";
-            case NUMPAD8 -> Language.t("key.numpad") + " 8";
-            case NUMPAD9 -> Language.t("key.numpad") + " 9";
+            case NUMPAD1 -> Languages.t("key.numpad") + " 1";
+            case NUMPAD2 -> Languages.t("key.numpad") + " 2";
+            case NUMPAD3 -> Languages.t("key.numpad") + " 3";
+            case NUMPAD4 -> Languages.t("key.numpad") + " 4";
+            case NUMPAD5 -> Languages.t("key.numpad") + " 5";
+            case NUMPAD6 -> Languages.t("key.numpad") + " 6";
+            case NUMPAD7 -> Languages.t("key.numpad") + " 7";
+            case NUMPAD8 -> Languages.t("key.numpad") + " 8";
+            case NUMPAD9 -> Languages.t("key.numpad") + " 9";
             case UP -> "↑";
             case DOWN -> "↓";
             case LEFT -> "←";
             case RIGHT -> "→";
-            case ENTER -> Language.t("key.enter");
-            case SPACE -> Language.t("key.space");
+            case ENTER -> Languages.t("key.enter");
+            case SPACE -> Languages.t("key.space");
             default -> code.getName();
         };
     }

@@ -1,9 +1,9 @@
-package common.language;
+package common.languages;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Language {
+public final class Languages {
 
     public enum Language {
         FR("Français"),
@@ -448,7 +448,7 @@ public final class Language {
         TRANSLATIONS.put(Language.EN, en);
     }
 
-    private Language() {
+    private Languages() {
     }
 
     /** Change la langue courante. */

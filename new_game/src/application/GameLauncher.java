@@ -6,7 +6,7 @@ import common.entity.Archer;
 import common.entity.Berserker;
 import common.entity.Enemy;
 import common.entity.Hero;
-import common.language.Language;
+import common.languages.Languages;
 import common.item.Bag;
 import common.item.Chest;
 import common.item.HealSpell;
@@ -62,14 +62,14 @@ public final class GameLauncher {
 
         if (existingHero == null) {
             hero = new Hero(
-                    Language.t("hero.name"),
+                    Languages.t("hero.name"),
                     100,
-                    new Bag(Language.t("hero.backpack"), DEFAULT_HERO_BAG_CAPACITY),
+                    new Bag(Languages.t("hero.backpack"), DEFAULT_HERO_BAG_CAPACITY),
                     startRoom,
                     DEFAULT_HERO_DAMAGE);
 
-            Weapon basicSword = new Weapon(Language.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
-            Weapon basicBow = new Weapon(Language.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
+            Weapon basicSword = new Weapon(Languages.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
+            Weapon basicBow = new Weapon(Languages.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
 
             hero.addItem(basicSword);
             hero.addItem(basicBow);
@@ -79,11 +79,11 @@ public final class GameLauncher {
             hero.setCurrentRoom(startRoom);
         }
 
-        Scroll healingScroll = new Scroll(Language.t("item.healingScroll"), new HealSpell(25));
-        Chest chest = new Chest(Language.t("item.woodenChest"), false, Language.t("item.chestDesc"));
+        Scroll healingScroll = new Scroll(Languages.t("item.healingScroll"), new HealSpell(25));
+        Chest chest = new Chest(Languages.t("item.woodenChest"), false, Languages.t("item.chestDesc"));
 
-        chest.addItem(new Item(Language.t("item.ruby"), Language.t("item.rubyDesc")));
-        chest.addItem(new Item(Language.t("item.coin"), Language.t("item.coinDesc")));
+        chest.addItem(new Item(Languages.t("item.ruby"), Languages.t("item.rubyDesc")));
+        chest.addItem(new Item(Languages.t("item.coin"), Languages.t("item.coinDesc")));
 
         startRoom.addItem(healingScroll);
         startRoom.addItem(chest);
@@ -138,14 +138,14 @@ public final class GameLauncher {
 
         if (safePlayerCount == 2) {
             Hero secondHero = new Hero(
-                    Language.t("hero.name2"),
+                    Languages.t("hero.name2"),
                     100,
-                    new Bag(Language.t("hero.backpackP2"), DEFAULT_HERO_BAG_CAPACITY),
+                    new Bag(Languages.t("hero.backpackP2"), DEFAULT_HERO_BAG_CAPACITY),
                     startRoom,
                     DEFAULT_HERO_DAMAGE);
 
-            Weapon secondBasicSword = new Weapon(Language.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
-            Weapon secondBasicBow = new Weapon(Language.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
+            Weapon secondBasicSword = new Weapon(Languages.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
+            Weapon secondBasicBow = new Weapon(Languages.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
 
             secondHero.addItem(secondBasicSword);
             secondHero.addItem(secondBasicBow);
@@ -169,7 +169,7 @@ public final class GameLauncher {
         });
 
         gameViewGUI.setOnSaveGame(() -> {
-            logWindowGUI.append(Language.t("game.saveNotReady"));
+            logWindowGUI.append(Languages.t("game.saveNotReady"));
             logWindowGUI.showWindow();
         });
 
@@ -181,7 +181,7 @@ public final class GameLauncher {
         gameViewGUI.setOnQuitToDesktop(javafx.application.Platform::exit);
 
         gameViewGUI.setOnSettings(() -> {
-            logWindowGUI.append(Language.t("game.settingsNotReady"));
+            logWindowGUI.append(Languages.t("game.settingsNotReady"));
             logWindowGUI.showWindow();
         });
 
@@ -198,7 +198,7 @@ public final class GameLauncher {
                 roomViewCLI,
                 roomViewGUI,
                 () -> {
-                    logWindowGUI.append(Language.t("game.newLevel"));
+                    logWindowGUI.append(Languages.t("game.newLevel"));
                     logWindowGUI.showWindow();
                     gameViewGUI.hide();
                     GameLauncher.startRandomGame(stage, safePlayerCount, hero);

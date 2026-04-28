@@ -3,7 +3,7 @@ package mvc.menu.controller;
 import java.util.List;
 
 import application.GameLauncher;
-import common.language.Language;
+import common.languages.Languages;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import mvc.GameConfig;
@@ -53,11 +53,11 @@ public class MainMenuController extends Controller {
         });
 
         view.setOnContinue(() -> {
-            System.out.println(Language.t("game.continueNotReady"));
+            System.out.println(Languages.t("game.continueNotReady"));
         });
 
         view.setOnCreateLevel(() -> {
-            System.out.println(Language.t("game.createLevelNotReady"));
+            System.out.println(Languages.t("game.createLevelNotReady"));
         });
 
         view.setOnSettings(view::showSettingsWindow);

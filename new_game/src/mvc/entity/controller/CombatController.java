@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import common.entity.Enemy;
-import common.language.Language;
+import common.languages.Languages;
 import common.item.Item;
 import common.map.Room;
 import mvc.entity.model.EnemyModel;
@@ -146,7 +146,7 @@ public class CombatController extends Controller {
 
         if (attacker.getEquippedWeapon() == null) {
 
-            displayMessage(Language.tf("combat.noWeapon", attacker.getName()));
+            displayMessage(Languages.tf("combat.noWeapon", attacker.getName()));
             return;
         }
 
@@ -381,7 +381,7 @@ public class CombatController extends Controller {
 
         target.flashHit(now);
 
-        displayMessage(Language.tf("combat.shootsArrow", attacker.getName(), target.getEnemy().getName()));
+        displayMessage(Languages.tf("combat.shootsArrow", attacker.getName(), target.getEnemy().getName()));
 
         displayEnemiesAndProjectiles();
     }
@@ -407,7 +407,7 @@ public class CombatController extends Controller {
                     enemyModel.flashHit(now);
                     projectile.kill();
 
-                    displayMessage(Language.tf("combat.arrowHits", enemyModel.getEnemy().getName(), realDamage));
+                    displayMessage(Languages.tf("combat.arrowHits", enemyModel.getEnemy().getName(), realDamage));
 
                     if (!enemyModel.isAlive()) {
                         handleEnemyDefeated(enemyModel);
@@ -432,7 +432,7 @@ public class CombatController extends Controller {
             viewGUI.displayHeroAttackFlash();
         }
 
-        displayMessage(Language.tf("combat.meleeAttack", attacker.getName(), enemyModel.getEnemy().getName(), attackName, realDamage));
+        displayMessage(Languages.tf("combat.meleeAttack", attacker.getName(), enemyModel.getEnemy().getName(), attackName, realDamage));
 
 
         if (!enemyModel.isAlive()) {
@@ -450,7 +450,7 @@ public class CombatController extends Controller {
             currentRoom.removeCharacter(enemyModel.getEnemy());
         }
 
-        displayMessage(Language.tf("combat.defeated", enemyModel.getEnemy().getName()));
+        displayMessage(Languages.tf("combat.defeated", enemyModel.getEnemy().getName()));
 
         for (HeroModel hero : getAliveHeroes()) {
             applyKillReward(hero);
@@ -471,7 +471,7 @@ public class CombatController extends Controller {
         rewardedHero.healPercent(10);
         rewardedHero.increaseDamageByPercent(20);
 
-        displayMessage(Language.tf("combat.killReward",
+        displayMessage(Languages.tf("combat.killReward",
                 rewardedHero.getName(),
                 rewardedHero.getHealth(), rewardedHero.getMaxHealth(),
                 rewardedHero.getDamage()));
@@ -488,7 +488,7 @@ public class CombatController extends Controller {
             enemy.removeFromInventory(item);
             room.addItem(item);
 
-            displayMessage(Language.tf("combat.dropped", enemy.getName(), item.getName()));
+            displayMessage(Languages.tf("combat.dropped", enemy.getName(), item.getName()));
         }
     }
 
@@ -513,7 +513,7 @@ public class CombatController extends Controller {
             int bonus = 20;
             heroModel.increaseMaxHp(bonus);
 
-            String message = Language.tf("combat.bossHP", bonus,
+            String message = Languages.tf("combat.bossHP", bonus,
                     heroModel.getHealth(), heroModel.getMaxHealth());
 
             displayMessage(message);
@@ -521,7 +521,7 @@ public class CombatController extends Controller {
             int bonus = 5;
             heroModel.increaseBaseDamage(bonus);
 
-            String message = Language.tf("combat.bossDamage", bonus,
+            String message = Languages.tf("combat.bossDamage", bonus,
                     heroModel.getDamage());
 
             displayMessage(message);

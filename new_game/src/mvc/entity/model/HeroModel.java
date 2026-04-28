@@ -6,7 +6,7 @@ import java.util.List;
 import common.entity.Hero;
 import common.item.Item;
 import common.map.Room;
-import common.language.Language;
+import common.languages.Languages;
 import mvc.mvc.Model;
 import mvc.map.MapLayout;
 import common.item.Scroll;
@@ -204,11 +204,11 @@ public class HeroModel implements Model {
         List<Item> inventory = hero.getInventory();
 
         if (slotIndex < 0 || slotIndex >= 9) {
-            return Language.t("hero.invalidSlot");
+            return Languages.t("hero.invalidSlot");
         }
 
         if (slotIndex >= inventory.size()) {
-            return Language.t("hero.noItemInSlot");
+            return Languages.t("hero.noItemInSlot");
         }
 
         Item item = inventory.get(slotIndex);
@@ -218,19 +218,19 @@ public class HeroModel implements Model {
 
             if (equipped) {
                 syncState();
-                return Language.tf("hero.weaponEquipped", weapon.getName(), hero.getDamage());
+                return Languages.tf("hero.weaponEquipped", weapon.getName(), hero.getDamage());
             }
 
-            return Language.t("hero.cannotEquip");
+            return Languages.t("hero.cannotEquip");
         }
 
         if (item instanceof Scroll scroll) {
             scroll.use(hero);
             syncState();
-            return Language.tf("hero.spellUsed", scroll.getName(), hero.getHp(), hero.getMaxHp());
+            return Languages.tf("hero.spellUsed", scroll.getName(), hero.getHp(), hero.getMaxHp());
         }
 
-        return Language.tf("hero.noEffect", item.getName());
+        return Languages.tf("hero.noEffect", item.getName());
     }
 
     public void healPercent(int percent) {
