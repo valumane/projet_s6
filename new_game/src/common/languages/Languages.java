@@ -66,6 +66,9 @@ public final class Languages {
         fr.put("newGame.backward", "Reculer");
         fr.put("newGame.moveRight", "Aller à droite");
         fr.put("newGame.moveLeft", "Aller à gauche");
+        fr.put("newGame.mapChoice", "Carte :");
+        fr.put("newGame.mapRandom", "Donjon aléatoire");
+        fr.put("newGame.mapCustom", "custom");
 
         // ── Fenêtre paramètres ──
         fr.put("settings.title", "Paramètres");
@@ -277,6 +280,9 @@ public final class Languages {
         en.put("newGame.backward", "Backward");
         en.put("newGame.moveRight", "Move right");
         en.put("newGame.moveLeft", "Move left");
+        en.put("newGame.mapChoice", "Map:");
+        en.put("newGame.mapRandom", "Random dungeon");
+        en.put("newGame.mapCustom", "custom");
 
         // ── Settings window ──
         en.put("settings.title", "Settings");

@@ -1,10 +1,11 @@
 package mvc.menu.view.gui;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
 import common.languages.Languages;
+import common.leveleditor.LevelRegistry;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,10 +21,13 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import mvc.GameConfig;
 import mvc.PlayerControls;
 
 public final class GameConfigurationDialog {
+
+    public record MapChoice(String displayName, Path path, boolean isRandom) {}
 
     public static final class Result {
         private final int playerCount;
@@ -31,19 +35,22 @@ public final class GameConfigurationDialog {
         private final PlayerControls player1Controls;
         private final PlayerControls player2Controls;
         private final String language;
+        private final String selectedMapPath;
 
         public Result(
                 int playerCount,
                 String resolution,
                 String language,
                 PlayerControls player1Controls,
-                PlayerControls player2Controls
+                PlayerControls player2Controls,
+                String selectedMapPath
         ) {
             this.playerCount = playerCount;
             this.resolution = resolution;
             this.language = language;
             this.player1Controls = player1Controls;
             this.player2Controls = player2Controls;
+            this.selectedMapPath = selectedMapPath;
         }
 
         public String getLanguage() {
@@ -64,6 +71,10 @@ public final class GameConfigurationDialog {
 
         public PlayerControls getPlayer2Controls() {
             return player2Controls;
+        }
+
+        public String getSelectedMapPath() {
+            return selectedMapPath;
         }
     }
 
@@ -96,6 +107,44 @@ public final class GameConfigurationDialog {
 
         HBox playerChoiceBox = new HBox(18, onePlayerRadio, twoPlayersRadio);
         playerChoiceBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label mapLabel = new Label(Languages.t("newGame.mapChoice"));
+        mapLabel.setStyle("-fx-font-weight: bold;");
+        mapLabel.setVisible(allowPlayerCountChange);
+        mapLabel.setManaged(allowPlayerCountChange);
+
+        ComboBox<MapChoice> mapCombo = new ComboBox<>();
+        mapCombo.setVisible(allowPlayerCountChange);
+        mapCombo.setManaged(allowPlayerCountChange);
+
+        if (allowPlayerCountChange) {
+            mapCombo.getItems().add(new MapChoice(Languages.t("newGame.mapRandom"), null, true));
+
+            try {
+                for (LevelRegistry.LevelSummary s : LevelRegistry.loadSummaries()) {
+                    mapCombo.getItems().add(
+                        new MapChoice(s.name() + " (" + Languages.t("newGame.mapCustom") + ")", s.path(), false)
+                    );
+                }
+            } catch (Exception ignored) {
+            }
+
+            mapCombo.setConverter(new StringConverter<>() {
+                @Override public String toString(MapChoice c) { return c == null ? "" : c.displayName(); }
+                @Override public MapChoice fromString(String s) { return null; }
+            });
+            mapCombo.getSelectionModel().selectFirst();
+            mapCombo.setMaxWidth(Double.MAX_VALUE);
+
+            String lastMap = GameConfig.getSelectedMap();
+            if (lastMap != null) {
+                mapCombo.getItems().stream()
+                    .filter(c -> !c.isRandom() && c.path() != null && c.path().toString().equals(lastMap))
+                    .findFirst()
+                    .ifPresent(c -> mapCombo.getSelectionModel().select(c));
+            }
+        }
+
 
         Label resolutionLabel = new Label("Résolution");
         ComboBox<String> resolutionCombo = new ComboBox<>();
@@ -182,13 +231,20 @@ public final class GameConfigurationDialog {
                 return;
             }
 
+            String selectedMapPath = null;
+            if (allowPlayerCountChange && mapCombo.getValue() != null && !mapCombo.getValue().isRandom()) {
+                selectedMapPath = mapCombo.getValue().path().toString();
+            }
+            GameConfig.setSelectedMap(selectedMapPath);
+
             if (onApply != null) {
                 onApply.accept(new Result(
                         playerCount,
                         resolutionCombo.getValue(),
                         languageCombo.getValue(),
                         p1,
-                        p2
+                        p2,
+                        selectedMapPath
                 ));
             }
 
@@ -209,6 +265,8 @@ public final class GameConfigurationDialog {
                 14,
                 title,
                 playerChoiceBox,
+                mapLabel,
+                mapCombo,
                 resolutionLabel,
                 resolutionCombo,
                 languageLabel,

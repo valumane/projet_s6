@@ -172,6 +172,9 @@ public class MainMenuViewGUI extends MainMenuView {
                 GameConfig.setPlayer1Controls(result.getPlayer1Controls());
             }
 
+            // null = donjon aléatoire sinon chemin absolu du fichier .lvl
+            GameConfig.setSelectedMap(result.getSelectedMapPath());
+
             refreshTexts();
 
             if (onApplySettings != null) {
