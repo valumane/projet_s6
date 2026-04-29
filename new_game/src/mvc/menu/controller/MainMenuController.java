@@ -3,6 +3,7 @@ package mvc.menu.controller;
 import java.util.List;
 
 import application.GameLauncher;
+import application.LevelEditorLauncher;
 import common.languages.Languages;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -49,7 +50,20 @@ public class MainMenuController extends Controller {
             }
 
             GameConfig.setPlayerCount(safePlayerCount);
-            GameLauncher.startRandomGame(stage, safePlayerCount);
+
+            String mapPath = GameConfig.getSelectedMap();
+            if (mapPath == null) {
+                GameLauncher.startRandomGame(stage);
+            } else {
+                try {
+                    var levelData = common.leveleditor.LevelRegistry.loadLevel(java.nio.file.Path.of(mapPath));
+                    var dungeon = common.leveleditor.LevelDataConverter.toDungeonData(levelData);
+                    GameLauncher.startWithDungeon(stage, dungeon, safePlayerCount);
+                } catch (Exception e) {
+                    System.err.println("Erreur chargement niveau : " + e.getMessage());
+                    GameLauncher.startRandomGame(stage);
+                }
+            }
         });
 
         view.setOnContinue(() -> {
@@ -57,7 +71,7 @@ public class MainMenuController extends Controller {
         });
 
         view.setOnCreateLevel(() -> {
-            System.out.println(Languages.t("game.createLevelNotReady"));
+            LevelEditorLauncher.show(stage);
         });
 
         view.setOnSettings(view::showSettingsWindow);

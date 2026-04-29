@@ -14,10 +14,10 @@ public final class GameConfig {
     private static PlayerControls player1Controls = createDefaultPlayer1Controls();
     private static PlayerControls player2Controls = createDefaultPlayer2Controls();
 
+    private static String selectedMapPath = null;
+
     private GameConfig() {
     }
-
-    // ── Langue ──
 
     public static void setLanguage(String value) {
         if ("English".equals(value) || "EN".equals(value)) {
@@ -30,8 +30,6 @@ public final class GameConfig {
     public static String getLanguage() {
         return Languages.getLanguage().getDisplayName();
     }
-
-    // ── Contrôles ──
 
     public static PlayerControls createDefaultPlayer1Controls() {
         return new PlayerControls(
@@ -186,5 +184,13 @@ public final class GameConfig {
 
     public static int getWindowHeight() {
         return windowHeight;
+    }
+
+    public static void setSelectedMap(String path) {
+        selectedMapPath = path;
+    }
+
+    public static String getSelectedMap() {
+        return selectedMapPath;
     }
 }

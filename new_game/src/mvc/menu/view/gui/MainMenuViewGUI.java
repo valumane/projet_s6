@@ -58,7 +58,7 @@ public class MainMenuViewGUI extends MainMenuView {
         quitButton.setMaxWidth(Double.MAX_VALUE);
 
         continueButton.setDisable(true);
-        createLevelButton.setDisable(true);
+        //createLevelButton.setDisable(true);
 
         newGameButton.setOnAction(e -> {
             if (onNewGame != null) {

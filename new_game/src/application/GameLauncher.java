@@ -229,4 +229,162 @@ public final class GameLauncher {
 
         gameViewGUI.show();
     }
+
+    public static void startWithDungeon(Stage stage, DungeonData dungeon) {
+        startWithDungeon(stage, dungeon, GameConfig.getPlayerCount());
+    }
+
+    public static void startWithDungeon(Stage stage, DungeonData dungeon, int playerCount) {
+        int safePlayerCount = playerCount == 2 ? 2 : 1;
+        GameConfig.setPlayerCount(safePlayerCount);
+
+        Room startRoom = dungeon.getStartRoom();
+        Room bossRoom = dungeon.getBossRoom();
+
+        Hero hero = new Hero(
+                Languages.t("hero.name"),
+                100,
+                new Bag(Languages.t("hero.backpack"), DEFAULT_HERO_BAG_CAPACITY),
+                startRoom,
+                DEFAULT_HERO_DAMAGE);
+
+        Weapon basicSword = new Weapon(Languages.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
+        Weapon basicBow = new Weapon(Languages.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
+        hero.addItem(basicSword);
+        hero.addItem(basicBow);
+        hero.equipWeapon(basicSword);
+
+        if (startRoom.getItems().isEmpty()) {
+            Scroll healingScroll = new Scroll(Languages.t("item.healingScroll"), new HealSpell(25));
+            Chest chest = new Chest(Languages.t("item.woodenChest"), false, Languages.t("item.chestDesc"));
+            chest.addItem(new Item(Languages.t("item.ruby"), Languages.t("item.rubyDesc")));
+            chest.addItem(new Item(Languages.t("item.coin"), Languages.t("item.coinDesc")));
+            startRoom.addItem(healingScroll);
+            startRoom.addItem(chest);
+        }
+
+        List<Enemy> keyCandidates = new ArrayList<>();
+        for (Room room : dungeon.getRooms()) {
+            if (room == startRoom || room == bossRoom) {
+                continue;
+            }
+            for (common.entity.Character c : room.getCharacters()) {
+                if (c instanceof Enemy e) {
+                    keyCandidates.add(e);
+                }
+            }
+        }
+
+        if (!keyCandidates.isEmpty()) {
+            Enemy keyHolder = keyCandidates.get(ThreadLocalRandom.current().nextInt(keyCandidates.size()));
+            keyHolder.addToInventory(dungeon.getGoldenKey());
+        } else {
+            startRoom.addItem(dungeon.getGoldenKey());
+        }
+
+        if (bossRoom != null && bossRoom.getCharacters().isEmpty()) {
+            bossRoom.addCharacter(new Berserker(5));
+            bossRoom.addCharacter(new Archer(5));
+        }
+
+        HeroModel heroModel = new HeroModel(hero);
+        HeroModel secondHeroModel = null;
+
+        RoomModel roomModel = new RoomModel(heroModel.getRoom());
+
+        HeroViewCLI heroViewCLI = new HeroViewCLI();
+        RoomViewCLI roomViewCLI = new RoomViewCLI();
+
+        HeroViewGUI heroViewGUI = new HeroViewGUI();
+        HeroViewGUI secondHeroViewGUI = null;
+
+        if (safePlayerCount == 2) {
+            Hero secondHero = new Hero(
+                    Languages.t("hero.name2"),
+                    100,
+                    new Bag(Languages.t("hero.backpackP2"), DEFAULT_HERO_BAG_CAPACITY),
+                    startRoom,
+                    DEFAULT_HERO_DAMAGE);
+
+            Weapon sword2 = new Weapon(Languages.t("item.basicSword"), 10, Weapon.WeaponType.MELEE);
+            Weapon bow2 = new Weapon(Languages.t("item.basicBow"), 10, Weapon.WeaponType.RANGED);
+            secondHero.addItem(sword2);
+            secondHero.addItem(bow2);
+            secondHero.equipWeapon(sword2);
+
+            secondHeroModel = new HeroModel(secondHero);
+            secondHeroModel.setPosition(heroModel.getX() + 55, heroModel.getY());
+            secondHeroViewGUI = new HeroViewGUI();
+        }
+
+        LogWindowGUI logWindowGUI = new LogWindowGUI();
+        RoomViewGUI roomViewGUI = new RoomViewGUI(logWindowGUI::append);
+
+        GameViewGUI gameViewGUI = new GameViewGUI(stage, heroViewGUI, secondHeroViewGUI, roomViewGUI);
+        gameViewGUI.setOnShowLogs(logWindowGUI::showWindow);
+
+        gameViewGUI.setOnResetGame(() -> {
+            gameViewGUI.hide();
+            GameLauncher.startWithDungeon(stage, dungeon, safePlayerCount);
+        });
+
+        gameViewGUI.setOnSaveGame(() -> {
+            logWindowGUI.append(Languages.t("game.saveNotReady"));
+            logWindowGUI.showWindow();
+        });
+
+        gameViewGUI.setOnQuitToMenu(() -> {
+            gameViewGUI.hide();
+            MenuLauncher.showMainMenu(stage);
+        });
+
+        gameViewGUI.setOnQuitToDesktop(javafx.application.Platform::exit);
+
+        gameViewGUI.setOnSettings(() -> {
+            GameConfigurationDialog.show(stage, Languages.t("menu.settings"), false, result -> {
+                GameConfig.setLanguage(result.getLanguage());
+                GameConfig.setResolution(result.getResolution());
+
+                if (GameConfig.isTwoPlayers()) {
+                    GameConfig.setPlayerControls(result.getPlayer1Controls(), result.getPlayer2Controls());
+                } else {
+                    GameConfig.setPlayer1Controls(result.getPlayer1Controls());
+                }
+
+                gameViewGUI.applyCurrentResolution();
+            });
+        });
+
+        new HeroController(heroModel, heroViewCLI, heroViewGUI);
+
+        if (secondHeroModel != null && secondHeroViewGUI != null) {
+            new HeroController(secondHeroModel, new HeroViewCLI(), secondHeroViewGUI);
+        }
+
+        RoomController roomController = new RoomController(
+                roomModel,
+                heroModel,
+                secondHeroModel,
+                roomViewCLI,
+                roomViewGUI,
+                () -> {
+                    logWindowGUI.append(Languages.t("game.newLevel"));
+                    logWindowGUI.showWindow();
+                    gameViewGUI.hide();
+                    MenuLauncher.showMainMenu(stage);
+                });
+
+        new GameController(new GameModel(), gameViewGUI, roomController, heroModel, secondHeroModel);
+
+        heroViewGUI.setHeroName(hero.getName());
+        heroModel.syncState();
+
+        if (secondHeroModel != null && secondHeroViewGUI != null) {
+            secondHeroViewGUI.setHeroName(secondHeroModel.getHero().getName());
+            secondHeroModel.syncState();
+        }
+
+        roomController.onEnterRoom();
+        gameViewGUI.show();
+    }
 }
