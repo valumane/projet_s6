@@ -19,20 +19,20 @@ JAVA_CLI_FLAGS=-cp $(OUT_DIR)
 all: cli
 
 build:
-    rm -rf $(OUT_DIR) $(SOURCES)
-    find $(SRC_DIR) -name "*.java" > $(SOURCES)
-    $(JAVAC) $(JAVAC_FLAGS) @$(SOURCES)
+	rm -rf $(OUT_DIR) $(SOURCES)
+	find $(SRC_DIR) -name "*.java" > $(SOURCES)
+	$(JAVAC) $(JAVAC_FLAGS) @$(SOURCES)
 
 cli: build
-    $(JAVA) $(JAVA_CLI_FLAGS) application.Main
+	$(JAVA) $(JAVA_CLI_FLAGS) application.Main
 
 gui: build
-    $(JAVA) $(JAVA_FX_FLAGS) application.GuiMain
+	$(JAVA) $(JAVA_FX_FLAGS) application.GuiMain
 
 random: build
-    $(JAVA) $(JAVA_FX_FLAGS) application.RandomGuiMain
+	$(JAVA) $(JAVA_FX_FLAGS) application.RandomGuiMain
 
 clean:
-    rm -rf $(OUT_DIR) $(SOURCES)
+	rm -rf $(OUT_DIR) $(SOURCES)
 
 rebuild: clean build
